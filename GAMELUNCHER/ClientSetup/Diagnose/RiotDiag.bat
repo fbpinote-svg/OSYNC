@@ -1,0 +1,3 @@
+@echo off
+echo Checking Riot files, please wait...
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\_system\RiotDiag.ps1"

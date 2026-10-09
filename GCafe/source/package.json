@@ -1,0 +1,21 @@
+{
+  "name": "0jayshop-timer-client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "electron .",
+    "dist": "next build && electron-packager . 0JAYSHOP --platform=win32 --arch=x64 --out=dist --overwrite --ignore=dist"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.3.0"
+  }
+}

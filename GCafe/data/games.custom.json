@@ -1,0 +1,38 @@
+{
+  "_help": "Games that are not found automatically (not Steam / Riot / EA app). exe can be one path or a list of candidate paths; the first that exists is used. {GAMELUNCHER} = H:\\OSYNC\\GAMELUNCHER. root = game folder (zPoster.jpg is looked up there). platform = badge on the card (Steam, EA app, Riot, Epic, Ubisoft, Rockstar, Garena); empty = the category is shown. To change a found game add an entry with only its id and the fields to change; \"hide\": true removes it. Run tools\\Build-GameList.bat after editing.",
+  "games": [
+    { "id": "pointblank",        "title": "Point Blank",              "cat": "Online", "exe": "J:\\Online\\PointBlank\\PBLauncher.exe" },
+    { "id": "betapb",            "title": "BetaPB",                   "cat": "Online", "exe": "J:\\PvP\\BETAPB\\BetaPB Launcher.exe" },
+    { "id": "talesrunner",       "title": "TalesRunner",              "cat": "Online", "exe": "J:\\Online\\Talesrunner\\talesrunner.exe" },
+    { "id": "zone4",             "title": "Zone4",                    "cat": "Online", "exe": "J:\\Online\\Zone4\\Zone4Launcher.exe" },
+    { "id": "ragnarok-classic",  "title": "Ragnarok Classic",         "cat": "Online", "exe": "J:\\Online\\RagnarokClassic\\Ragnarok.exe" },
+    { "id": "ragnarok-online",   "title": "Ragnarok Online",          "cat": "Online", "exe": "J:\\Online\\RagnarokOnline\\Ragnarok.exe" },
+    { "id": "yulgang",           "title": "Yulgang",                  "cat": "Online", "exe": "I:\\Online\\Yulgang\\launcher.exe" },
+    { "id": "warz",              "title": "WarZ TH",                  "cat": "Online", "exe": "G:\\Online\\WarZ TH\\Launcher.exe" },
+    { "id": "xshot",             "title": "XSHOT",                    "cat": "Online", "exe": "E:\\Online\\XSHOT\\XSHOT.exe" },
+    { "id": "warframe",          "title": "Warframe",                 "cat": "Online", "exe": "E:\\Online\\Warframe\\Downloaded\\Public\\Warframe.x64.exe", "args": "-cluster:public", "root": "E:\\Online\\Warframe" },
+    { "id": "fivem",             "title": "FiveM (GTA V Roleplay)",   "cat": "Online", "exe": "J:\\Online\\FiveM\\FiveM.exe" },
+    { "id": "gtasa-nt",          "title": "GTA SA NewThings",         "cat": "Online", "exe": "H:\\รวม NT\\NTNT\\n-launcher.exe", "root": "H:\\รวม NT" },
+    { "id": "minecraft",         "title": "Minecraft (TLauncher)",    "cat": "Online", "exe": "G:\\Minecraft\\TLauncher.exe" },
+
+    { "id": "genshin",           "title": "Genshin Impact",           "cat": "Mobile", "exe": "H:\\Mobile\\Genshin Impact\\Genshin Impact game\\GenshinImpact.exe", "root": "H:\\Mobile\\Genshin Impact" },
+    { "id": "star-rail",         "title": "Honkai: Star Rail",        "cat": "Mobile", "exe": "E:\\Mobile\\Honkai Star Rail\\Star Rail Games\\StarRail.exe", "root": "E:\\Mobile\\Honkai Star Rail" },
+    { "id": "zzz",               "title": "Zenless Zone Zero",        "cat": "Mobile", "exe": "E:\\Mobile\\Zenless Zone Zero\\ZenlessZoneZero Game\\ZenlessZoneZero.exe", "root": "E:\\Mobile\\Zenless Zone Zero" },
+    { "id": "nte",               "title": "Neverness To Everness",    "cat": "Mobile", "exe": "F:\\Mobile\\Neverness To Everness\\NTEGlobalLauncher.exe" },
+    { "id": "arena-breakout",    "title": "Arena Breakout: Infinite", "cat": "Mobile", "exe": "I:\\Mobile\\Arena Breakout Infinite\\launcher\\arena_breakout_infinite_launcher.exe", "root": "I:\\Mobile\\Arena Breakout Infinite" },
+    { "id": "endfield",          "title": "Arknights: Endfield",      "cat": "Mobile", "exe": "I:\\Mobile\\Arknights Endfield\\Launcher.exe" },
+    { "id": "soul-land",         "title": "Soul Land: New World",     "cat": "Mobile", "exe": "I:\\Mobile\\Soul Land New World\\dldlslkxy.exe" },
+    { "id": "fconline",          "title": "FC Online",                "cat": "Garena", "platform": "Garena", "exe": "D:\\FIFA\\32836\\launcher\\fco-th.exe", "root": "D:\\FIFA\\32836" },
+    { "id": "deltaforce-garena", "title": "Delta Force (Garena)",     "cat": "Garena", "platform": "Garena", "exe": "I:\\Mobile\\Garena Delta Force\\launcher\\df_garena_launcher.exe", "root": "I:\\Mobile\\Garena Delta Force" },
+
+    { "id": "app-chrome",        "title": "Google Chrome",            "cat": "Apps",   "exe": "F:\\Web\\Google Chrome\\GoogleChromePortable.exe" },
+    { "id": "app-edge",          "title": "Microsoft Edge",           "cat": "Apps",   "exe": "F:\\Web\\Microsoft Edge\\msedge.exe" },
+    { "id": "app-firefox",       "title": "Mozilla Firefox",          "cat": "Apps",   "exe": "F:\\Web\\Mozilla Firefox\\phyrox-portable.exe" },
+    { "id": "app-brave",         "title": "Brave",                    "cat": "Apps",   "exe": "J:\\Web\\Brave\\brave-portable.exe" },
+    { "id": "app-obs",           "title": "OBS Studio",               "cat": "Apps",   "exe": "F:\\Web\\OBS Studio\\bin\\64bit\\obs64.exe", "root": "F:\\Web\\OBS Studio" },
+    { "id": "app-telegram",      "title": "Telegram",                 "cat": "Apps",   "exe": "J:\\Web\\Telegram\\Telegram.exe" },
+    { "id": "app-wechat",        "title": "WeChat",                   "cat": "Apps",   "exe": "J:\\Web\\WeChat\\Weixin.exe" },
+    { "id": "app-anydesk",       "title": "AnyDesk",                  "cat": "Apps",   "exe": "F:\\Web\\AnyDesk\\AnyDesk.exe" },
+    { "id": "app-rustdesk",      "title": "RustDesk",                 "cat": "Apps",   "exe": "F:\\Web\\RustDesk\\rustdesk.exe" }
+  ]
+}

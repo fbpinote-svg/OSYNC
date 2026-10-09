@@ -1,0 +1,8 @@
+{
+  "_help": "brandName/brandBadge = shop name and badge. brandLogo = picture file (relative to this folder) or a URL; make it with tools\\_system\\Make-Brand.ps1 (also makes the app icon). machineId empty = use the PC name (e.g. KORI01). apiUrl empty = offline game menu; set it (e.g. http://192.168.51.202:8000/api) when your API server is ready.",
+  "brandName": "0JAYSHOP",
+  "brandBadge": "VIP",
+  "brandLogo": "data\\brand\\logo.png",
+  "machineId": "",
+  "apiUrl": ""
+}

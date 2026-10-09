@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+<script>
+function load(src) {
+  return new Promise((ok, fail) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => fail(new Error('cannot read ' + src)); i.src = src; });
+}
+function cover(ctx, img, w, h, fx = 0.5, fy = 0.5) {
+  const s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+  const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+  ctx.drawImage(img, (w - dw) * fx, (h - dh) * fy, dw, dh);
+}
+async function render(job) {
+  const w = job.w || 920, h = job.h || 586;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  const img = await load(job.src);
+  if (job.mode === 'icon') {
+    ctx.fillStyle = '#0b0f17'; ctx.fillRect(0, 0, w, h);
+    // colour wash from the icon itself
+    ctx.filter = 'blur(70px) saturate(1.7)'; ctx.globalAlpha = 0.85;
+    ctx.drawImage(img, -w * 0.15, -w * 0.45, w * 1.3, w * 1.3);
+    ctx.filter = 'none'; ctx.globalAlpha = 1;
+    const cy = h * 0.42;
+    const v = ctx.createRadialGradient(w / 2, cy, h * 0.1, w / 2, cy, w * 0.75);
+    v.addColorStop(0, 'rgba(8,10,15,0.15)'); v.addColorStop(1, 'rgba(8,10,15,0.85)');
+    ctx.fillStyle = v; ctx.fillRect(0, 0, w, h);
+    // soft light behind the icon
+    const glow = ctx.createRadialGradient(w / 2, cy, 0, w / 2, cy, h * 0.42);
+    glow.addColorStop(0, 'rgba(255,255,255,0.16)'); glow.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
+    const size = h * 0.44;
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 12;
+    ctx.drawImage(img, (w - size) / 2, cy - size / 2, size, size);
+  } else if (img.naturalWidth / img.naturalHeight < 1.25) {
+    // portrait / square art: blurred copy as background, whole picture in the middle
+    ctx.filter = 'blur(30px) brightness(0.6)';
+    cover(ctx, img, w, h);
+    ctx.filter = 'none';
+    const s = h / img.naturalHeight, dw = img.naturalWidth * s;
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 40;
+    ctx.drawImage(img, (w - dw) / 2, 0, dw, h);
+  } else {
+    cover(ctx, img, w, h, job.fx ?? 0.5, job.fy ?? 0.5);
+  }
+  return c.toDataURL('image/jpeg', 0.9);
+}
+</script>

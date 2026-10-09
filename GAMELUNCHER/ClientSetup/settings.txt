@@ -1,0 +1,4 @@
+# GAMELUNCHER settings
+# Drive letters that the CLIENT PCs see for the game disks (must be the same letters as on this master).
+# Leave empty = every fixed drive except the system drive.
+SharedDrives=DEFGHIJ

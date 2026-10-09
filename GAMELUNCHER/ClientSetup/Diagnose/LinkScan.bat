@@ -1,0 +1,3 @@
+@echo off
+echo Scanning folder links, please wait...
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\_system\LinkScan.ps1"

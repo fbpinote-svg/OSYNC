@@ -1,0 +1,32 @@
+# Only our own scripts, source and settings go to git.
+# Never: game files, launcher programs (third-party), built app, per-PC snapshots, logs.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/SETUP-AI.md
+!/GCafe/
+!/GAMELUNCHER/
+
+# GAMELUNCHER: only the ClientSetup kit (launcher programs stay on each master)
+/GAMELUNCHER/*
+!/GAMELUNCHER/ClientSetup/
+/GAMELUNCHER/ClientSetup/_system/Metadata/
+/GAMELUNCHER/ClientSetup/_system/EA-InstallData/
+/GAMELUNCHER/ClientSetup/_system/Epic-InstallData/
+/GAMELUNCHER/ClientSetup/_system/ea-client.reg
+/GAMELUNCHER/ClientSetup/_system/ea-games.reg
+/GAMELUNCHER/ClientSetup/_system/riotclient-files.csv
+
+# GCafe: built app, build output and per-PC data are made on each master
+/GCafe/app/
+/GCafe/_build/
+/GCafe/source/node_modules/
+/GCafe/source/out/
+/GCafe/source/.next/
+/GCafe/data/games.json
+/GCafe/data/posters/
+
+*.log
+Thumbs.db
+desktop.ini
