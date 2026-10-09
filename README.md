@@ -7,9 +7,21 @@
 | ปุ่ม | กดที่ | เมื่อไร |
 |---|---|---|
 | `MASTER-Update-All.bat` | เครื่องแม่ | หลังติดตั้ง / อัปเดต / ลบเกม (ปิด Riot Client ก่อนถ้าเกม Riot ยังอัปเดตอยู่) — อัปเดตข้อมูล Riot, EA, Epic, EasyAntiCheat ให้เครื่องลูก และสแกนรายการเกมในเมนูใหม่ |
-| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | ครั้งแรก, และเมื่อมีเกม EA หรือเกมที่ใช้กันโกงเพิ่ม — ติดตั้ง Riot แบบเงียบ, EA app + เกม EA + EA AntiCheat, EasyAntiCheat, เมนูเกม 0JAYSHOP |
+| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | ครั้งแรก และทุกครั้งที่ลงเกมใหม่ — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP |
 
-ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log`
+ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log` (รันซ้ำได้ ของที่ทำแล้วจะข้าม)
+
+## ลงเกมใหม่ในอนาคต
+| เกมจาก | ติดตั้งที่เครื่องแม่ | แล้วกด |
+|---|---|---|
+| Steam | ลงใน `X:\SteamLibrary` ของไดรฟ์ที่เครื่องลูกเห็น | `MASTER-Update-All.bat` → `CLIENT-Install-All.bat` ที่เครื่องลูก (โหมดแก้ Image) |
+| Riot (VALORANT/LoL/TFT) | อัปเดตใน Riot Client จนขึ้น Play แล้วปิด Riot Client | `MASTER-Update-All.bat` |
+| Epic | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EPIC\<เกม>` | `MASTER-Update-All.bat` → `CLIENT-Install-All.bat` |
+| EA app | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EA\<เกม>` | `MASTER-Update-All.bat` → `CLIENT-Install-All.bat` (เมนูจะเปิด EA app ให้กด Play; ถ้ารู้ offer id ใส่ใน `GCafe\tools\_system\Build-GameList.ps1` แล้วเปิดเกมตรงได้) |
+| เกมออนไลน์ / มือถือ / Garena / โปรแกรม | วางโฟลเดอร์เกมใน `X:\Online\<เกม>`, `X:\Mobile\<เกม>`, `X:\PvP\<เกม>`, `X:\Single Player\<เกม>` หรือ `X:\Web\<โปรแกรม>` | `MASTER-Update-All.bat` — เมนูหา exe ให้เอง (ดูบรรทัด `AUTO added ...` ว่าเลือกถูกไหม ถ้าผิดเพิ่มใน `GCafe\data\games.custom.json`) |
+| Ubisoft / Rockstar / Battle.net (ไม่ผ่าน Steam) | ยังไม่รองรับอัตโนมัติ — ใช้เวอร์ชัน Steam ถ้ามี | ให้ AI ช่วยเพิ่ม |
+
+รูปปก: Steam ใช้รูปจาก Steam, เกมอื่นใช้ `zPoster.jpg` ในโฟลเดอร์เกม หรือทำจากไอคอนให้เอง, ใส่รูปเองได้ที่ `GCafe\data\posters\<id>.jpg`
 
 ## โครงสร้างโฟลเดอร์
 ```

@@ -51,6 +51,8 @@ ClientSetup\  (ปุ่มที่กดได้)
   EA-Install-Autostart.bat     เหมือนข้างบน + เปิด EA แบบเงียบตอนล็อกอิน
   EA-Uninstall.bat             เอาออก
   EAC-Install.bat              ติดตั้ง EasyAntiCheat (Dead by Daylight, Rust, Chivalry 2, VRChat, Sea of Thieves, Fortnite)
+  Steam-FirstRun.bat           ทำสิ่งที่ Steam ทำตอนเปิดเกมครั้งแรกของทุกเกม Steam (กันโกง BattlEye/ACE/Ricochet/EAC,
+                               Social Club, DirectX, VC++ และ registry ของเกม) — รันซ้ำได้ ของที่ทำแล้วจะข้าม
 
 [ Update-Master\ - กดที่ "เครื่องแม่" หลังอัปเดตเกม ]
   Riot-Update-ClientData.bat   หลังอัปเดต VALORANT / League / TFT ใน Riot Client จนขึ้น Play

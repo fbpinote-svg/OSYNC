@@ -104,15 +104,25 @@ if (Test-Path -LiteralPath $riotVbs) {
 }
 
 # ---------- EA app games (installed through the EA app, not Steam) ----------
+# Every game installed through the EA app (registry "Install Dir" with __Installer\installerdata.xml, not a Steam copy).
+# Known offer ids start the game directly; others open the EA app on the game (add an offer id below when known).
 $eaOffers = @{ 'Respawn\Apex' = @('Origin.OFR.50.0002694', '1172470') }      # registry key = offer id, Steam appid (artwork)
-foreach ($k in $eaOffers.Keys) {
-  $p = Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\$k" -ErrorAction SilentlyContinue
-  if ($p -and $p.'Install Dir' -and (Test-Path -LiteralPath $p.'Install Dir')) {
-    $id = 'ea-' + ($k -split '\\')[-1].ToLower()
-    $img = Poster $id $p.'Install Dir'
-    if (-not $img -and $steamDir) { $img = SteamPoster $eaOffers[$k][1] }
-    Add-Game $id $p.DisplayName 'EA' ("origin2://game/launch?offerIds=" + $eaOffers[$k][0]) '' $img 'EA app'
+$eaLauncher = Join-Path $GameLuncher 'EA Desktop\EA Desktop\EALauncher.exe'
+foreach ($k in Get-ChildItem 'HKLM:\SOFTWARE\WOW6432Node' -ErrorAction SilentlyContinue | ForEach-Object { Get-ChildItem $_.PSPath -ErrorAction SilentlyContinue }) {
+  $dir = "$($k.GetValue('Install Dir'))"
+  if (-not $dir -or $dir -match '\\steamapps\\' -or -not (Test-Path -LiteralPath (Join-Path $dir '__Installer\installerdata.xml'))) { continue }
+  $rel = ($k.Name -split '\\')[-2..-1] -join '\'
+  $id = 'ea-' + (($k.Name -split '\\')[-1] -replace '[^A-Za-z0-9]', '').ToLower()
+  $title = "$($k.GetValue('DisplayName'))"; if (-not $title) { $title = Split-Path -Leaf $dir.TrimEnd('\') }
+  $img = Poster $id $dir
+  if ($eaOffers.ContainsKey($rel)) {
+    if (-not $img -and $steamDir) { $img = SteamPoster $eaOffers[$rel][1] }
+    Add-Game $id $title 'EA' ("origin2://game/launch?offerIds=" + $eaOffers[$rel][0]) '' $img 'EA app'
+  } elseif (Test-Path -LiteralPath $eaLauncher) {
+    Add-Game $id $title 'EA' ('"' + $eaLauncher + '"') (Split-Path -Parent $eaLauncher) $img 'EA app'
+    $warn.Add("EA app game without a direct-start id (opens the EA app): $title - add its offer id in Build-GameList.ps1 `$eaOffers")
   }
+  $iconOf[$id] = $eaLauncher
 }
 
 # ---------- Epic games (ClientSetup\EpicSilent.vbs gives clients the install list, then starts the game) ----------
@@ -146,6 +156,43 @@ if (Test-Path -LiteralPath $customFile) {
     $img = if ($g.img) { $g.img } else { Poster $g.id $root }
     Add-Game $g.id $g.title $g.cat $cmd (Split-Path -Parent $exe) $img $(if ($g.platform) { $g.platform } else { '' })
     $iconOf[$g.id] = $exe
+  }
+}
+
+# ---------- new game folders nobody listed yet (X:\Online, X:\Mobile, X:\PvP, X:\Single Player, X:\Web ...) ----------
+# Picks the most likely start exe; the result is shown as "AUTO" so it can be checked. To fix one, add an entry to
+# games.custom.json with "root" = that folder (or {"id": "auto-...", "hide": true} to hide it).
+$autoCats = @{ 'Online' = 'Online'; 'PvP' = 'Online'; 'Mobile' = 'Mobile'; 'Single Player' = 'Single Player'; 'Offline' = 'Single Player'; 'Web' = 'Apps'; 'Emulator' = 'Emulator' }
+$notStart = '(?i)unins|setup|install|updat|patch|crash|report|redist|dxsetup|prereq|easyanticheat|beservice|battleye|^cef|chrome_|webview|qtwebengine|7z|helper|notif|service|bugtrap|dump|elevat|repair|diag|benchmark|unitycrash|xigncode|^xldr|gameguard|anticheat|^ace-|tenprotect|_pwa|proxy|^python|^java|^node'
+# start-exe score: launcher / portable wrapper > start / play; + name like the folder; - each subfolder level
+# (tested against the 28 hand-made entries of the main branch: all picked right)
+function ExeScore($e, [string]$folderName, [string]$folderPath) {
+  $s = 0; $n = Slug $e.BaseName; $fs = Slug $folderName
+  if ($n -match 'launcher|portable') { $s += 5 } elseif ($n -match 'start|play') { $s += 3 }
+  if ($fs -and $n -and ($n.Contains($fs) -or $fs.Contains($n))) { $s += 3 }
+  $s - $e.DirectoryName.Substring($folderPath.Length).Split('\', [StringSplitOptions]::RemoveEmptyEntries).Count
+}
+$covered = New-Object System.Collections.Generic.List[string]
+foreach ($g in $games) {
+  if ($g.cwd) { $covered.Add($g.cwd.TrimEnd('\')) }
+  $m = [regex]::Match("$($g.cmd)", '^"([^"]+)"'); if ($m.Success) { $covered.Add((Split-Path -Parent $m.Groups[1].Value)) }
+}
+if ($custom) { foreach ($g in $custom.games) { if ($g.root) { $covered.Add($g.root.TrimEnd('\')) }; foreach ($c in @($g.exe)) { if ($c) { $covered.Add((Split-Path -Parent $c.Replace('{GAMELUNCHER}', $GameLuncher))) } } } }
+function Slug([string]$s) { ($s -replace '[^A-Za-z0-9]', '').ToLower() }
+foreach ($drv in Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Root -match '^[D-Z]:\\$' }) {
+  foreach ($catDir in $autoCats.Keys) {
+    foreach ($f in Get-ChildItem -LiteralPath (Join-Path $drv.Root $catDir) -Directory -ErrorAction SilentlyContinue) {
+      $fp = $f.FullName
+      if ($covered | Where-Object { $_ -ieq $fp -or $_.StartsWith($fp + '\', [StringComparison]::OrdinalIgnoreCase) }) { continue }
+      $best = Get-ChildItem -LiteralPath $fp -Filter *.exe -Recurse -Depth 2 -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Length -gt 100KB -and $_.BaseName -notmatch $notStart } |
+        Sort-Object @{ e = { ExeScore $_ $f.Name $fp }; Descending = $true }, @{ e = { $_.Length }; Descending = $true } | Select-Object -First 1
+      if (-not $best) { $warn.Add("new folder without a start exe: $fp"); continue }
+      $id = 'auto-' + (Slug $f.Name)
+      Add-Game $id $f.Name $autoCats[$catDir] ('"' + $best.FullName + '"') $best.DirectoryName (Poster $id $fp) ''
+      $iconOf[$id] = $best.FullName
+      $warn.Add("AUTO added $($f.Name) [$($autoCats[$catDir])] -> $($best.FullName)  (check it once)")
+    }
   }
 }
 

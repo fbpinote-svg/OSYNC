@@ -23,8 +23,11 @@ H:\OSYNC\GCafe\
 [ เครื่องแม่ ]
   Build-GameList.bat   สแกนเกมใหม่ทั้งหมด -> เขียน data\games.json  (ไม่ต้อง build โปรแกรมใหม่)
                        กดทุกครั้งที่ ติดตั้ง/ลบเกม, แก้ games.custom.json, หรือใส่รูปปกใหม่
-                       หาเกมจาก: Steam ทุก Library, Riot (ผ่านชุด GAMELUNCHER), EA app,
-                                 games.custom.json, และ launcher ใน H:\OSYNC\GAMELUNCHER (หมวด Launchers)
+                       หาเกมจาก: Steam ทุก Library, Riot (ผ่านชุด GAMELUNCHER), Epic, EA app,
+                                 games.custom.json, launcher ใน H:\OSYNC\GAMELUNCHER (หมวด Launchers)
+                                 และโฟลเดอร์ใหม่ใน X:\Online X:\Mobile X:\PvP X:\Single Player X:\Web
+                                 (เลือก exe ให้เอง แสดงเป็นบรรทัด "AUTO added ..." ให้ตรวจ)
+                       ปกติกด H:\OSYNC\MASTER-Update-All.bat แทน (ทำข้อนี้ให้ด้วย)
   Build-App.bat        ประกอบโปรแกรมใหม่จาก source\ -> app\  (กดเฉพาะหลังแก้ source\ เท่านั้น)
                        ปิด 0JAYSHOP ที่เครื่องแม่ก่อน; ตอนท้ายจะเปิดเมนูเกมทดสอบเองแล้วปิด
 [ เครื่องลูก - โหมด super workstation (แก้ Image) แล้วบันทึก Image ]

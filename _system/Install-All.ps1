@@ -1,9 +1,11 @@
 # Install-All.ps1 - CLIENT PC: everything a client needs, in one run (CLIENT-Install-All.bat).
 # Run as administrator in super-workstation (image edit) mode, then save the image.
 #   1 Riot   : start Riot silently at logon (prepares the PC for VALORANT / LoL / TFT)
-#   2 EA     : EA app, EA games and EA AntiCheat (Apex, Battlefield)
-#   3 EAC    : EasyAntiCheat for Dead by Daylight, Rust, Chivalry 2, VRChat, Sea of Thieves, Fortnite ...
-#   4 Menu   : 0JAYSHOP game menu at logon + desktop icon
+#   2 Steam  : every Steam game's first-run setup (BattlEye, ACE, Ricochet, EasyAntiCheat, Social Club,
+#              DirectX, VC++ ...) - also covers Steam games installed later
+#   3 EA     : EA app, EA games and EA AntiCheat (Apex, Battlefield)
+#   4 EAC    : EasyAntiCheat for games outside Steam's scripts (Fortnite, Dead by Daylight, VRChat ...)
+#   5 Menu   : 0JAYSHOP game menu at logon + desktop icon
 # Log: C:\Users\Public\OSYNC-Install-All.log
 $root = Split-Path -Parent $PSScriptRoot                                    # ...\OSYNC
 $kit  = Join-Path $root 'GAMELUNCHER\ClientSetup'
@@ -33,14 +35,17 @@ Step '1 Riot  - silent start at logon' {
   Write-Host "    Run\RiotStart -> wscript.exe `"$vbs`" background"
   0
 }
-Step '2 EA    - EA app, games, EA AntiCheat' {
+Step '2 Steam - first-run setup of every game' {
+  Run-Script (Join-Path $sys 'Steam-FirstRun.ps1')
+}
+Step '3 EA    - EA app, games, EA AntiCheat' {
   if (-not (Test-Path -LiteralPath (Join-Path $sys 'ea-client.reg'))) { return 'SKIP (run MASTER-Update-All.bat on the master first)' }
   Run-Script (Join-Path $sys 'EA-ClientInstall.ps1')
 }
-Step '3 EAC   - EasyAntiCheat for Steam/Epic games' {
+Step '4 EAC   - EasyAntiCheat (Epic and others)' {
   Run-Script (Join-Path $sys 'EAC-Install.ps1')
 }
-Step '4 Menu  - 0JAYSHOP game menu' {
+Step '5 Menu  - 0JAYSHOP game menu' {
   $s = Join-Path $root 'GCafe\tools\_system\Install-Client.ps1'
   if (-not (Test-Path -LiteralPath (Join-Path $root 'GCafe\app\0JAYSHOP.exe'))) { return 'SKIP (build the menu on the master: GCafe\tools\Build-App.bat)' }
   Run-Script $s

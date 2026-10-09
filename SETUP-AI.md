@@ -62,7 +62,8 @@ launcher ทุกค่ายรวมอยู่ที่ `<ไดรฟ์>:
    ดูรูป `GCafe\_build\selftest\selftest-gamemenu.png` ว่าเมนูขึ้นจริง)
 4. `GCafe\config.json`: ชื่อร้าน/ป้าย/โลโก้ (`data\brand\logo.png`), `apiUrl` ว่าง = ออฟไลน์, `machineId` ว่าง = ใช้ชื่อเครื่อง
    เปลี่ยนโลโก้: `powershell -ExecutionPolicy Bypass -File GCafe\tools\_system\Make-Brand.ps1 -Image <รูป>` แล้ว Build-App ใหม่
-5. `GCafe\data\games.custom.json` เป็นของสาขาหลัก — **เขียนใหม่ให้ตรงเครื่องนี้**: สแกนโฟลเดอร์เกมที่ไม่ใช่ Steam/Riot/EA/Epic
+5. `GCafe\data\games.custom.json` เป็นของสาขาหลัก — **เขียนใหม่ให้ตรงเครื่องนี้** (เก็บเฉพาะเกมที่มีจริง; Build-GameList หาโฟลเดอร์ใหม่ใน
+   `X:\Online|Mobile|PvP|Single Player|Web` ให้เองพร้อมเดา exe — ใส่ใน custom เฉพาะเกมที่เดาผิด หรืออยู่นอกโฟลเดอร์เหล่านี้): สแกนโฟลเดอร์เกมที่ไม่ใช่ Steam/Riot/EA/Epic
    (`X:\Online`, `X:\Mobile`, `X:\PvP`, `X:\Web`, โฟลเดอร์เกม Garena ฯลฯ) หา exe ตัวเปิดเกมที่ถูก (launcher ของเกม ไม่ใช่ตัว updater/uninstall)
    รูปแบบ: `{ "id": "ชื่อสั้น", "title": "ชื่อโชว์", "cat": "Online|Mobile|Garena|Apps", "platform": "Garena (ถ้ามี)", "exe": "X:\\...\\game.exe", "root": "X:\\...", "args": "" }`
 6. `GCafe\tools\Build-GameList.bat` (หรือ `X:\OSYNC\MASTER-Update-All.bat` ซึ่งทำให้ด้วย) → อ่าน WARNING ทุกบรรทัด (exe ไม่เจอ / exe 0 ไบต์ = ยังติดตั้งไม่เสร็จ) แล้วแก้
@@ -71,8 +72,9 @@ launcher ทุกค่ายรวมอยู่ที่ `<ไดรฟ์>:
 
 ## 6. เครื่องลูก (ให้เจ้าของร้านทำในโหมด super workstation / แก้ Image แล้วบันทึก Image)
 - เครื่องแม่: กด `X:\OSYNC\MASTER-Update-All.bat` ก่อน (เก็บข้อมูล Riot/EA/Epic/EasyAntiCheat + สแกนรายการเกม) ทุกผลต้อง OK
-- เครื่องลูก 1 เครื่อง: `X:\OSYNC\CLIENT-Install-All.bat` → Riot เงียบตอนล็อกอิน, EA app + เกม EA + **EA AntiCheat**,
-  **EasyAntiCheat**, เมนูเกม 0JAYSHOP — ดูตาราง RESULT ท้ายหน้าต่าง (log: `C:\Users\Public\OSYNC-Install-All.log`)
+- เครื่องลูก 1 เครื่อง: `X:\OSYNC\CLIENT-Install-All.bat` → Riot เงียบตอนล็อกอิน, **Steam first-run ของทุกเกม** (installscript.vdf:
+  กันโกง BattlEye/ACE/Ricochet/EAC, Social Club, DirectX, VC++, registry), EA app + เกม EA + **EA AntiCheat**,
+  **EasyAntiCheat** ของ Epic, เมนูเกม 0JAYSHOP — ดูตาราง RESULT ท้ายหน้าต่าง (log: `C:\Users\Public\OSYNC-Install-All.log`)
   ถ้าไม่ติดตั้งกันโกง เกมจะขึ้นหน้าโหลด/เช็กอัปเดตแล้วปิดเองบนเครื่องลูก (เช่น Apex "Checking for updates...")
 - ปุ่มทีละอย่างอยู่ใน `GAMELUNCHER\ClientSetup\Install-Client\` สำหรับแก้ปัญหาเฉพาะจุด
 - Riot Vanguard ต้องอยู่ใน Image; เกมที่ใช้ ACE (Delta Force, Arena Breakout) / BattlEye ติดตั้งกันโกงตอนเปิดเกมครั้งแรก — ให้เปิดครั้งแรกในโหมดแก้ Image

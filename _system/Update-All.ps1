@@ -24,5 +24,5 @@ Step '5 Menu - game list'               (Join-Path $root 'GCafe\tools\_system\Bu
 
 Write-Host "`n================ RESULT ================" -ForegroundColor Cyan
 $results | ForEach-Object { Write-Host ('{0,-36} {1}' -f $_.Step, $_.Result) -ForegroundColor $(if ($_.Result -eq 'OK') { 'Green' } elseif ($_.Result -like 'SKIP*') { 'DarkYellow' } else { 'Red' }) }
-Write-Host "`nClients pick this up after a reboot. New anti-cheat / EA game? Run CLIENT-Install-All.bat on a client in image mode." -ForegroundColor Cyan
+Write-Host "`nClients pick this up after a reboot. Installed a new game? Also run CLIENT-Install-All.bat on one client in image mode, then save the image." -ForegroundColor Cyan
 if ($results | Where-Object { $_.Result -like 'FAIL*' }) { exit 1 }
