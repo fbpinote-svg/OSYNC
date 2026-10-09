@@ -4,7 +4,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Settings.ps1')
 $stage = Join-Path $env:TEMP ('GAMELUNCHER-Kit_' + [guid]::NewGuid().ToString('N'))
 $dst = Join-Path $stage 'GAMELUNCHER\ClientSetup'
-& robocopy.exe $KitSetup $dst /E /XD Metadata EA-InstallData Epic-InstallData /XF ea-client.reg ea-games.reg riotclient-files.csv *.log /R:1 /W:1 /NP /NFL /NDL /NJH /NJS | Out-Null
+& robocopy.exe $KitSetup $dst /E /XD Metadata EA-InstallData Epic-InstallData /XF ea-client.reg ea-games.reg riotclient-files.csv eac-products.txt *.log /R:1 /W:1 /NP /NFL /NDL /NJH /NJS | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "robocopy failed ($LASTEXITCODE)" }
 $settings = @'
 # GAMELUNCHER settings

@@ -21,6 +21,13 @@ H:\RIOT\Riot Games\              ตัวเกม League of Legends / Teamfigh
 H:\Mobile\Genshin Impact\        ตัวเกม Genshin (ย้ายออกจาก HoYoPlay\games เมื่อ 8 ต.ค. 2026)
 
 
+ปุ่มรวม (ใช้ 2 ปุ่มนี้เป็นหลัก อยู่ที่ H:\OSYNC)
+------------------------------------------
+  MASTER-Update-All.bat   เครื่องแม่: หลังติดตั้ง/อัปเดต/ลบเกม = ทุกปุ่มใน Update-Master\ + สแกนรายการเกมในเมนู
+  CLIENT-Install-All.bat  เครื่องลูก (โหมดแก้ Image แล้วบันทึก Image) = ทุกปุ่มใน Install-Client\ + เมนูเกม 0JAYSHOP
+ปุ่มทีละอย่างด้านล่างใช้ตอนแก้ปัญหาเฉพาะจุด
+
+
 ClientSetup\  (ปุ่มที่กดได้)
 ---------------------------
 [ เปิดเกม - ให้เมนูเกมของเครื่องลูกเรียกไฟล์เหล่านี้ ]
@@ -43,6 +50,7 @@ ClientSetup\  (ปุ่มที่กดได้)
                                อาการถ้าไม่มี: กดเล่น Apex แล้วขึ้นรูป Apex "Checking for updates..." แล้วปิดไปเอง
   EA-Install-Autostart.bat     เหมือนข้างบน + เปิด EA แบบเงียบตอนล็อกอิน
   EA-Uninstall.bat             เอาออก
+  EAC-Install.bat              ติดตั้ง EasyAntiCheat (Dead by Daylight, Rust, Chivalry 2, VRChat, Sea of Thieves, Fortnite)
 
 [ Update-Master\ - กดที่ "เครื่องแม่" หลังอัปเดตเกม ]
   Riot-Update-ClientData.bat   หลังอัปเดต VALORANT / League / TFT ใน Riot Client จนขึ้น Play
@@ -88,4 +96,5 @@ ClientSetup\  (ปุ่มที่กดได้)
 6. กด Update-Master\Riot-Update-ClientData.bat, EA-Update-ClientData.bat และ Epic-Update-ClientData.bat
 7. ที่เครื่องลูก (โหมด super workstation) กดปุ่มใน Install-Client\ แล้วบันทึก Image
 8. ตั้งเมนูเกมให้เรียก ClientSetup\VALORANT.bat ฯลฯ
+   (ปัจจุบัน: กด MASTER-Update-All.bat ที่เครื่องแม่ แล้ว CLIENT-Install-All.bat ที่เครื่องลูก แทนข้อ 6-8)
    (โปรแกรมเมนูเกม GCafe ทำให้อัตโนมัติ: ดู H:\OSYNC\GCafe\README-TH.txt)

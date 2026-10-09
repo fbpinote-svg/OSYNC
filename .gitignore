@@ -5,6 +5,9 @@
 !/.gitattributes
 !/README.md
 !/SETUP-AI.md
+!/CLIENT-Install-All.bat
+!/MASTER-Update-All.bat
+!/_system/
 !/GCafe/
 !/GAMELUNCHER/
 
@@ -17,6 +20,7 @@
 /GAMELUNCHER/ClientSetup/_system/ea-client.reg
 /GAMELUNCHER/ClientSetup/_system/ea-games.reg
 /GAMELUNCHER/ClientSetup/_system/riotclient-files.csv
+/GAMELUNCHER/ClientSetup/_system/eac-products.txt
 
 # GCafe: built app, build output and per-PC data are made on each master
 /GCafe/app/

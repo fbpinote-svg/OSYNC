@@ -65,15 +65,17 @@ launcher ทุกค่ายรวมอยู่ที่ `<ไดรฟ์>:
 5. `GCafe\data\games.custom.json` เป็นของสาขาหลัก — **เขียนใหม่ให้ตรงเครื่องนี้**: สแกนโฟลเดอร์เกมที่ไม่ใช่ Steam/Riot/EA/Epic
    (`X:\Online`, `X:\Mobile`, `X:\PvP`, `X:\Web`, โฟลเดอร์เกม Garena ฯลฯ) หา exe ตัวเปิดเกมที่ถูก (launcher ของเกม ไม่ใช่ตัว updater/uninstall)
    รูปแบบ: `{ "id": "ชื่อสั้น", "title": "ชื่อโชว์", "cat": "Online|Mobile|Garena|Apps", "platform": "Garena (ถ้ามี)", "exe": "X:\\...\\game.exe", "root": "X:\\...", "args": "" }`
-6. `GCafe\tools\Build-GameList.bat` → อ่าน WARNING ทุกบรรทัด (exe ไม่เจอ / exe 0 ไบต์ = ยังติดตั้งไม่เสร็จ) แล้วแก้
+6. `GCafe\tools\Build-GameList.bat` (หรือ `X:\OSYNC\MASTER-Update-All.bat` ซึ่งทำให้ด้วย) → อ่าน WARNING ทุกบรรทัด (exe ไม่เจอ / exe 0 ไบต์ = ยังติดตั้งไม่เสร็จ) แล้วแก้
    รูปปก: Steam จากแคชในเครื่อง, ไม่มีรูปทำจากไอคอนโปรแกรมให้เอง, ใส่รูปจริงเองได้ที่ `data\posters\<id>.jpg`
 7. เปิด `GCafe\app\0JAYSHOP.exe` บนเครื่องแม่ ลองกดเปิดเกม 2-3 เกมจากเมนู
 
 ## 6. เครื่องลูก (ให้เจ้าของร้านทำในโหมด super workstation / แก้ Image แล้วบันทึก Image)
-- `GAMELUNCHER\ClientSetup\Install-Client\EA-Install.bat` (ถ้ามีเกม EA app)
-- `GAMELUNCHER\ClientSetup\Install-Client\Riot-Startup-Install.bat` (ไม่บังคับ — เปิด Riot Client เงียบๆ ตอนล็อกอิน)
-- `GCafe\tools\Install-Client.bat` → เมนูเกมเปิดเองตอนเข้า Windows + ไอคอนบนเดสก์ท็อป
-- Riot Vanguard / EasyAntiCheat / BattlEye ควรอยู่ใน Image
+- เครื่องแม่: กด `X:\OSYNC\MASTER-Update-All.bat` ก่อน (เก็บข้อมูล Riot/EA/Epic/EasyAntiCheat + สแกนรายการเกม) ทุกผลต้อง OK
+- เครื่องลูก 1 เครื่อง: `X:\OSYNC\CLIENT-Install-All.bat` → Riot เงียบตอนล็อกอิน, EA app + เกม EA + **EA AntiCheat**,
+  **EasyAntiCheat**, เมนูเกม 0JAYSHOP — ดูตาราง RESULT ท้ายหน้าต่าง (log: `C:\Users\Public\OSYNC-Install-All.log`)
+  ถ้าไม่ติดตั้งกันโกง เกมจะขึ้นหน้าโหลด/เช็กอัปเดตแล้วปิดเองบนเครื่องลูก (เช่น Apex "Checking for updates...")
+- ปุ่มทีละอย่างอยู่ใน `GAMELUNCHER\ClientSetup\Install-Client\` สำหรับแก้ปัญหาเฉพาะจุด
+- Riot Vanguard ต้องอยู่ใน Image; เกมที่ใช้ ACE (Delta Force, Arena Breakout) / BattlEye ติดตั้งกันโกงตอนเปิดเกมครั้งแรก — ให้เปิดครั้งแรกในโหมดแก้ Image
 - ทดสอบที่เครื่องลูกจริง: เปิด VALORANT, เกม Steam, เกม EA, Fortnite และเกมออนไลน์ 1 เกม จากเมนู
 - มีปัญหา Riot ขึ้น Repair: `GAMELUNCHER\ClientSetup\Diagnose\RiotDiag.bat` ที่เครื่องลูก แล้วอ่านรายงาน
 

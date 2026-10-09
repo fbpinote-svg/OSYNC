@@ -28,6 +28,7 @@ H:\OSYNC\GCafe\
   Build-App.bat        ประกอบโปรแกรมใหม่จาก source\ -> app\  (กดเฉพาะหลังแก้ source\ เท่านั้น)
                        ปิด 0JAYSHOP ที่เครื่องแม่ก่อน; ตอนท้ายจะเปิดเมนูเกมทดสอบเองแล้วปิด
 [ เครื่องลูก - โหมด super workstation (แก้ Image) แล้วบันทึก Image ]
+  ปกติใช้ H:\OSYNC\CLIENT-Install-All.bat ปุ่มเดียว (ทำข้อนี้ให้ด้วย พร้อม Riot / EA / กันโกง)
   Install-Client.bat   ให้โปรแกรมเปิดเองตอนเข้า Windows + ไอคอนบนเดสก์ท็อป
   Uninstall-Client.bat เอาออก
 

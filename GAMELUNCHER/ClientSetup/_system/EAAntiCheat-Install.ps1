@@ -41,7 +41,7 @@ foreach ($dir in $dirs | Sort-Object -Unique) {
 }
 if (-not $jobs) { Write-Output 'No EA AntiCheat games found on the shared disks.'; return }
 # one run per title, with the newest installer (Steam and EA-app copies of a game may differ in version)
-$jobs = @($jobs | Group-Object Title | ForEach-Object { $_.Group | Sort-Object { [version](Get-Item -LiteralPath $_.Installer).VersionInfo.FileVersion } -Descending | Select-Object -First 1 })
+$jobs = @($jobs | Group-Object Title | ForEach-Object { $_.Group | Sort-Object { $v = (Get-Item -LiteralPath $_.Installer).VersionInfo.FileVersion; if ($v -as [version]) { [version]$v } else { [version]'0.0' } } -Descending | Select-Object -First 1 })
 $jobs | ForEach-Object { Write-Output ('{0,-6} {1}' -f $_.Title, $_.Installer) }
 if ($DryRun) { Write-Output 'DryRun: nothing installed.'; return }
 
