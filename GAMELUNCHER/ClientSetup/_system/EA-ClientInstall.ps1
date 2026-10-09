@@ -85,7 +85,10 @@ if ($Autostart) {
     Say 'autostart: EA starts silently at logon'
 }
 
-# 5) check
+# 5) EA AntiCheat (Apex / Battlefield cannot start without it on this PC)
+& (Join-Path $setupDir 'EAAntiCheat-Install.ps1')
+
+# 6) check
 Start-Service EABackgroundService
 Start-Sleep -Seconds 2
 $svc = Get-CimInstance Win32_Service -Filter "Name='EABackgroundService'"

@@ -38,7 +38,9 @@ ClientSetup\  (ปุ่มที่กดได้)
   Riot-Startup-Install.bat     เปิด Riot Client แบบเงียบที่ถาดไอคอนตอนล็อกอิน
                                (คลิกขวา Run as administrator = ทุกผู้ใช้)
   Riot-Startup-Uninstall.bat   เอาออก
-  EA-Install.bat               ติดตั้ง EA app + ลงทะเบียนเกม EA ที่ติดตั้งไว้ให้เครื่องลูก (ขอสิทธิ์ admin เอง)
+  EA-Install.bat               ติดตั้ง EA app + ลงทะเบียนเกม EA ที่ติดตั้งไว้ให้เครื่องลูก + ติดตั้ง EA AntiCheat (ขอสิทธิ์ admin เอง)
+  EA-AntiCheat-Install.bat     ติดตั้งเฉพาะ EA AntiCheat (Apex / Battlefield V / Battlefield 6)
+                               อาการถ้าไม่มี: กดเล่น Apex แล้วขึ้นรูป Apex "Checking for updates..." แล้วปิดไปเอง
   EA-Install-Autostart.bat     เหมือนข้างบน + เปิด EA แบบเงียบตอนล็อกอิน
   EA-Uninstall.bat             เอาออก
 
