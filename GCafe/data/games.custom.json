@@ -12,7 +12,7 @@
     { "id": "xshot",             "title": "XSHOT",                    "cat": "Online", "exe": "E:\\Online\\XSHOT\\XSHOT.exe" },
     { "id": "warframe",          "title": "Warframe",                 "cat": "Online", "exe": "E:\\Online\\Warframe\\Downloaded\\Public\\Warframe.x64.exe", "args": "-cluster:public", "root": "E:\\Online\\Warframe" },
     { "id": "fivem",             "title": "FiveM (GTA V Roleplay)",   "cat": "Online", "exe": "J:\\Online\\FiveM\\FiveM.exe" },
-    { "id": "gtasa-nt",          "title": "GTA SA NewThings",         "cat": "Online", "exe": "H:\\รวม NT\\NTNT\\n-launcher.exe", "root": "H:\\รวม NT" },
+    { "id": "gtasa-nt",          "title": "GTA SA NewThings",         "cat": "Online", "exe": "H:\\รวม NT\\NEWTHINGS-GAMES\\NEWTHINGS-GAMES.exe", "root": "H:\\รวม NT\\NEWTHINGS-GAMES" },
     { "id": "minecraft",         "title": "Minecraft (TLauncher)",    "cat": "Online", "exe": "G:\\Minecraft\\TLauncher.exe" },
 
     { "id": "genshin",           "title": "Genshin Impact",           "cat": "Mobile", "exe": "H:\\Mobile\\Genshin Impact\\Genshin Impact game\\GenshinImpact.exe", "root": "H:\\Mobile\\Genshin Impact" },
