@@ -21,6 +21,9 @@ if (-not $Path -or -not (Test-Path -LiteralPath (Join-Path $Path 'NEWTHINGS-GAME
 $exe = Join-Path $Path 'NEWTHINGS-GAMES.exe'
 $gta = Join-Path $Path 'bin\newthings\gta_sa.exe'
 Write-Output "NEWTHINGS-GAMES: $Path"
+# GTA SA / SA-MP and Windows shortcuts read paths in the system code page: Thai (or any non-English) folder
+# names break on PCs whose locale is not Thai. Keep the launcher in an English path, e.g. H:\Online\NEWTHINGS-GAMES.
+if ($Path -match '[^\x20-\x7e]') { Write-Output 'WARNING the folder name has non-English letters - move it to an English path (e.g. H:\Online\NEWTHINGS-GAMES)' }
 
 # 2) registry the installer writes (current user = the account players use)
 New-Item -Path 'HKCU:\Software\newthings\NEWTHINGS-GAMES' -Force | Out-Null
@@ -40,10 +43,12 @@ if (Test-Path -LiteralPath $gta) {
 
 # 3) shortcuts for every user
 $sh = New-Object -ComObject WScript.Shell
-foreach ($l in (Join-Path $env:PUBLIC 'Desktop\NEWTHINGS-GAMES.lnk'), (Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\NEWTHINGS-GAMES.lnk')) {
-  $s = $sh.CreateShortcut($l); $s.TargetPath = $exe; $s.WorkingDirectory = $Path; $s.IconLocation = "$exe,0"; $s.Save()
-}
-Write-Output 'shortcuts: Public Desktop + Start Menu'
+try {
+  foreach ($l in (Join-Path $env:PUBLIC 'Desktop\NEWTHINGS-GAMES.lnk'), (Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\NEWTHINGS-GAMES.lnk')) {
+    $s = $sh.CreateShortcut($l); $s.TargetPath = $exe; $s.WorkingDirectory = $Path; $s.IconLocation = "$exe,0"; $s.Save()
+  }
+  Write-Output 'shortcuts: Public Desktop + Start Menu'
+} catch { Write-Output "WARNING shortcuts not created ($($_.Exception.Message)) - usually a non-English folder name" }
 
 # 4) Thai text: GTA SA / SA-MP and older Thai games read text with the system code page. With the
 #    "Beta: Use Unicode UTF-8" option (code page 65001) Thai shows as alien letters; Thai needs 874.
