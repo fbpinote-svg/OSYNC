@@ -6,6 +6,8 @@
 #   3 EA     : EA app, EA games and EA AntiCheat (Apex, Battlefield)
 #   4 EAC    : EasyAntiCheat for games outside Steam's scripts (Fortnite, Dead by Daylight, VRChat ...)
 #   5 Menu   : 0JAYSHOP game menu at logon + desktop icon
+#   6 NT     : NEWTHINGS-GAMES (GTA SA / SA-MP) registry + shortcuts; asks first whether to fix Thai text
+#              (alien letters in-game = "Beta: UTF-8" code page 65001; fix = Thai 874, restart needed)
 # Log: C:\Users\Public\OSYNC-Install-All.log
 $root = Split-Path -Parent $PSScriptRoot                                    # ...\OSYNC
 $kit  = Join-Path $root 'GAMELUNCHER\ClientSetup'
@@ -14,6 +16,14 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 if (-not $isAdmin) { Write-Host 'Run as administrator (CLIENT-Install-All.bat asks for it).' -ForegroundColor Red; exit 1 }
 Start-Transcript -Path (Join-Path $env:PUBLIC 'OSYNC-Install-All.log') -Force | Out-Null
 Write-Host "OSYNC client install on $env:COMPUTERNAME  ($root)" -ForegroundColor Cyan
+
+# the only question, asked up front so the rest runs unattended
+$acp = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage').ACP
+$fixThai = $false
+if ($acp -ne '874') {
+  Write-Host "Thai text in games shows as alien letters on this PC (code page $acp)." -ForegroundColor DarkYellow
+  $fixThai = (Read-Host 'Fix it now? Sets system locale Thai, UTF-8 beta off, needs a restart [Y/N]') -match '^[Yy]'
+}
 
 function Run-Script([string]$file, [string[]]$extra = @()) {
   & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $file @extra 2>&1 | ForEach-Object { "    $_" } | Out-Host
@@ -50,9 +60,13 @@ Step '5 Menu  - 0JAYSHOP game menu' {
   if (-not (Test-Path -LiteralPath (Join-Path $root 'GCafe\app\0JAYSHOP.exe'))) { return 'SKIP (build the menu on the master: GCafe\tools\Build-App.bat)' }
   Run-Script $s
 }
+Step '6 NT    - NEWTHINGS-GAMES (GTA SA)' {
+  Run-Script (Join-Path $sys 'NEWTHINGS-ClientInstall.ps1') $(if ($fixThai) { @('-FixThaiText') } else { @() })
+}
 
 Write-Host "`n================ RESULT ================" -ForegroundColor Cyan
 $results | ForEach-Object { Write-Host ('{0,-42} {1}' -f $_.Step, $_.Result) -ForegroundColor $(if ($_.Result -eq 'OK') { 'Green' } elseif ($_.Result -like 'SKIP*') { 'DarkYellow' } else { 'Red' }) }
+if ($fixThai) { Write-Host "`nThai text fix applied - it works after the restart." -ForegroundColor Yellow }
 Write-Host "`nNow SAVE THE IMAGE (super workstation), then reboot this PC." -ForegroundColor Cyan
 Stop-Transcript | Out-Null
 if ($results | Where-Object { $_.Result -like 'FAIL*' }) { exit 1 }

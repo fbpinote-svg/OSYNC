@@ -51,6 +51,8 @@ ClientSetup\  (ปุ่มที่กดได้)
   EA-Install-Autostart.bat     เหมือนข้างบน + เปิด EA แบบเงียบตอนล็อกอิน
   EA-Uninstall.bat             เอาออก
   EAC-Install.bat              ติดตั้ง EasyAntiCheat (Dead by Daylight, Rust, Chivalry 2, VRChat, Sea of Thieves, Fortnite)
+  NEWTHINGS-Install.bat        ตั้งค่า NEWTHINGS-GAMES (GTA SA / SA-MP) ที่ H:\รวม NT\NEWTHINGS-GAMES: registry, ที่อยู่ gta_sa.exe ของ SA-MP,
+                               ทางลัดบนเดสก์ท็อป + ถามว่าจะแก้ "ภาษาเอเลี่ยน" ไหม (Y = ภาษาระบบไทย + ปิด UTF-8 beta ต้องรีสตาร์ท)
   Steam-FirstRun.bat           ทำสิ่งที่ Steam ทำตอนเปิดเกมครั้งแรกของทุกเกม Steam (กันโกง BattlEye/ACE/Ricochet/EAC,
                                Social Club, DirectX, VC++ และ registry ของเกม) — รันซ้ำได้ ของที่ทำแล้วจะข้าม
 

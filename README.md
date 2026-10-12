@@ -7,7 +7,7 @@
 | ปุ่ม | กดที่ | เมื่อไร |
 |---|---|---|
 | `MASTER-Update-All.bat` | เครื่องแม่ | หลังติดตั้ง / อัปเดต / ลบเกม (ปิด Riot Client ก่อนถ้าเกม Riot ยังอัปเดตอยู่) — อัปเดตข้อมูล Riot, EA, Epic, EasyAntiCheat ให้เครื่องลูก และสแกนรายการเกมในเมนูใหม่ |
-| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | ครั้งแรก และทุกครั้งที่ลงเกมใหม่ — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP |
+| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | ครั้งแรก และทุกครั้งที่ลงเกมใหม่ — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP, NEWTHINGS-GAMES (GTA SA) — ถามครั้งเดียวตอนเริ่มว่าจะแก้ภาษาไทยเอเลี่ยนในเกมไหม (Y แล้วต้องรีสตาร์ท) |
 
 ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log` (รันซ้ำได้ ของที่ทำแล้วจะข้าม)
 
