@@ -3,22 +3,35 @@
 ใช้บน **เครื่องแม่ (master)** ของร้านที่ใช้ diskless (LW / Kritidet) วางโฟลเดอร์ไว้บนไดรฟ์เกมที่เครื่องลูกมองเห็น
 เครื่องลูกจึงใช้ path เดียวกับเครื่องแม่ได้ เช่น `H:\OSYNC\...`
 
-## ปุ่มหลัก (กดแค่ 2 ปุ่มนี้)
+อธิบายการทำงานทั้งระบบพร้อมแผนภาพ: [HOW-IT-WORKS.md](HOW-IT-WORKS.md)
+
+## ปุ่มเดียวจบ
+กด `OSYNC-All-In-One.bat` ได้ทั้งเครื่องแม่และเครื่องลูก มันจะดูเองว่าเป็นเครื่องไหน แล้วทำทุกอย่างให้
+- **เครื่องแม่:** อัปเดตข้อมูลให้เครื่องลูก แล้วเปิด launcher ทุกค่ายค้างไว้ + เปิดตัวเฝ้าที่อัปเดตข้อมูลให้เอง
+- **เครื่องลูก:** กดในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** ติดตั้งทุกอย่างและตั้งให้เครื่องลูกเซ็ตเกมใหม่เองตอนเปิดเครื่อง
+
+เครื่องแม่ที่ไม่มี `C:\lwserver` จะถูกเข้าใจว่าเป็นเครื่องลูก ให้สั่ง `OSYNC-All-In-One.bat master`
+
+## ปุ่มแยก
 | ปุ่ม | กดที่ | เมื่อไร |
 |---|---|---|
-| `MASTER-Update-All.bat` | เครื่องแม่ | หลังติดตั้ง / อัปเดต / ลบเกม (ปิด Riot Client ก่อนถ้าเกม Riot ยังอัปเดตอยู่) — อัปเดตข้อมูล Riot, EA, Epic, EasyAntiCheat ให้เครื่องลูก และสแกนรายการเกมในเมนูใหม่ |
-| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | ครั้งแรก และทุกครั้งที่ลงเกมใหม่ — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP, NEWTHINGS-GAMES (GTA SA) — ถามครั้งเดียวตอนเริ่มว่าจะแก้ภาษาไทยเอเลี่ยนในเกมไหม (Y แล้วต้องรีสตาร์ท) |
+| `GAMELUNCHER\ClientSetup\MASTER-Start-All.bat` | เครื่องแม่ กดครั้งเดียว | เปิด launcher ทุกค่ายตอนนี้และทุกครั้งที่ล็อกอิน ปิดไปจะเปิดกลับเอง เกมอัปเดตเองที่เครื่องแม่ — อัปเดตเสร็จแล้วทำ `MASTER-Update-All` ให้เองภายใน ~3 นาที และทุก 1 ชั่วโมงอีกรอบ เครื่องลูกเข้าเกมได้เลยไม่ขึ้นซ่อม (ปิด: `Update-Master\Master-Start-All-Off.bat`, log: `C:\Users\Public\OSYNC-Master-Watch.log`) |
+| `MASTER-Update-All.bat` | เครื่องแม่ | หลังติดตั้ง / อัปเดต / ลบเกม (ถ้าเปิด MASTER-Start-All ไว้ ทำให้เองแล้ว) — อัปเดตข้อมูล Riot, EA, Epic, EasyAntiCheat ให้เครื่องลูก และสแกนรายการเกมในเมนูใหม่ (ไม่ต้องปิด Riot Client) |
+| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | **ครั้งเดียว** — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP, NEWTHINGS-GAMES (GTA SA) และงาน `OSYNC-Client-Boot` ที่ทำให้เครื่องลูก **เซ็ตเกมใหม่เองทุกครั้งที่เปิดเครื่อง** (ลงเกมใหม่ไม่ต้องแก้ Image แค่รีบูตเครื่องลูก) — ถามครั้งเดียวตอนเริ่มว่าจะแก้ภาษาไทยเอเลี่ยนในเกมไหม (Y แล้วต้องรีสตาร์ท) |
 
-ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log` (รันซ้ำได้ ของที่ทำแล้วจะข้าม)
+ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log`, ผลตอนเปิดเครื่องที่ `C:\Users\Public\OSYNC-Boot-Setup.log` (ของที่ทำแล้วจะข้าม จึงบูตเร็ว)
+ของใหม่สะสมเยอะจนบูตช้า → กด `CLIENT-Install-All.bat` ใส่ Image อีกรอบ; ปิดการเซ็ตตอนเปิดเครื่อง: `GAMELUNCHER\ClientSetup\Install-Client\Boot-AutoSetup-Off.bat` (โหมดแก้ Image)
 
 ## ลงเกมใหม่ในอนาคต
+เมื่อกด `OSYNC-All-In-One` ที่เครื่องแม่ และใส่ Image ของเครื่องลูกไว้แล้ว: ลงเกมที่เครื่องแม่ → รอ ~3 นาที → **รีบูตเครื่องลูก** จบ
+
 | เกมจาก | ติดตั้งที่เครื่องแม่ | แล้วกด |
 |---|---|---|
-| Steam | ลงใน `X:\SteamLibrary` ของไดรฟ์ที่เครื่องลูกเห็น | `MASTER-Update-All.bat` → `CLIENT-Install-All.bat` ที่เครื่องลูก (โหมดแก้ Image) |
-| Riot (VALORANT/LoL/TFT) | อัปเดตใน Riot Client จนขึ้น Play แล้วปิด Riot Client | `MASTER-Update-All.bat` |
-| Epic | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EPIC\<เกม>` | `MASTER-Update-All.bat` → `CLIENT-Install-All.bat` |
-| EA app | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EA\<เกม>` | `MASTER-Update-All.bat` → `CLIENT-Install-All.bat` (เมนูจะเปิด EA app ให้กด Play; ถ้ารู้ offer id ใส่ใน `GCafe\tools\_system\Build-GameList.ps1` แล้วเปิดเกมตรงได้) |
-| เกมออนไลน์ / มือถือ / Garena / โปรแกรม | วางโฟลเดอร์เกมใน `X:\Online\<เกม>`, `X:\Mobile\<เกม>`, `X:\PvP\<เกม>`, `X:\Single Player\<เกม>` หรือ `X:\Web\<โปรแกรม>` | `MASTER-Update-All.bat` — เมนูหา exe ให้เอง (ดูบรรทัด `AUTO added ...` ว่าเลือกถูกไหม ถ้าผิดเพิ่มใน `GCafe\data\games.custom.json`) |
+| Steam | ลงใน `X:\SteamLibrary` ของไดรฟ์ที่เครื่องลูกเห็น | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) → รีบูตเครื่องลูก |
+| Riot (VALORANT/LoL/TFT) | อัปเดตใน Riot Client จนขึ้น Play (เปิด MASTER-Start-All ไว้ = อัปเดตเอง) | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) — เครื่องลูกกดเล่นได้เลย |
+| Epic | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EPIC\<เกม>` | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) → รีบูตเครื่องลูก |
+| EA app | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EA\<เกม>` | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) → รีบูตเครื่องลูก (เมนูจะเปิด EA app ให้กด Play; ถ้ารู้ offer id ใส่ใน `GCafe\tools\_system\Build-GameList.ps1` แล้วเปิดเกมตรงได้) |
+| เกมออนไลน์ / มือถือ / Garena / โปรแกรม | วางโฟลเดอร์เกมใน `X:\Online\<เกม>`, `X:\Mobile\<เกม>`, `X:\PvP\<เกม>`, `X:\Single Player\<เกม>` หรือ `X:\Web\<โปรแกรม>` | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) — เมนูหา exe ให้เอง (ดูบรรทัด `AUTO added ...` ใน log ว่าเลือกถูกไหม ถ้าผิดเพิ่มใน `GCafe\data\games.custom.json`) |
 | Ubisoft / Rockstar / Battle.net (ไม่ผ่าน Steam) | ยังไม่รองรับอัตโนมัติ — ใช้เวอร์ชัน Steam ถ้ามี | ให้ AI ช่วยเพิ่ม |
 
 รูปปก: Steam ใช้รูปจาก Steam, เกมอื่นใช้ `zPoster.jpg` ในโฟลเดอร์เกม หรือทำจากไอคอนให้เอง, ใส่รูปเองได้ที่ `GCafe\data\posters\<id>.jpg`
@@ -26,11 +39,14 @@
 ## โครงสร้างโฟลเดอร์
 ```
 OSYNC\
+  OSYNC-All-In-One.bat      ปุ่มเดียว ใช้ได้ทั้งเครื่องแม่และเครื่องลูก
   MASTER-Update-All.bat     ปุ่มเครื่องแม่
   CLIENT-Install-All.bat    ปุ่มเครื่องลูก
-  _system\                  สคริปต์ของ 2 ปุ่มบน
+  HOW-IT-WORKS.md           อธิบายการทำงานทั้งระบบ
+  _system\                  สคริปต์ของปุ่มด้านบน
   GAMELUNCHER\              ตัวโปรแกรม launcher ทุกค่าย (ห้ามย้าย/เปลี่ยนชื่อ) + ClientSetup\
     ClientSetup\
+      MASTER-Start-All.bat  เครื่องแม่: เปิด launcher ทุกค่ายค้างไว้ + อัปเดตข้อมูลเครื่องลูกให้เองหลังเกมอัปเดต
       VALORANT.bat ... RiotSilent.vbs, EpicSilent.vbs   ตัวเปิดเกมที่เมนูเรียกใช้ (ห้ามย้าย)
       Install-Client\       ปุ่มติดตั้งเครื่องลูกทีละอย่าง (ใช้ตอนแก้ปัญหา)
       Update-Master\        ปุ่มอัปเดตเครื่องแม่ทีละอย่าง

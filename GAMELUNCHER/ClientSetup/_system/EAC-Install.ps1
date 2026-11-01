@@ -58,11 +58,16 @@ $found | ForEach-Object { Write-Output ('{0,-22} {1}' -f $_.Game, $_.ProductId) 
 if (-not $newest) { Write-Output 'WARNING no EasyAntiCheat_EOS_Setup.exe found'; exit 1 }
 if ($DryRun) { Write-Output 'DryRun: nothing installed.'; return }
 
+# products EasyAntiCheat already lists as installed on this PC = skip (keeps every boot fast, Install-All.ps1 -Boot)
+$have = @("$((Get-ItemProperty 'HKLM:\SOFTWARE\WOW6432Node\EasyAntiCheat_EOS' -ErrorAction SilentlyContinue).ProductsInstalled)" -split ';')
+$svcBefore = Get-CimInstance Win32_Service -Filter "Name='EasyAntiCheat_EOS'"
 $fail = 0
 foreach ($g in $found) {
-  $p = Start-Process -FilePath $g.Setup -ArgumentList 'install', $g.ProductId -WorkingDirectory (Split-Path -Parent $g.Setup) -Wait -PassThru -WindowStyle Hidden
-  Write-Output ('{0,-22} exit {1}' -f $g.Game, $p.ExitCode)
-  if ($p.ExitCode -ne 0) { $fail++ }
+  if ($svcBefore -and $have -contains $g.ProductId) { Write-Output ('{0,-22} already installed' -f $g.Game); continue }
+  $r = Invoke-Installer $g.Setup @('install', $g.ProductId) "EasyAntiCheat $($g.Game)"
+  if ($null -eq $r.Code) { $fail++; continue }
+  Write-Output ('{0,-22} exit {1}, {2} s' -f $g.Game, $r.Code, $r.Sec)
+  if ($r.Code -ne 0) { $fail++ }
 }
 $svc = Get-CimInstance Win32_Service -Filter "Name='EasyAntiCheat_EOS'"
 Write-Output $(if ($svc) { "EasyAntiCheat_EOS: $($svc.StartMode)  $($svc.PathName)" } else { 'ERROR EasyAntiCheat_EOS service was not created' })

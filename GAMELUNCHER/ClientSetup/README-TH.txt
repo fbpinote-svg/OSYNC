@@ -21,10 +21,28 @@ H:\RIOT\Riot Games\              ตัวเกม League of Legends / Teamfigh
 H:\Mobile\Genshin Impact\        ตัวเกม Genshin (ย้ายออกจาก HoYoPlay\games เมื่อ 8 ต.ค. 2026)
 
 
-ปุ่มรวม (ใช้ 2 ปุ่มนี้เป็นหลัก อยู่ที่ H:\OSYNC)
-------------------------------------------
-  MASTER-Update-All.bat   เครื่องแม่: หลังติดตั้ง/อัปเดต/ลบเกม = ทุกปุ่มใน Update-Master\ + สแกนรายการเกมในเมนู
-  CLIENT-Install-All.bat  เครื่องลูก (โหมดแก้ Image แล้วบันทึก Image) = ทุกปุ่มใน Install-Client\ + เมนูเกม 0JAYSHOP
+ปุ่มเดียวจบ
+----------
+  H:\OSYNC\OSYNC-All-In-One.bat      กดได้ทั้งเครื่องแม่และเครื่องลูก ดูเองว่าเป็นเครื่องไหน แล้วทำ 3 ปุ่มด้านล่างที่เกี่ยวข้องให้
+                                     เครื่องลูก: กดในโหมดแก้ Image แล้วบันทึก Image
+                                     อธิบายการทำงานทั้งระบบ: H:\OSYNC\HOW-IT-WORKS.md
+
+
+ปุ่มรวม (ใช้ 3 ปุ่มนี้เป็นหลัก)
+------------------------------
+  ClientSetup\MASTER-Start-All.bat   เครื่องแม่ กดครั้งเดียว: เปิด launcher ทุกค่าย (Riot, Steam, Epic, EA, HoYoPlay, Garena,
+                                     Ubisoft, Rockstar, Modrinth) ตอนนี้และทุกครั้งที่ล็อกอิน ปิดไปจะเปิดกลับเอง เกมอัปเดตเอง
+                                     อัปเดตเสร็จแล้วทำ MASTER-Update-All ให้เองภายใน ~3 นาที และทุก 1 ชั่วโมงอีกรอบ
+                                     -> เครื่องลูกเข้าเกมได้เลย ไม่ขึ้นซ่อม
+                                     Riot Client อัปเดตตัวเองค้างไว้ = รีสตาร์ท Riot Client ให้เอง
+                                     ปิด: Update-Master\Master-Start-All-Off.bat   log: C:\Users\Public\OSYNC-Master-Watch.log
+  H:\OSYNC\MASTER-Update-All.bat     เครื่องแม่: หลังติดตั้ง/อัปเดต/ลบเกม = ทุกปุ่มใน Update-Master\ + สแกนรายการเกมในเมนู
+                                     (ถ้าเปิด MASTER-Start-All ไว้ ทำให้เองแล้ว ไม่ต้องกด)
+  H:\OSYNC\CLIENT-Install-All.bat    เครื่องลูก (โหมดแก้ Image แล้วบันทึก Image) กดครั้งเดียว = ทุกปุ่มใน Install-Client\ + เมนูเกม 0JAYSHOP
+                                     + งาน OSYNC-Client-Boot: เครื่องลูกเซ็ตเกมใหม่เองทุกครั้งที่เปิดเครื่อง (กันโกง/ของที่ Steam
+                                     ติดตั้งครั้งแรก/EA/EAC) ติดตั้งเฉพาะของที่ยังไม่มี -> ลงเกมใหม่ไม่ต้องแก้ Image แค่รีบูตเครื่องลูก
+                                     log ตอนเปิดเครื่อง: C:\Users\Public\OSYNC-Boot-Setup.log
+                                     ของใหม่สะสมเยอะจนบูตช้า = กดใส่ Image อีกรอบ; ปิด: Install-Client\Boot-AutoSetup-Off.bat
 ปุ่มทีละอย่างด้านล่างใช้ตอนแก้ปัญหาเฉพาะจุด
 
 
@@ -58,7 +76,8 @@ ClientSetup\  (ปุ่มที่กดได้)
 
 [ Update-Master\ - กดที่ "เครื่องแม่" หลังอัปเดตเกม ]
   Riot-Update-ClientData.bat   หลังอัปเดต VALORANT / League / TFT ใน Riot Client จนขึ้น Play
-                               (ปิด Riot Client ก่อนกด)
+                               (ไม่ต้องปิด Riot Client; ถ้าเกมยังอัปเดตไม่เสร็จจะบอกให้รอ)
+  Master-Start-All-Off.bat     ปิด MASTER-Start-All (เลิกเปิด launcher ให้เอง / เลิกอัปเดตข้อมูลเครื่องลูกให้เอง)
   Export-Kit.bat               แพ็กชุดนี้เป็น zip (GAMELUNCHER-Kit_วันที่.zip) ไว้ส่งไปสาขาอื่น
   Epic-Update-ClientData.bat   หลังติดตั้ง/อัปเดตเกมผ่าน Epic (เช่น Fortnite ที่ J:\EPIC) ให้เครื่องลูกรู้ว่ามีเกม
   EA-Update-ClientData.bat     หลังติดตั้ง/อัปเดตเกมผ่าน EA app (เช่น Apex ที่ I:\EA) หรือ EA app อัปเดตเวอร์ชัน

@@ -45,11 +45,17 @@ $jobs = @($jobs | Group-Object Title | ForEach-Object { $_.Group | Sort-Object {
 $jobs | ForEach-Object { Write-Output ('{0,-6} {1}' -f $_.Title, $_.Installer) }
 if ($DryRun) { Write-Output 'DryRun: nothing installed.'; return }
 
+# installed before on this PC with the same installer version = skip (keeps every boot fast, Install-All.ps1 -Boot)
+$marks = [Microsoft.Win32.RegistryKey]::OpenBaseKey('LocalMachine', 'Registry64').CreateSubKey('SOFTWARE\OSYNC\EAAntiCheat')
+$svcBefore = Get-CimInstance Win32_Service -Filter "Name='EAAntiCheatService'"
 $fail = 0
 foreach ($j in $jobs) {
-  $p = Start-Process -FilePath $j.Installer -ArgumentList '--noui', '--install', '--title', $j.Title -WorkingDirectory (Split-Path -Parent $j.Installer) -Wait -PassThru -WindowStyle Hidden
-  Write-Output ('{0,-6} exit {1}' -f $j.Title, $p.ExitCode)
-  if ($p.ExitCode -ne 0) { $fail++ }
+  $sig = "$($j.Title)|$((Get-Item -LiteralPath $j.Installer).VersionInfo.FileVersion)"
+  if ($svcBefore -and $marks.GetValue($sig)) { Write-Output ('{0,-6} already installed' -f $j.Title); continue }
+  $r = Invoke-Installer $j.Installer @('--noui', '--install', '--title', $j.Title) "EA AntiCheat $($j.Title)"
+  if ($null -eq $r.Code) { $fail++; continue }
+  Write-Output ('{0,-6} exit {1}, {2} s' -f $j.Title, $r.Code, $r.Sec)
+  if ($r.Code -ne 0) { $fail++ } else { $marks.SetValue($sig, 1, 'DWord') }
 }
 $svc = Get-CimInstance Win32_Service -Filter "Name='EAAntiCheatService'"
 Write-Output $(if ($svc) { "EAAntiCheatService: $($svc.StartMode)  $($svc.PathName)" } else { 'ERROR EAAntiCheatService was not created' })

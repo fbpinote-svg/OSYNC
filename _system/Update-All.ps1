@@ -1,11 +1,21 @@
 # Update-All.ps1 - MASTER: after installing / updating / removing games, refresh everything clients use
-# (MASTER-Update-All.bat). Close Riot Client first if a Riot game is still downloading.
+# (MASTER-Update-All.bat; GAMELUNCHER\ClientSetup\MASTER-Start-All.bat runs it by itself after updates).
+# Riot Client may stay open; while a Riot game is still patching, step 1 fails - run again when it is done.
 #   1 Riot : install state of VALORANT / LoL / TFT        2 EA  : EA app + EA games registration
 #   3 Epic : Epic games list (Fortnite ...)               4 EAC : EasyAntiCheat products installed here
 #   5 Menu : rescan all games -> GCafe\data\games.json
 $root = Split-Path -Parent $PSScriptRoot
 $sys  = Join-Path $root 'GAMELUNCHER\ClientSetup\_system'
 Write-Host "OSYNC master update on $env:COMPUTERNAME  ($root)" -ForegroundColor Cyan
+
+# one run at a time: the watcher (MASTER-Start-All) and the buttons can start this together
+$lock = New-Object Threading.Mutex($false, 'Local\OSYNC-Update-All')
+try {
+  if (-not $lock.WaitOne(0)) {
+    Write-Host 'Another update is running, waiting for it to finish ...' -ForegroundColor DarkYellow
+    if (-not $lock.WaitOne([TimeSpan]::FromMinutes(30))) { Write-Host 'Still running after 30 min, stopped.' -ForegroundColor Red; exit 1 }
+  }
+} catch [Threading.AbandonedMutexException] { }
 
 $results = New-Object System.Collections.Generic.List[object]
 function Step([string]$name, [string]$file, [string[]]$extra = @()) {
@@ -15,7 +25,6 @@ function Step([string]$name, [string]$file, [string[]]$extra = @()) {
   $results.Add([pscustomobject]@{ Step = $name; Result = $(if ($LASTEXITCODE -eq 0) { 'OK' } else { "FAIL (exit $LASTEXITCODE)" }) })
 }
 
-if (Get-Process -Name 'RiotClientServices' -ErrorAction SilentlyContinue) { Write-Host 'Riot Client is running - if a game is still updating, let it finish first.' -ForegroundColor DarkYellow }
 Step '1 Riot - VALORANT / LoL / TFT'   (Join-Path $sys 'Snapshot-Metadata.ps1')
 Step '2 EA   - EA app + games'          (Join-Path $sys 'Snapshot-EA.ps1')
 Step '3 Epic - Epic games'              (Join-Path $sys 'Snapshot-Epic.ps1')
@@ -24,5 +33,5 @@ Step '5 Menu - game list'               (Join-Path $root 'GCafe\tools\_system\Bu
 
 Write-Host "`n================ RESULT ================" -ForegroundColor Cyan
 $results | ForEach-Object { Write-Host ('{0,-36} {1}' -f $_.Step, $_.Result) -ForegroundColor $(if ($_.Result -eq 'OK') { 'Green' } elseif ($_.Result -like 'SKIP*') { 'DarkYellow' } else { 'Red' }) }
-Write-Host "`nClients pick this up after a reboot. Installed a new game? Also run CLIENT-Install-All.bat on one client in image mode, then save the image." -ForegroundColor Cyan
+Write-Host "`nClients pick this up after a reboot. New games are set up on each client at boot (task OSYNC-Client-Boot, from CLIENT-Install-All.bat)." -ForegroundColor Cyan
 if ($results | Where-Object { $_.Result -like 'FAIL*' }) { exit 1 }

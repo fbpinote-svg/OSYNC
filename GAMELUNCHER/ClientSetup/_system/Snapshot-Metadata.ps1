@@ -10,9 +10,9 @@ $src = Join-Path $env:ProgramData 'Riot Games\Metadata'
 $dst = Join-Path $setupDir 'Metadata'
 Write-Output "shared drives: $SharedDrives"
 
-if (Get-Process -Name 'RiotClientServices' -ErrorAction SilentlyContinue) {
-    Write-Warning 'Riot Client is running. If a game is still downloading/patching, wait until it finishes first.'
-}
+# Riot Client may stay open; a half-patched game would make clients ask for REPAIR, so wait for it
+$busy = @(Get-RiotBusy)
+if ($busy) { throw ("still updating, run again when it is done (RiotClient = open Riot Client once to install its own update): " + ($busy -join ', ')) }
 $bad = @()
 foreach ($y in Get-ChildItem $src -Recurse -Filter '*.live.product_settings.yaml') {
     $line = Select-String -Path $y.FullName -Pattern 'product_install_full_path:\s*"(.+)"' | Select-Object -First 1
@@ -25,8 +25,19 @@ foreach ($y in Get-ChildItem $src -Recurse -Filter '*.live.product_settings.yaml
 }
 if ($bad) { throw ("Install path not on a shared game disk ($SharedDrives):`n" + ($bad -join "`n")) }
 
-& robocopy.exe $src $dst /MIR /XF *.lockfile /R:1 /W:1 /NP /NFL /NDL /NJH | Select-Object -Last 4
+# Update = a downloaded Riot Client self-update; clients must not get it (each would install it on every boot)
+& robocopy.exe $src $dst /MIR /XD Update /XF *.lockfile lockfile /R:1 /W:1 /NP /NFL /NDL /NJH | Select-Object -Last 4
 if ($LASTEXITCODE -ge 8) { throw "robocopy failed ($LASTEXITCODE)" }
+
+# only the master patches Riot games; clients run them from the shared disk, so auto-update stays off there
+foreach ($y in Get-ChildItem $dst -Recurse -Filter '*.product_settings.yaml') {
+    $t = [IO.File]::ReadAllText($y.FullName)
+    if ($t -match 'auto_patching_enabled_by_player:\s*true') {
+        $time = $y.LastWriteTimeUtc
+        [IO.File]::WriteAllText($y.FullName, ($t -replace 'auto_patching_enabled_by_player:\s*true', 'auto_patching_enabled_by_player: false'), (New-Object Text.UTF8Encoding $false))
+        $y.LastWriteTimeUtc = $time    # keep the master's time so clients copy it like the other files
+    }
+}
 Write-Output "snapshot updated: $dst"
 
 # reference list of the Riot Client files, used by Diagnose\RiotDiag.bat on clients

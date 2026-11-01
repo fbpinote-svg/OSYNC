@@ -36,7 +36,11 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 - อาการ: เครื่องลูกขึ้น **REPAIR NEEDED** / Install ทั้งที่เกมมีอยู่
 - สาเหตุ: เครื่องลูกไม่มีข้อมูล `C:\ProgramData\Riot Games` (Metadata, RiotClientInstalls.json) และ/หรือมี **link เก่าที่เสีย** ใน ProgramData จากระบบเดิม
 - วิธีแก้: เครื่องแม่ snapshot Metadata (`MASTER-Update-All.bat`) → เปิดเกมผ่าน `RiotSilent.vbs` เสมอ (ก๊อป Metadata + ซ่อม link + ตั้ง protocol ก่อนเปิด)
-- เครื่องแม่ต้องอัปเดตเกมใน Riot Client จนขึ้น Play แล้ว **ปิด Riot Client** ก่อน snapshot
+- snapshot ได้ทั้งที่ Riot Client เปิดอยู่ แต่ต้องไม่มีเกมกำลังอัปเดต: Riot เขียน `<เกม>.manifest` ตอนเริ่ม patch และ `<เกม>.ok` ตอนเสร็จ — manifest ใหม่กว่า ok = ยังไม่เสร็จ (`Get-RiotBusy` ใน `Settings.ps1`; snapshot จะรอ)
+- ขึ้น REPAIR **หลังเกมอัปเดต** (เคยใช้ได้แล้ว) = เครื่องแม่อัปเดตเกมแล้วแต่ snapshot ยังเป็นของเก่า → `MASTER-Update-All.bat` หลังทุก patch (VALORANT ประมาณทุก 2 สัปดาห์)
+  ถาวร: `GAMELUNCHER\ClientSetup\MASTER-Start-All.bat` ที่เครื่องแม่ (เปิด launcher ทุกค่ายค้างไว้ + ทำ MASTER-Update-All เองเมื่ออัปเดตเสร็จ); เครื่องลูกก๊อป Metadata ใหม่ทุกครั้งที่กดเล่น
+- auto-update ของเกม Riot: เปิดที่เครื่องแม่ (`auto_patching_enabled_by_player: true`) แต่ snapshot บังคับสำเนาของเครื่องลูกเป็น `false` — เครื่องลูกต้องไม่ patch เกมบนไดรฟ์ที่แชร์เอง
+- `C:\ProgramData\Riot Games\Metadata\RiotClient\Update\` ที่เครื่องแม่ = Riot Client โหลดอัปเดตตัวเองค้างไว้ (ติดตั้งตอนเปิด Riot Client ใหม่) → ห้ามส่งให้เครื่องลูก (snapshot ข้าม `Update`; ไม่งั้นเครื่องลูกติดตั้งเองทุกครั้งที่บูต) — MASTER-Start-All รีสตาร์ท Riot Client ให้เองเมื่อไม่มีเกมเปิด/อัปเดตอยู่
 - Riot Vanguard (vgk/vgc) ต้องอยู่ใน Image ของเครื่องลูก — ตรวจปัญหาด้วย `Diagnose\RiotDiag.bat`
 
 ## 4. EA (EA app + เกม EA บน Steam)
@@ -61,6 +65,15 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
   และเขียน registry; Steam จำว่าทำแล้วที่ `HKLM\SOFTWARE\WOW6432Node\Valve\Steam\Apps\...` (ค่า `HasRunKey`, ชื่อค่า = ชื่อ entry, 32-bit view)
   เครื่องลูก diskless ลืมทุกรีบูต → ช้า/เด้งปิด → `Steam-FirstRun.ps1` ทำให้ครั้งเดียวในโหมดแก้ Image
   (ข้าม `EAappInstaller` เพราะใช้ EA app ตัวกลาง, ข้าม `EAAntiCheat` เพราะมีขั้นตอนเฉพาะ)
+  entry ที่ไม่มี `HasRunKey` (VC++, .NET, PhysX, EAC ของ Dead by Daylight/Rust/Chivalry 2 ... ~26 รายการ) จะรันซ้ำทุกครั้ง → เราจำเองที่
+  `HKLM\SOFTWARE\OSYNC\SteamFirstRun` (ชื่อเกม|entry|คำสั่ง) — คำสั่งเปลี่ยน (เกมอัปเดตตัวกันโกง) = รันใหม่เอง
+  ข้าม `_CommonRedist\DotNet` บน Windows 10/11: .NET 4.8 มีในตัว, `DotNetFx35Client.exe /q` รอ Windows Update → ค้างจนหมดเวลา
+  ตัวติดตั้งทุกตัว (Steam/EAC/EA AntiCheat) ผ่าน `Invoke-Installer` ใน Settings.ps1: จำกัด 5 นาที, บรรทัดสถานะสด (หมุน + เวลา, ไม่ลง log; ลูกส่งเป็นบรรทัด "~" ให้ Install-All วาดทับ), เกิน 15 วิขึ้น "still running" ลง log, หมดเวลาฆ่าทั้ง process tree
+  (ลูกที่ค้างไว้จะล็อก Windows Installer ให้ตัวถัดไปพัง 1618)
+  (เกมไหนต้องการ .NET 3.5 จริง → เปิด Windows feature `NetFx3` ในโหมดแก้ Image)
+- **เครื่องลูกเซ็ตตัวเองตอนเปิดเครื่อง**: งาน `OSYNC-Client-Boot` (SYSTEM, ตอน startup) รัน `Install-All.ps1 -Boot` ขั้น 1-4 เฉพาะของที่ยังไม่มี
+  (EA AntiCheat จำที่ `HKLM\SOFTWARE\OSYNC\EAAntiCheat` ชื่อเกม|เวอร์ชัน, EAC ใช้ `ProductsInstalled` ของ EAC เอง) → ลงเกมใหม่ไม่ต้องแก้ Image
+  เมนู/NEWTHINGS ไม่รันตอนบูต (เป็นของต่อผู้ใช้ และไม่เปลี่ยนเมื่อมีเกมใหม่); เครื่องแม่ยังต้องอัปเดตเกมและก๊อปข้อมูลติดตั้ง (C: ของเครื่องแม่ไม่ได้แชร์ให้เครื่องลูก)
 - รูปปกเกม Steam รุ่นใหม่ไม่อยู่ที่ `cdn.akamai.steamstatic.com/steam/apps/<id>/header.jpg` แล้ว — ใช้แคชในเครื่อง `steam\appcache\librarycache\<id>\**\header.jpg`
   หรือ `store.steampowered.com/api/appdetails?appids=<id>` → `header_image`
 
@@ -107,6 +120,7 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 - `Remove-Item -Recurse` อาจเดินเข้า junction — ลบ link ก่อนด้วย `[IO.Directory]::Delete(link)`
 - `Get-Content` ไฟล์ UTF-8 ต้องใส่ `-Encoding UTF8`; ใน string ใช้ `${var}:` แทน `$var:`
 - `Get-ItemProperty -Path` กับชื่อ key ที่มี `[` `]` ถูกตีเป็น wildcard → ใช้ `$key.GetValue('name')`
+- กด `.bat` จาก terminal PowerShell 7 → `PSModulePath` ของ 7 ติดไปถึง `powershell.exe` 5.1 จนหา `Get-FileHash` ไม่เจอ (ขั้น Riot ขึ้น FAIL ทั้งที่ Riot ปกติ) — ล้างค่าในไฟล์ `.bat` ด้วย `set "PSModulePath="`
 - Electron app ที่มี single-instance lock: โหมดเครื่องมือ (`--imagetool`) ต้องเช็กก่อน lock
 - หยุด Windows Update นานเกิน 5 สัปดาห์: `HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings` →
   `FlightSettingsMaxPauseDays`, `Pause*StartTime` / `PauseUpdatesExpiryTime` / `Pause*UpdatesEndTime` (เวลา UTC แบบ ISO) — ให้เจ้าของร้านรันเอง

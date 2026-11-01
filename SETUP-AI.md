@@ -51,7 +51,10 @@ launcher ทุกค่ายรวมอยู่ที่ `<ไดรฟ์>:
 - **Steam**: ทุกไดรฟ์มี `X:\SteamLibrary` และเพิ่มเป็น library ใน Steam; ย้ายเกมได้เฉพาะ **ภายในไดรฟ์เดียวกัน**
   (ย้ายโฟลเดอร์ `common\<เกม>` + `appmanifest_<id>.acf` ไปพร้อมกัน, ปิด Steam ก่อน); เกมซ้ำ → ย้ายไป `X:\_ลบได้`
   โฟลเดอร์ใน `common\` ที่ไม่มี manifest = Steam ไม่เห็น ให้ถามเจ้าของร้าน (ทำ manifest ให้ Steam ตรวจไฟล์ หรือย้ายไปลบ)
-- **Riot**: อัปเดต VALORANT/LoL/TFT ใน Riot Client จนขึ้น Play → ปิด Riot Client → `Update-Master\Riot-Update-ClientData.bat`
+- **Riot**: อัปเดต VALORANT/LoL/TFT ใน Riot Client จนขึ้น Play → `Update-Master\Riot-Update-ClientData.bat` (ไม่ต้องปิด Riot Client)
+- **ทุกค่าย (แนะนำ)**: เมื่อเกมครบแล้วให้เจ้าของร้านกด `GAMELUNCHER\ClientSetup\MASTER-Start-All.bat` ที่เครื่องแม่ครั้งเดียว — เปิด launcher ทุกค่ายค้างไว้
+  ให้เกมอัปเดตเอง และทำ MASTER-Update-All ให้เองหลังอัปเดตเสร็จ; เปิด auto-update ของเกม Riot ที่เครื่องแม่ (Riot Client → Settings → เกม →
+  อัปเดตอัตโนมัติ) — สำเนาที่ส่งให้เครื่องลูกถูกบังคับเป็นปิดเสมอ
 - **EA app**: ติดตั้งเกมลงไดรฟ์เกม → `Update-Master\EA-Update-ClientData.bat`
 - **Epic**: ติดตั้งเกมลงไดรฟ์เกม (เช่น `X:\EPIC\Fortnite`) → `Update-Master\Epic-Update-ClientData.bat`
 - **Garena และเกมที่เปิดจาก exe ตรง** (เกมออนไลน์ไทย, มือถือ, โปรแกรม): ใส่ใน `GCafe\data\games.custom.json` (ขั้น 5)
@@ -74,7 +77,8 @@ launcher ทุกค่ายรวมอยู่ที่ `<ไดรฟ์>:
 
 ## 6. เครื่องลูก (ให้เจ้าของร้านทำในโหมด super workstation / แก้ Image แล้วบันทึก Image)
 - เครื่องแม่: กด `X:\OSYNC\MASTER-Update-All.bat` ก่อน (เก็บข้อมูล Riot/EA/Epic/EasyAntiCheat + สแกนรายการเกม) ทุกผลต้อง OK
-- เครื่องลูก 1 เครื่อง: `X:\OSYNC\CLIENT-Install-All.bat` → Riot เงียบตอนล็อกอิน, **Steam first-run ของทุกเกม** (installscript.vdf:
+- เครื่องลูก 1 เครื่อง: `X:\OSYNC\CLIENT-Install-All.bat` (ครั้งเดียว — สร้างงาน `OSYNC-Client-Boot` ให้เครื่องลูกเซ็ตเกมใหม่เองทุกครั้งที่บูต
+  ด้วย `Install-All.ps1 -Boot` ขั้น 1-4 ติดตั้งเฉพาะของที่ยังไม่มี; บันทึกว่าทำแล้วไว้ใน `HKLM\SOFTWARE\OSYNC\*` และ EAC ProductsInstalled) → Riot เงียบตอนล็อกอิน, **Steam first-run ของทุกเกม** (installscript.vdf:
   กันโกง BattlEye/ACE/Ricochet/EAC, Social Club, DirectX, VC++, registry), EA app + เกม EA + **EA AntiCheat**,
   **EasyAntiCheat** ของ Epic, เมนูเกม 0JAYSHOP — ดูตาราง RESULT ท้ายหน้าต่าง (log: `C:\Users\Public\OSYNC-Install-All.log`)
   ถ้าไม่ติดตั้งกันโกง เกมจะขึ้นหน้าโหลด/เช็กอัปเดตแล้วปิดเองบนเครื่องลูก (เช่น Apex "Checking for updates...")
@@ -84,5 +88,7 @@ launcher ทุกค่ายรวมอยู่ที่ `<ไดรฟ์>:
 - มีปัญหา Riot ขึ้น Repair: `GAMELUNCHER\ClientSetup\Diagnose\RiotDiag.bat` ที่เครื่องลูก แล้วอ่านรายงาน
 
 ## 7. ส่งงาน
+เมื่อตั้งค่าครบแล้ว เจ้าของร้านใช้ `X:\OSYNC\OSYNC-All-In-One.bat` ปุ่มเดียวได้ทั้งเครื่องแม่และเครื่องลูก (ตรวจเครื่องแม่จาก `C:\lwserver`; ถ้าไม่มีให้สั่ง `OSYNC-All-In-One.bat master`)
+ระบบทั้งหมดอธิบายไว้ใน `HOW-IT-WORKS.md`
 สรุปให้เจ้าของร้าน: launcher ที่ย้าย, เกมที่อยู่ในเมนู (จำนวนตามหมวด), เกมที่ข้าม/ยังไม่สมบูรณ์, ของที่ย้ายไป `_ลบได้` พร้อมคำสั่งลบ,
 และสิ่งที่เขาต้องทำต่อที่เครื่องลูก ถ้าแก้สคริปต์ในระบบ ให้ commit แยก branch ของสาขา (เช่น `branch-<ชื่อสาขา>`) อย่า push ทับ `main` โดยไม่ถาม
