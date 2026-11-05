@@ -106,6 +106,20 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 - **ย้ายโฟลเดอร์เกมที่ torrent ยังทำงาน = มันโหลดใหม่ทั้งเกม**; kill/suspend BitTorrent ยิ่งแย่ (AutoSync รีสตาร์ทตัวเองแล้วดึงเกมที่ลบไปแล้วกลับมา)
   ที่ได้ผล: kill ครั้งเดียว → ย้ายโฟลเดอร์ออก → วางไฟล์ 0 ไบต์ read-only ชื่อเดียวกับโฟลเดอร์ไว้กันไม่ให้สร้างใหม่
 - ก่อนแตะโฟลเดอร์ที่ AutoSync ดูแล ต้องถามเจ้าของร้าน
+- ที่มา: บริการของ iPlay Cafe (iplaycafe.app) — `C:\Program Files\AutoSync Service Manager` (เปิดตอนล็อกอินจาก HKCU Run), `D:\AutoSync\AutoSync.exe` (Electron),
+  BitTorrent แบบซ่อนหน้าต่างใน `AppData\Local\AutoSync\BitTorrent` (ปิดไป AutoSync เปิดกลับเอง), LockHunter ใช้ปลดล็อก/ปิดโปรแกรมที่จับไฟล์เกมก่อนอัปเดต
+- ฐานข้อมูล `AppData\Local\AutoSync\db\*.db` **ไม่ใช่ SQLite** แต่เป็น NeDB: JSON 1 บรรทัดต่อ 1 รายการ บรรทัดหลังที่ `_id` เดียวกันทับบรรทัดก่อน `{"$$deleted":true}` = ลบ
+  `gameClient.db` = เกมที่ลงในเครื่อง (`game_name`, `dir`, `first_exe`, `game_size`, `game_update`, `magnet`), `gameServer.db` = แคตตาล็อกเกมของ iPlay, `listDir.db` = ไดรฟ์/หมวด
+- แต่ละเกมมี `zRunGame.exe` (สคริปต์ AutoIt ที่คอมไพล์แล้ว) เป็นตัวเปิด + `zPoster.jpg`; เกม Steam ถูกแพ็กเป็นโฟลเดอร์เดี่ยวพร้อม `appmanifest_<id>.acf`;
+  launcher ที่ `zRunGame` ใช้อยู่ใน `E:\Common\GameLauncher`
+- เมนูเก่า `E:\GameMenu` (iPlay GameMenu, Electron) ดึงรายการเกมจาก AutoSync บนเครื่องแม่ (พอร์ต 5555) แล้วรัน `first_exe` ในโฟลเดอร์เกม
+  เมนู 0JAYSHOP ทำแบบเดียวกัน: `Build-GameList` อ่าน `first_exe` จาก `gameClient.db` (อ่านอย่างเดียว) จึงไม่ต้องเดา exe ของเกม AutoSync
+- **ความปลอดภัย (จากการอ่านโค้ด ไม่ได้ลองเรียกจริง):** API พอร์ต 5555 ของ AutoSync บนเครื่องแม่ไม่มีการยืนยันตัวตน
+  เครื่องลูกเครื่องไหนก็อ่านข้อมูลสมาชิกระบบเซฟเกม (รวมรหัสผ่าน ซึ่งเก็บเป็นข้อความธรรมดาใน `GameSave.db`) และไฟล์บนเครื่องแม่ได้
+  AutoSync และ GameMenu ยังโหลดไฟล์ .reg จากเซิร์ฟเวอร์ของ iPlay แล้วรัน `regedit /s` ทุกครั้งที่เปิด และส่งข้อมูลเครื่อง (CPU/GPU/RAM/IP) ไปทุกครั้งที่เปิดเกม
+  แก้: ย้ายเครื่องลูกมาใช้เมนู 0JAYSHOP แล้วบล็อกพอร์ต 5555 จากเครื่องลูกหรือเลิกใช้ AutoSync, ให้สมาชิกที่ใช้ระบบเซฟเกมเปลี่ยนรหัสผ่าน,
+  แจ้งผู้ผลิต (iPlay Cafe) — ห้ามเอาข้อมูลสมาชิกหรือรายละเอียดวิธีเจาะลง git (repo นี้ public)
+- ย้ายมาใช้ GameSync: ไฟล์เกมที่ AutoSync โหลดไว้ใช้ต่อได้เลย (เทียบ sha256 ไม่โหลดใหม่), `pull.skipAutoSyncFolders` กันไม่ให้ GameSync ทับโฟลเดอร์ที่ AutoSync ของเครื่องนั้นยังดูแลอยู่
 
 ## 11. เมนูเกม GCafe (0JAYSHOP)
 - Build ได้โดยไม่ต้องลง Node.js: `ELECTRON_RUN_AS_NODE=1 electron.exe node_modules\next\dist\bin\next build` (Build-App.ps1 ทำให้)

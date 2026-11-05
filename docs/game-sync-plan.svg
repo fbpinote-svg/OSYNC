@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="680" height="440" viewBox="0 0 680 440" role="img">
-<title>ข้อเสนอระบบ Game Sync</title>
+<title>ระบบ GameSync</title>
 <desc>เครื่องแม่ต้นทางทำรายการไฟล์พร้อม hash แล้วแจกผ่าน HTTP เครื่องแม่ปลายทางเทียบรายการ ดึงเฉพาะไฟล์ที่เปลี่ยน ย้ายไฟล์ที่ถูกลบไป _ลบได้ แล้วรัน MASTER-Update-All</desc>
 <style>
 text{font-family:"Leelawadee UI","Noto Sans Thai",Tahoma,sans-serif;text-anchor:middle;dominant-baseline:central}
@@ -34,5 +34,6 @@ text{font-family:"Leelawadee UI","Noto Sans Thai",Tahoma,sans-serif;text-anchor:
 <line class="arr" x1="545" y1="142" x2="545" y2="162"/>
 <line class="arr" x1="545" y1="222" x2="545" y2="242"/>
 <line class="arr" x1="545" y1="302" x2="545" y2="322"/>
-<text class="note" x="135" y="350">ข้อเสนอ ยังไม่ได้สร้าง</text>
+<text class="note" x="135" y="350">ต้นทาง: GAMESYNC-Source.bat</text>
+<text class="note" x="135" y="370">ปลายทาง: GAMESYNC-Pull.bat</text>
 </svg>

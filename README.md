@@ -13,7 +13,7 @@ OSYNC แก้โดยให้เครื่องแม่ก๊อปข�
 2. **เครื่องลูก** — `CLIENT-Install-All` ครั้งเดียวตอนแก้ Image (กันโกง, Steam first-run, EA app, เมนู) แล้วงาน `OSYNC-Client-Boot` ลงของใหม่ให้เองทุกครั้งที่เปิดเครื่อง
 3. **เมนู 0JAYSHOP** — อ่าน `games.json` ตอนกดเล่นเกม Riot / Epic จะก๊อปข้อมูลล่าสุดลง C: ก่อนเปิด จึงไม่ขึ้นซ่อม
 
-ยังไม่มี: sync ไฟล์เกมระหว่างเครื่องแม่ด้วยกัน (สาขาอื่น / server อีกตัว) — ข้อเสนอการออกแบบอยู่ที่ [docs/GAME-SYNC-PLAN.md](docs/GAME-SYNC-PLAN.md)
+sync ไฟล์เกมระหว่างเครื่องแม่ด้วยกัน (สาขาอื่น / server อีกตัว): **GameSync** — ดู [GameSync/README-TH.md](GameSync/README-TH.md)
 
 ## ปุ่มเดียวจบ
 กด `OSYNC-All-In-One.bat` ได้ทั้งเครื่องแม่และเครื่องลูก มันจะดูเองว่าเป็นเครื่องไหน แล้วทำทุกอย่างให้
@@ -28,6 +28,9 @@ OSYNC แก้โดยให้เครื่องแม่ก๊อปข�
 | `GAMELUNCHER\ClientSetup\MASTER-Start-All.bat` | เครื่องแม่ กดครั้งเดียว | เปิด launcher ทุกค่ายตอนนี้และทุกครั้งที่ล็อกอิน ปิดไปจะเปิดกลับเอง เกมอัปเดตเองที่เครื่องแม่ — อัปเดตเสร็จแล้วทำ `MASTER-Update-All` ให้เองภายใน ~3 นาที และทุก 1 ชั่วโมงอีกรอบ เครื่องลูกเข้าเกมได้เลยไม่ขึ้นซ่อม (ปิด: `Update-Master\Master-Start-All-Off.bat`, log: `C:\Users\Public\OSYNC-Master-Watch.log`) |
 | `MASTER-Update-All.bat` | เครื่องแม่ | หลังติดตั้ง / อัปเดต / ลบเกม (ถ้าเปิด MASTER-Start-All ไว้ ทำให้เองแล้ว) — อัปเดตข้อมูล Riot, EA, Epic, EasyAntiCheat ให้เครื่องลูก และสแกนรายการเกมในเมนูใหม่ (ไม่ต้องปิด Riot Client) |
 | `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | **ครั้งเดียว** — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP, NEWTHINGS-GAMES (GTA SA) และงาน `OSYNC-Client-Boot` ที่ทำให้เครื่องลูก **เซ็ตเกมใหม่เองทุกครั้งที่เปิดเครื่อง** (ลงเกมใหม่ไม่ต้องแก้ Image แค่รีบูตเครื่องลูก) — ถามครั้งเดียวตอนเริ่มว่าจะแก้ภาษาไทยเอเลี่ยนในเกมไหม (Y แล้วต้องรีสตาร์ท) |
+
+| `GAMESYNC-Source.bat` | เครื่องแม่ที่มีเกม (ต้นทาง) เปิดค้างไว้ | ทำรายการไฟล์เกมใน E F H I ... แล้วแจกให้เครื่องแม่อื่น (ต้องมี key) — [GameSync/README-TH.md](GameSync/README-TH.md) |
+| `GAMESYNC-Pull.bat` | เครื่องแม่ปลายทาง (สาขาอื่น / server ตัวที่ 2) | ดึงเฉพาะไฟล์เกมที่เปลี่ยนจากต้นทาง ไฟล์ที่มีอยู่แล้วใช้ต่อ ไฟล์ที่ต้นทางลบย้ายไป `X:\_ลบได้` แล้วรัน `MASTER-Update-All` ให้ (`list` = ดูก่อน, `--watch` = เช็กเรื่อยๆ) |
 
 ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log`, ผลตอนเปิดเครื่องที่ `C:\Users\Public\OSYNC-Boot-Setup.log` (ของที่ทำแล้วจะข้าม จึงบูตเร็ว)
 ของใหม่สะสมเยอะจนบูตช้า → กด `CLIENT-Install-All.bat` ใส่ Image อีกรอบ; ปิดการเซ็ตตอนเปิดเครื่อง: `GAMELUNCHER\ClientSetup\Install-Client\Boot-AutoSetup-Off.bat` (โหมดแก้ Image)
@@ -52,8 +55,11 @@ OSYNC\
   OSYNC-All-In-One.bat      ปุ่มเดียว ใช้ได้ทั้งเครื่องแม่และเครื่องลูก
   MASTER-Update-All.bat     ปุ่มเครื่องแม่
   CLIENT-Install-All.bat    ปุ่มเครื่องลูก
+  GAMESYNC-Source.bat       GameSync ต้นทาง: แจกเกมให้เครื่องแม่อื่น
+  GAMESYNC-Pull.bat         GameSync ปลายทาง: ดึงเกมที่เปลี่ยน
   HOW-IT-WORKS.md           อธิบายการทำงานทั้งระบบ
-  docs\                     แผนภาพ + ข้อเสนอระบบ Game Sync
+  GameSync\                 ตัวโปรแกรม GameSync (Node.js ไฟล์เดียว) + คู่มือ README-TH.md
+  docs\                     แผนภาพ + แนวคิดระบบ Game Sync
   _system\                  สคริปต์ของปุ่มด้านบน
   GAMELUNCHER\              ตัวโปรแกรม launcher ทุกค่าย (ห้ามย้าย/เปลี่ยนชื่อ) + ClientSetup\
     ClientSetup\
