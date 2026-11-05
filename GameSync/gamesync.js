@@ -243,6 +243,7 @@ async function indexGame(game, limiter) {
   const w = await walk(game.root, only);
   const files = [];
   let total = 0, hashed = 0, unstable = '';
+  let lastShow = Date.now(), lastSave = Date.now();
   for (const rel of w.files.sort()) {
     const full = path.join(game.root, rel);
     let st;
@@ -254,6 +255,13 @@ async function indexGame(game, limiter) {
       hashed += st.size;
       const after = await fsp.stat(full).catch(() => null);
       if (!after || after.size !== st.size || !sameMtime(after.mtimeMs, st.mtimeMs)) { unstable = `${rel} changed while reading`; break; }
+      // big games take a while: show progress, and keep the hashes done so far in case the window is closed
+      if (Date.now() - lastShow > (+process.env.GAMESYNC_PROGRESS_MS || 60000)) { lastShow = Date.now(); log(`index: ${game.id}  reading... ${fmtBytes(hashed)} so far`); }
+      if (Date.now() - lastSave > (+process.env.GAMESYNC_SAVE_MS || 300000)) {
+        lastSave = Date.now();
+        const done = new Set(files.map((f) => f[0]));
+        writeJsonAtomic(file, { ...game, files: [...files, [rel, st.size, st.mtimeMs, sha], ...[...old.values()].filter((f) => !done.has(f[0]) && f[0] !== rel)], dirs: [], links: [], size: 0, version: '', unstable: 'index not finished' });
+      }
     }
     // written since this index began (a time far in the future is a wrong clock in the file, not a write)
     if (st.mtimeMs > startedAt && st.mtimeMs < Date.now() + 60000) { unstable = `${rel} is being written`; break; }
