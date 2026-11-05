@@ -123,6 +123,7 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 
 ## 11. เมนูเกม GCafe (0JAYSHOP)
 - Build ได้โดยไม่ต้องลง Node.js: `ELECTRON_RUN_AS_NODE=1 electron.exe node_modules\next\dist\bin\next build` (Build-App.ps1 ทำให้)
+- Electron 44 ขึ้นไป `npm ci` **ไม่โหลด** `electron.exe` ให้แล้ว (แพ็กเกจไม่มี postinstall) → `node node_modules\electron\install.js` (โหลด release ทางการ ตรวจกับ `checksums.json`) — Build-App.ps1 ทำให้เองถ้ามี Node
 - ตัวโปรแกรมที่ build แล้วรัน `0JAYSHOP.exe --imagetool <jobs.json>` เพื่อทำรูปปก (Chromium อ่าน webp/bmp/ico ได้ — WIC ของ Windows อ่าน webp บางไฟล์ไม่ได้)
 - ปิด 0JAYSHOP แล้ว antivirus อาจล็อก exe อยู่หลายวินาที → robocopy ต้อง retry (`/R:10 /W:3`)
 - เดา exe ของเกมใหม่ (Build-GameList): launcher/portable +5, start/play +3, ชื่อคล้ายโฟลเดอร์ +3, ลบ 1 ต่อชั้นโฟลเดอร์ย่อย,

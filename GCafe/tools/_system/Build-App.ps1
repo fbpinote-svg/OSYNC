@@ -11,6 +11,12 @@ $appDir  = Join-Path $gcafe 'app'
 $electron = Join-Path $src 'node_modules\electron\dist\electron.exe'
 
 if (Get-Process -Name '0JAYSHOP' -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$appDir\*" }) { throw "Close 0JAYSHOP.exe (running from $appDir) first." }
+# Electron 44+ no longer downloads electron.exe during 'npm ci': fetch it once (official release, checked against checksums.json)
+$eInstall = Join-Path $src 'node_modules\electron\install.js'
+if (-not (Test-Path -LiteralPath $electron) -and (Test-Path -LiteralPath $eInstall) -and (Get-Command node -ErrorAction SilentlyContinue)) {
+  Write-Output 'downloading the Electron runtime (node_modules\electron\install.js)...'
+  & node $eInstall
+}
 if (-not (Test-Path -LiteralPath $electron)) { throw "source\node_modules is missing: install Node.js LTS, then run 'npm ci' in $src" }
 
 # first build on a new PC: make the runtime from Electron (electron.exe -> 0JAYSHOP.exe, no default app)
