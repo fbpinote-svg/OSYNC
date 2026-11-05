@@ -118,7 +118,7 @@ const DEFAULTS = {
   key: '',
   source: {
     drives: 'EFHI', categories: ['Online', 'Mobile', 'PvP', 'Single Player', 'Web', 'Common'], steam: true,
-    include: [], exclude: [], port: 8765, bind: '0.0.0.0', readLimitMBps: 0, indexHours: '', reindexMinutes: 60,
+    include: [], exclude: [], port: 18765, bind: '0.0.0.0', readLimitMBps: 0, indexHours: '', reindexMinutes: 60,
   },
   pull: {
     url: '', drives: '', include: [], exclude: [], hours: '', everyMinutes: 30, parallel: 4, downloadLimitMBps: 0,
@@ -563,7 +563,7 @@ function acquireLock(name) {
 }
 
 async function pullOnce(cfg, opt) {
-  if (!cfg.pull.url) throw new Error(`set pull.url (e.g. http://100.64.0.10:8765) and key in ${CONFIG_FILE}`);
+  if (!cfg.pull.url) throw new Error(`set pull.url (e.g. http://100.64.0.10:18765) and key in ${CONFIG_FILE}`);
   if (!cfg.key) throw new Error(`set "key" in ${CONFIG_FILE} (copy it from the source)`);
   const drives = parseDrives(cfg.pull.drives || cfg.source.drives);
   const api = client(cfg, cfg.key);

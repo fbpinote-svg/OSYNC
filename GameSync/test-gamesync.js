@@ -10,7 +10,7 @@ const { spawn, spawnSync } = require('node:child_process');
 const GS = process.argv[2] || path.join(__dirname, 'gamesync.js');
 const T = path.join(require('node:os').tmpdir(), 'osync-gamesync-test');
 fs.rmSync(T, { recursive: true, force: true });
-const SRC = path.join(T, 'src'), PORT = 18765, KEY = 'test-key-123';
+const SRC = path.join(T, 'src'), PORT = 28765, KEY = 'test-key-123';
 let failures = 0;
 const ok = (cond, msg) => { console.log(`${cond ? 'PASS' : 'FAIL'}  ${msg}`); if (!cond) failures++; };
 const sha = (f) => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');

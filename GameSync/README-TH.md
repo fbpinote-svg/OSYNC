@@ -13,7 +13,7 @@
 1. กด `GAMESYNC-Source.bat` ครั้งแรก จะได้ไฟล์ `GameSync\gamesync.json` พร้อม `key` ใหม่ (ไฟล์นี้ไม่อยู่ใน git เพราะมี key)
 2. เปิดพอร์ตในไฟร์วอลล์ 1 ครั้ง (Command Prompt แบบ admin — เจ้าของร้านรันเอง):
    ```
-   netsh advfirewall firewall add rule name="OSYNC GameSync" dir=in action=allow protocol=TCP localport=8765
+   netsh advfirewall firewall add rule name="OSYNC GameSync" dir=in action=allow protocol=TCP localport=18765
    ```
 3. เปิดหน้าต่างค้างไว้ รอบแรกจะอ่านทุกเกมเพื่อทำรายการไฟล์ ร้านที่มีเกมหลาย TB ใช้เวลาหลายชั่วโมง และดิสก์จะทำงานหนัก
    แนะนำให้ตั้ง `source.indexHours` เป็นช่วงร้านปิด หรือจำกัดความเร็วด้วย `source.readLimitMBps`
@@ -22,7 +22,7 @@
 
 ## เครื่องแม่ปลายทาง
 1. clone OSYNC ลงไดรฟ์เกม แล้วกด `GAMESYNC-Pull.bat list` 1 ครั้ง เพื่อสร้าง `GameSync\gamesync.json`
-2. แก้ `GameSync\gamesync.json`: `key` (ก๊อปจากต้นทาง), `pull.url` (เช่น `http://100.64.0.10:8765`), `pull.drives`, `pull.hours`
+2. แก้ `GameSync\gamesync.json`: `key` (ก๊อปจากต้นทาง), `pull.url` (เช่น `http://100.64.0.10:18765`), `pull.drives`, `pull.hours`
 3. `GAMESYNC-Pull.bat list` ดูว่าจะโหลดอะไร (ยังไม่โหลดจริง)
 4. `GAMESYNC-Pull.bat` โหลดตอนนี้ หรือ `GAMESYNC-Pull.bat --watch` ให้เช็กเองทุก `pull.everyMinutes` นาที
 5. เกมเปลี่ยนแล้วจะรัน `MASTER-Update-All` ให้เอง เมนูจะมีเกมใหม่ จากนั้นรีบูตเครื่องลูก
@@ -46,7 +46,7 @@
 | `source.drives` | ไดรฟ์ที่แจก เช่น `"EFHI"` |
 | `source.categories`, `source.steam` | หมวดโฟลเดอร์ที่แจก และจะแจกเกม Steam ไหม |
 | `source.include` / `source.exclude` | เลือกเกมด้วยชื่อหรือ id ใช้ `*` ได้ เช่น `["E/Online/*", "I/Single Player/Cyberpunk*"]` |
-| `source.port`, `source.bind` | พอร์ต (8765) และ IP ที่รับ (`0.0.0.0` = ทุก network card) |
+| `source.port`, `source.bind` | พอร์ต (18765) และ IP ที่รับ (`0.0.0.0` = ทุก network card) |
 | `source.readLimitMBps`, `source.indexHours`, `source.reindexMinutes` | จำกัดความเร็วอ่านดิสก์, ช่วงเวลาที่ทำรายการไฟล์ (เช่น `"02:00-09:00"`), ทำรายการใหม่ทุกกี่นาที |
 | `pull.url` | ที่อยู่ของต้นทาง |
 | `pull.drives` | ว่าง = ใช้ตัวอักษรไดรฟ์เดียวกับต้นทาง, `{"E": "H"}` = เกมจาก E: ของต้นทางให้ลง H: ของเครื่องนี้ |
@@ -57,6 +57,7 @@
 | `pull.afterSync` | `"update-all"` = รัน `MASTER-Update-All` หลังเกมเปลี่ยน, `"none"` = ไม่รัน |
 
 ## ข้อควรรู้
+- ขึ้น `EADDRINUSE` = มีโปรแกรมอื่นใช้พอร์ตอยู่ (เช่น CafeNet Server ใช้ 8765) ให้เปลี่ยน `source.port` แล้วแก้ `pull.url` ของปลายทางให้ตรงกัน
 - ช่วงที่กำลังโหลด เครื่องลูกที่เปิดเกมนั้นอยู่อาจเจอไฟล์เก่ากับใหม่ปนกัน ควรตั้ง `pull.hours` เป็นช่วงร้านปิด
 - เกมที่ต้นทางลบทั้งเกม ปลายทาง **ไม่ลบตาม** (ลบเองถ้าไม่ต้องการ) — ที่ย้ายไป `_ลบได้` คือไฟล์ที่หายไปจากเกมที่ยังอยู่
 - ไฟล์ที่เกมเปิดค้างอยู่ที่ปลายทางจะสลับไม่ได้ เกมนั้นจะขึ้นว่า "NOT complete" แล้วทำต่อให้ในรอบหน้า
