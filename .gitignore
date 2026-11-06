@@ -7,6 +7,13 @@
 !/SETUP-AI.md
 !/KNOWLEDGE.md
 !/HOW-IT-WORKS.md
+!/docs/
+!/GAMESYNC-Source.bat
+!/GAMESYNC-Pull.bat
+!/GameSync/
+# GameSync: settings hold the key, _data is per-PC (index, state, log)
+/GameSync/gamesync.json
+/GameSync/_data/
 !/OSYNC-All-In-One.bat
 !/CLIENT-Install-All.bat
 !/MASTER-Update-All.bat

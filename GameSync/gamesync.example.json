@@ -1,0 +1,29 @@
+{
+  "_help": "Copied to gamesync.json on first run (gamesync.json is not in git: it holds the key). key: the source makes one on first run; copy the same key to every destination. source = the master that has the games. pull = a master that copies them. drives: \"EFHI\" = same letters, or {\"E\": \"H\"} to put the source's E: games on this PC's H:. Hours like \"02:00-08:00\" (empty = any time). readLimitMBps / downloadLimitMBps: 0 = no limit. See README-TH.md.",
+  "key": "",
+  "source": {
+    "drives": "EFHI",
+    "categories": ["Online", "Mobile", "PvP", "Single Player", "Web", "Common"],
+    "steam": true,
+    "include": [],
+    "exclude": [],
+    "port": 18765,
+    "bind": "0.0.0.0",
+    "readLimitMBps": 0,
+    "indexHours": "",
+    "reindexMinutes": 60
+  },
+  "pull": {
+    "url": "",
+    "drives": "",
+    "include": [],
+    "exclude": [],
+    "hours": "02:00-09:00",
+    "everyMinutes": 30,
+    "parallel": 4,
+    "downloadLimitMBps": 0,
+    "moveRemoved": true,
+    "skipAutoSyncFolders": true,
+    "afterSync": "update-all"
+  }
+}

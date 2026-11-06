@@ -179,16 +179,56 @@ foreach ($g in $games) {
 }
 if ($custom) { foreach ($g in $custom.games) { if ($g.root) { $covered.Add($g.root.TrimEnd('\')) }; foreach ($c in @($g.exe)) { if ($c) { $covered.Add((Split-Path -Parent $c.Replace('{GAMELUNCHER}', $GameLuncher))) } } } }
 function Slug([string]$s) { ($s -replace '[^A-Za-z0-9]', '').ToLower() }
+
+# start exe already known for a folder (no guessing): games copied by OSYNC GameSync (GameSync\_data\synced.json),
+# then the old AutoSync game list (first_exe, e.g. zRunGame.exe - the same exe the AutoSync menu starts). Read only.
+$known = @{}
+$syncedFile = Join-Path (Split-Path -Parent $gcafe) 'GameSync\_data\synced.json'
+if (Test-Path -LiteralPath $syncedFile) {
+  try {
+    $s = Get-Content -LiteralPath $syncedFile -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($p in $s.PSObject.Properties) { $g = $p.Value; if ($g.kind -eq 'folder' -and $g.start) { $known[$g.root.ToLower()] = @{ exe = $g.start; from = 'GameSync' } } }
+  } catch { $warn.Add("cannot read $syncedFile") }
+}
+$asDb = Join-Path $env:LOCALAPPDATA 'AutoSync\db\gameClient.db'
+if (Test-Path -LiteralPath $asDb) {
+  try {
+    $byId = @{}
+    $sr = New-Object IO.StreamReader([IO.File]::Open($asDb, 'Open', 'Read', 'ReadWrite'), [Text.Encoding]::UTF8)
+    while ($null -ne ($l = $sr.ReadLine())) {        # one JSON per line; later lines replace earlier ones with the same _id
+      if (-not $l.Trim()) { continue }
+      try { $g = $l | ConvertFrom-Json; if ($g.'$$deleted') { $byId.Remove($g._id) } else { $byId[$g._id] = $g } } catch { }
+    }
+    $sr.Close()
+    foreach ($g in $byId.Values) {
+      if (-not ($g.game_name -and $g.dir -and $g.first_exe)) { continue }
+      $k = (Join-Path $g.dir $g.game_name).ToLower()
+      if (-not $known.ContainsKey($k)) { $known[$k] = @{ exe = (Join-Path (Join-Path $g.dir $g.game_name) $g.first_exe); from = 'AutoSync' } }
+    }
+  } catch { $warn.Add("cannot read the AutoSync game list: $($_.Exception.Message)") }
+}
+
+$usedIds = @{}; foreach ($g in $games) { $usedIds[$g.id] = $true }
 foreach ($drv in Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Root -match '^[D-Z]:\\$' }) {
   foreach ($catDir in $autoCats.Keys) {
     foreach ($f in Get-ChildItem -LiteralPath (Join-Path $drv.Root $catDir) -Directory -ErrorAction SilentlyContinue) {
       $fp = $f.FullName
+      if ($f.Name -like '*.gsync-new') { continue }                          # GameSync is still downloading this game
       if ($covered | Where-Object { $_ -ieq $fp -or $_.StartsWith($fp + '\', [StringComparison]::OrdinalIgnoreCase) }) { continue }
+      $id = 'auto-' + (Slug $f.Name)
+      if ($usedIds.ContainsKey($id)) { $id = "$id-$($drv.Name.ToLower())" }   # same folder name on two drives
+      $k = $known[$fp.ToLower()]
+      if ($k -and (Test-Path -LiteralPath $k.exe)) {
+        $usedIds[$id] = $true
+        Add-Game $id $f.Name $autoCats[$catDir] ('"' + $k.exe + '"') (Split-Path -Parent $k.exe) (Poster $id $fp) $(if ($k.from -eq 'AutoSync') { 'AutoSync' } else { '' })
+        $iconOf[$id] = $k.exe
+        continue
+      }
       $best = Get-ChildItem -LiteralPath $fp -Filter *.exe -Recurse -Depth 2 -File -ErrorAction SilentlyContinue |
         Where-Object { $_.Length -gt 100KB -and $_.BaseName -notmatch $notStart } |
         Sort-Object @{ e = { ExeScore $_ $f.Name $fp }; Descending = $true }, @{ e = { $_.Length }; Descending = $true } | Select-Object -First 1
       if (-not $best) { $warn.Add("new folder without a start exe: $fp"); continue }
-      $id = 'auto-' + (Slug $f.Name)
+      $usedIds[$id] = $true
       Add-Game $id $f.Name $autoCats[$catDir] ('"' + $best.FullName + '"') $best.DirectoryName (Poster $id $fp) ''
       $iconOf[$id] = $best.FullName
       $warn.Add("AUTO added $($f.Name) [$($autoCats[$catDir])] -> $($best.FullName)  (check it once)")
