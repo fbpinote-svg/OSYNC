@@ -54,7 +54,16 @@ function Run-Script([string]$file, [string[]]$extra = @()) {
   $LASTEXITCODE
 }
 $results = New-Object System.Collections.Generic.List[object]
+# 20 Nov 2026 (Apex, the owner: with iPlay Apex plays on the same diskless system): Settings ClientApexMinimal = PC names ->
+# on those PCs ONLY the steps Steam and EA AntiCheat need run (0a CPU-Z block, 1q 1r 1u Steam, 2 Steam first-run, 3 EA);
+# the rest of OSYNC's boot setup (Sunshine, OSLink, mic, Parsec, VDD, runtimes, menu, desktop ...) is skipped for that boot.
+# Apex OK there = one of the skipped steps is the cause (turn them back on one by one); still FAIL = the image / Steam.
+$ApexMinimal = $Boot -and @((Get-Setting 'ClientApexMinimal' '').Trim() -split '[,;\s]+' | Where-Object { $_ -and $_ -ieq $env:COMPUTERNAME }).Count -gt 0
 function Step([string]$name, [scriptblock]$body) {
+  if ($ApexMinimal -and $name -notmatch '^(0a|1q|1r|1u|2|3) ') {
+    Write-Host "`n== $name   SKIP (ClientApexMinimal: Apex test PC, only Steam + EA AntiCheat steps)" -ForegroundColor DarkGray
+    $results.Add([pscustomobject]@{ Step = $name; Result = 'SKIP (ClientApexMinimal)'; Sec = 0 }); return
+  }
   Write-Host "`n== $name" -ForegroundColor Yellow
   try { [Console]::Title = "OSYNC $name" } catch {}
   $t = [Diagnostics.Stopwatch]::StartNew()
@@ -490,7 +499,15 @@ Step '1t Rockstar - launcher on the game disk (FiveM / GTA V)' {
   }
   Write-Host "    Rockstar Games Launcher $ver : $dir (was: $(if ($old) { $old } else { 'not registered' })); $svcMsg"
 }
-Step '2 Steam - first-run setup of every game' {
+# BlueStacks 5 (20 Nov 2026): runs from the game disk where Master-Move-BlueStacks.ps1 put it (OSYNC.bat > 7 > 25 on the
+# master): its registry + COM registration from System\Data\BlueStacks and its kernel driver BlueStacksDrv_nxt from the game
+# disk (Client-BlueStacks.ps1). Not moved yet = skipped. Settings ClientBlueStacks=off skips this.
+Step '1w BlueStacks - Android emulator from the game disk' {
+  if (Test-IsMaster) { return 'SKIP (this is the master)' }
+  if ((Get-Setting 'ClientBlueStacks' 'on') -match '^(?i)(off|no|0|false)$') { return 'SKIP (ClientBlueStacks=off)' }
+  if (-not (Test-Path -LiteralPath (Join-Path $DataDir 'BlueStacks\bluestacks.reg'))) { return 'SKIP (not moved to a game disk yet: OSYNC.bat > 7 > 25 on the master)' }
+  Run-Script (Join-Path $ScriptsDir 'Client-BlueStacks.ps1')
+}Step '2 Steam - first-run setup of every game' {
   Run-Script (Join-Path $ScriptsDir 'Client-Steam-FirstRun.ps1') $(if ($Boot) { @('-SkipFailed') } else { @() })
 }
 Step '3 EA    - EA app, games, EA AntiCheat' {

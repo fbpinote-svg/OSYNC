@@ -1,66 +1,229 @@
-﻿# SETUP-AI.md — คู่มือติดตั้ง OSYNC บนเครื่องแม่สาขาใหม่ (สำหรับ AI / Claude Code)
+﻿# SETUP-AI.md — ขั้นตอนติดตั้ง OSYNC บนเครื่องแม่ร้านอื่น (สำหรับ AI / Claude Code)
 
-คุณคือ AI ที่ช่วยเจ้าของร้านตั้งค่า **เครื่องแม่ (master) ของร้านเกม diskless** ให้เหมือนสาขาหลัก
-คุยกับเจ้าของร้านเป็นภาษาไทย อธิบายสั้นๆ ว่ากำลังทำอะไร และถามก่อนทุกครั้งที่ระบุไว้ด้านล่าง
-**อ่าน [KNOWLEDGE.md](KNOWLEDGE.md) ก่อนเริ่ม** และ [HOW-IT-WORKS.md](HOW-IT-WORKS.md) เพื่อเข้าใจโครงโฟลเดอร์
-เจอปัญหาใหม่แล้วแก้ได้ ให้เพิ่มลง KNOWLEDGE.md
-
-```
-<ไดรฟ์เกม>:\OSYNC\   OSYNC.bat  README.md  Settings\  Launchers\  Menu\  System\      (ชื่อโฟลเดอร์จะตั้งอะไรก็ได้ · ร้านนี้ H:\OSYNC · ร้าน AT9 E:\Autosync)
-```
+คุณคือ AI ที่ช่วยเจ้าของร้านเกม diskless ติดตั้ง OSYNC บน **เครื่องแม่ (master)** ของร้าน
+- คุยกับเจ้าของร้านเป็นภาษาไทย บอกสั้นๆ ว่ากำลังทำอะไร
+- ทำตามลำดับในไฟล์นี้ หยุดถามทุกจุดที่เขียนว่า **[ถาม]** และให้คนทำทุกจุดที่เขียนว่า **[คนทำ]**
+- **ห้ามติดตั้งก่อนสัมภาษณ์เจ้าของร้านครบ (ข้อ 2)** ทุกร้านจัดไดรฟ์และเกมไม่เหมือนกัน การเดาเองทำให้วางผิดที่และต้องย้ายเกมทีหลัง
+- คู่มือฝั่งคน (อ่านประกอบ): [00-EASY-INSTALL.md](00-EASY-INSTALL.md) · บทเรียนที่เคยเจอ: [KNOWLEDGE.md](KNOWLEDGE.md) · ปุ่มทุกข้อ: [02-INSTALL-UPDATE.md](02-INSTALL-UPDATE.md)
+- เจอปัญหาใหม่แล้วแก้ได้ ให้เพิ่มลง KNOWLEDGE.md ของร้านนั้น
 
 ---
 
-## 0. กฎที่ต้องทำตามเสมอ
-1. **ห้ามลบไฟล์ถาวรเอง** — ย้ายไป `X:\_ลบได้\` (ไดรฟ์เดียวกัน = ย้ายเร็ว) แล้วให้คำสั่งลบกับเจ้าของร้านไปรันเอง
-2. **ย้ายจริง ไม่ทิ้ง junction/link ไว้ที่ C:** — ย้าย launcher ด้วย OSYNC.bat > 7 > 1 (มันรัน dry-run ให้ดูก่อนเสมอ) ให้เจ้าของร้านกด Y และกด Yes ที่ UAC เอง
-3. **ถามก่อน**: ดาวน์โหลด/ติดตั้งโปรแกรม (บอกชื่อ แหล่ง ขนาด), รีสตาร์ท Steam/launcher, ย้ายเกมข้ามไดรฟ์, แก้ไฟร์วอลล์/ความปลอดภัย, รีสตาร์ทบริการ diskless (`lwdiskless*`) — ห้ามทำเองเด็ดขาด
-4. **AutoSync (ระบบโหลดเกมแบบ BitTorrent ของร้านเก่า)**: ถ้ามี (BitTorrent.exe, โฟลเดอร์ `X:\AutoSync`) ห้าม kill/suspend และห้ามย้ายโฟลเดอร์ที่มันดูแลโดยไม่ถาม
-5. อย่าแตะไฟล์ระบบ diskless (`C:\lwserver`) นอกจาก **อ่าน**
-6. Windows PowerShell 5.1: ดู KNOWLEDGE ข้อ 12 — สคริปต์ใน `System\Scripts` เป็น ASCII ล้วน อย่าใส่ภาษาไทยในไฟล์ .ps1
-7. รายงานผลตามจริง ถ้าขั้นไหนข้ามหรือไม่ผ่านให้บอก
+## 0. ใครทำอะไร
+
+| AI ทำเองได้ | AI ต้องถามก่อน [ถาม] | คนต้องทำเอง [คนทำ] |
+|---|---|---|
+| ตรวจเครื่อง (`Setup-Plan.ps1`, `Tool-Check.ps1`), อ่านไฟล์และ registry | ทุกคำถามในข้อ 2 (ไดรฟ์, เกม, launcher, ฟีเจอร์) | กด Yes ที่ UAC |
+| ติดตั้ง OSYNC ด้วยสวิตช์ (`-Target -ShopName -Yes -NoWizard`) **หลังเจ้าของร้านตกลงแผน** | ดาวน์โหลด / ติดตั้งโปรแกรมใดๆ (บอกชื่อ แหล่ง ขนาด) | ล็อกอิน launcher (รหัสผ่าน, รหัสยืนยัน) และกดยอมรับข้อตกลง |
+| รันแบบ DryRun ทุกตัวที่มี (`Master-Setup -DryRun`, `Master-Move-Launcher -DryRun`) | ย้าย launcher จริง (ปิดโปรแกรมนั้น), ย้ายเกมข้ามไดรฟ์ | ตั้งค่าในโปรแกรม diskless: ไดรฟ์เกม, โหมด super, บันทึก Image |
+| `Master-Update.ps1`, `Master-GameList.ps1`, อ่านคำเตือน `AUTO added` | เปิดตัวเฝ้า, แก้ `settings.txt`, แก้ไฟร์วอลล์ | ตั้ง IP ตายตัวที่เราเตอร์ / Windows |
+| สรุปผลเป็นตารางให้เจ้าของร้าน | รีสตาร์ต launcher หรือบริการ | เปิด / รีบูตเครื่องลูก และทดสอบเกมที่เครื่องลูก |
+
+**ไม่มีทาง 100% อัตโนมัติ:** ขั้น [คนทำ] เป็นเรื่องบัญชี สิทธิ์ และโปรแกรม diskless ที่ AI ห้ามทำแทน ให้บอกเจ้าของร้านทีละขั้นว่าต้องกดอะไร แล้วรอเขาบอกว่าเสร็จ
+
+## 0.1 กฎที่ต้องทำตามเสมอ
+
+1. **ห้ามลบไฟล์ถาวรเอง** ย้ายไป `X:\_ลบได้\` (ไดรฟ์เดียวกัน = ย้ายเร็ว) แล้วให้คำสั่งลบกับเจ้าของร้านไปรันเอง
+2. **ห้ามย้าย launcher ด้วยมือ และห้ามทิ้ง junction ไว้ที่ C:** ใช้ `Master-Move-Launcher.ps1` (`OSYNC.bat` → `7` → `1` หรือ `OSYNC.bat` → `4` ขั้น 2) มันแก้ registry / เซอร์วิส / งานตั้งเวลา / shortcut ให้ และสำรองไว้ใน `System\Backup`
+3. **ห้ามรัน `OSYNC.bat` ในโฟลเดอร์ที่แตกจาก zip** และห้าม `git clone` ลงที่ใช้งานจริงแล้วรันเลย: `settings.txt` ในโปรเจกต์เป็นค่าของร้านต้นทาง (ชื่อเครื่องแม่ของเขา) ต้องติดตั้งผ่าน `EASY-INSTALL.bat` / `Setup-Install.ps1` เท่านั้น ตัวติดตั้งล้างค่าพวกนี้ให้ (`OSYNC.bat` ในโฟลเดอร์ที่ยังไม่ติดตั้งจะหยุดเองและขึ้น `This folder is a download of OSYNC`)
+4. **อย่าแตะไฟล์ระบบ diskless** (`C:\lwserver`, CCBoot ฯลฯ) นอกจากอ่าน · ห้ามรีสตาร์ตบริการ diskless · ไดรฟ์ Image / write-back / cache ของ diskless ห้ามวางอะไรลงไป
+5. **ระบบเดิมของร้าน** (เมนูเกมเดิม, ระบบโหลดเกมแบบ BitTorrent เช่น AutoSync) ห้าม kill / suspend / ย้ายโฟลเดอร์ที่มันดูแลโดยไม่ถาม
+6. **Windows PowerShell 5.1:** สคริปต์ใน `System\Scripts` เป็น ASCII ล้วน อย่าใส่ภาษาไทยในไฟล์ `.ps1` (KNOWLEDGE ข้อ 12) · สคริปต์ที่ถามด้วย `Read-Host` (`OSYNC.bat`, `Master-Setup.ps1` ที่ไม่ใช่ `-DryRun`) ต้องรันในหน้าต่างที่คนตอบได้ ไม่ใช่ใน shell ของ AI ที่ไม่มีคนพิมพ์
+7. **รายงานผลตามจริง** ขั้นไหนข้ามหรือไม่ผ่านให้บอก พร้อมข้อความจริงจากจอ · รัน `OSYNC.bat` จาก shell ให้ตั้ง `OSYNC_NOPAUSE=1` ก่อน (ไม่งั้นค้างรอ "Press Enter to close")
+8. repo นี้เป็น public: ห้ามใส่รหัสผ่าน token ข้อมูลสมาชิก หรืออีเมลส่วนตัวลงไฟล์ใดๆ ที่จะ commit · ห้ามขอรหัสผ่านจากเจ้าของร้าน
 
 ---
 
-## 1. สำรวจเครื่องก่อน (อ่านอย่างเดียว)
-1. วางโฟลเดอร์ OSYNC บนไดรฟ์เกมที่เครื่องลูกเห็น (ถามเจ้าของร้านว่าไดรฟ์ไหน) — `git clone <repo> X:\OSYNC` หรือก๊อปโฟลเดอร์มา
-2. กด `X:\OSYNC\OSYNC.bat check` (หรือ `System\Scripts\Tool-Check.ps1`) — ได้ตาราง OK / WARN / FAIL ของทั้งเครื่อง ไม่แก้อะไร
-3. ดูเพิ่มเอง: ไดรฟ์ทั้งหมด พื้นที่ว่าง โฟลเดอร์ชั้นบนของแต่ละไดรฟ์ (`X:\Online`, `X:\Mobile`, `X:\SteamLibrary` ฯลฯ), เกม Steam ที่ไม่มี appmanifest
-4. สรุปให้เจ้าของร้านเป็นตาราง แล้ว **เสนอแผน** รอเขาตกลงก่อนลงมือ
+## 1. ตรวจเครื่อง (อ่านอย่างเดียว)
 
-## 2. ตัวช่วยตั้งค่า: OSYNC.bat > 4 (`Master-Setup.ps1`)
-ให้เจ้าของร้านกดเอง (ขอ UAC) — มันถามทีละขั้น ขั้นที่ทำแล้วจะบอกว่า OK (ดูก่อนได้ด้วย `Master-Setup.ps1 -DryRun`):
+1. ยืนยันว่าเป็นเครื่องแม่: มีโปรแกรม diskless server (LW `C:\lwserver`, CCBoot, iCafeCloud, NxD, ggRock) ถ้าไม่มี **หยุด** แล้วบอกเจ้าของร้าน
+2. ได้โฟลเดอร์ OSYNC มาแบบใดแบบหนึ่ง:
+   - `OSYNC-Setup-<วันที่>.exe` ที่ร้านต้นทางส่งให้ (มากับ `SETUP-AI.md` และ `00-EASY-INSTALL.md` วางข้างกัน ใช้ไฟล์คู่มือชุดนั้น เพราะตรงกับรุ่นของ exe) หรือ
+   - zip จาก https://github.com/fbpinote-svg/OSYNC (Code → Download ZIP) **[ถาม]** ก่อนดาวน์โหลด แตกไว้ที่ชั่วคราว เช่น `%USERPROFILE%\Downloads\OSYNC-main`
+3. ตรวจเครื่อง (ไม่เปลี่ยนอะไร):
+   ```
+   powershell -NoProfile -ExecutionPolicy Bypass -File "<โฟลเดอร์ที่แตก>\System\Scripts\Setup-Plan.ps1"
+   ```
+   วิธีอ่านผล: [00 ข้อ 3.5](00-EASY-INSTALL.md#35-ตัวอย่างผลตรวจเครื่องจริง) · ใช้ในสคริปต์: `-Quiet -PassThru` คืน `OsyncRoot`, `Why`, `SharedDrives`, `Drives`, `Launchers`, `SteamLibraries`, `Dhcp`
+   จาก exe: `"<ไฟล์>.exe" -PlanOnly` ได้ผลตรวจแบบเดียวกัน (ไม่ติดตั้งอะไร) · เจอ OSYNC ที่ติดตั้งแล้ว = งานนี้คือ **อัปเดต** ไปข้อ 9
+4. จดสิ่งที่ผลตรวจบอกไว้ใช้ในข้อ 2: ตารางไดรฟ์ (ขนาด ว่าง SSD/HDD เครื่องลูกเห็นไหม), launcher ที่เจอและอยู่ที่ไหน, library ของ Steam (จำนวนเกม ขนาด), IP / DHCP, ที่วางที่แนะนำ + เหตุผล
 
-1. **ไดรฟ์ที่เครื่องลูกเห็น** → `Settings\settings.txt` (`SharedDrives=`) — อ่านจากฐานข้อมูลของโปรแกรม diskless ให้เองถ้ามี Node.js
-   (`C:\lwserver\config\lwservice.db` ตาราง `tServerDiskMng`: `vdiskletter` = ตัวอักษรที่เครื่องลูกเห็น, type 1 = ดิสก์เกม) ไม่งั้นถามเจ้าของร้าน
-2. **ย้าย launcher เข้า `Launchers\`** — ทีละค่าย: dry-run ให้ดู → ถาม → ย้าย (อ่านตำแหน่งเดิมจาก Registry, ไดรฟ์เดียวกัน = เปลี่ยนชื่อ, ข้ามไดรฟ์ = ก๊อป+ตรวจ+ลบต้นทาง, แก้ Registry/บริการ/งานตั้งเวลา/shortcut ให้ชี้ที่ใหม่, สำรองไว้ใน `System\Backup`)
-   ค่ายที่มี: Steam, Riot, EA, Epic, Garena, Ubisoft, Rockstar, HoYoPlay (เกมใน `HoYoPlay\games` ย้ายไป `GAME\HoYoPlay\<เกม>` แล้วให้เจ้าของร้านกด "Locate game" ใน HoYoPlay), Modrinth
-   หลังย้ายแต่ละตัว เปิดโปรแกรมจากที่ใหม่ให้ดูว่าใช้ได้ — ค่ายใหม่ที่ยังไม่มี: เพิ่มใน `Common.ps1` (`$LauncherTable`) และ preset ใน `Master-Move-Launcher.ps1`
-3. **Steam library** — แนะนำ `X:\SteamLibrary` ทุกไดรฟ์ ตั้งเป็นค่าเริ่มต้นใน Steam; เกมที่อยู่ใน `Launchers\Steam\steamapps` ย้ายด้วย OSYNC.bat > 7 > 2
-   (ต้องเพิ่ม library ใน Steam → Settings → Storage ก่อน) — โฟลเดอร์ใน `common\` ที่ไม่มี manifest = Steam ไม่เห็น ให้ถามเจ้าของร้าน
-4. **เมนูเกม (`Menu\`)** — ชื่อร้าน/ป้าย/โลโก้ใน `Menu\config.json` และ `Menu\data\brand\` (ทำโลโก้: `Menu\tools\_system\Make-Brand.ps1 -Image <รูป>`)
-   build ครั้งแรกต้องมี `Menu\source\node_modules`: ติดตั้ง Node.js LTS (ถามก่อน: `winget install OpenJS.NodeJS.LTS`) → `cd Menu\source` → `npm ci` → OSYNC.bat > 7 > 3
-   (Electron 44 ขึ้น "node_modules is missing" ทั้งที่ npm ci ผ่าน: ดู KNOWLEDGE ข้อ 11) — จบด้วย self-test ดูรูป `Menu\_build\selftest\selftest-gamemenu.png`
-5. **อัปเดตเครื่องลูก** (= OSYNC.bat > 1) — อ่าน WARNING ทุกบรรทัด: exe ไม่เจอ / exe 0 ไบต์ = ยังติดตั้งไม่เสร็จ / `AUTO added` = เดา exe ให้ ตรวจว่าถูก
-6. **ตัวเฝ้า ON** (= OSYNC.bat > 2) — เปิด launcher ทุกค่ายค้างไว้ให้เกมอัปเดตเอง; เปิด auto-update ของเกม Riot ที่เครื่องแม่ (สำเนาของเครื่องลูกถูกบังคับปิดเสมอ)
-7. **ตรวจระบบ** — ต้องไม่มี FAIL
+---
 
-## 3. เกมของแต่ละค่าย
-- **Riot**: อัปเดต VALORANT/LoL/TFT ใน Riot Client จนขึ้น Play แล้ว OSYNC.bat > 1 (ไม่ต้องปิด Riot Client)
-- **EA app / Epic**: ติดตั้งเกมลงไดรฟ์เกม (เช่น `X:\EA\<เกม>`, `X:\EPIC\Fortnite`) แล้ว OSYNC.bat > 1; เกม EA ที่รู้ offer id ใส่ใน `Settings\extra-games.json` → `eaOffers` จะเปิดตรงได้
-- **Garena และเกมที่เปิดจาก exe ตรง** (เกมออนไลน์ไทย, มือถือ, โปรแกรม): วางใน `X:\Online|Mobile|PvP|Single Player|Web` ระบบหา exe เอง — ใส่ใน `Settings\extra-games.json` → `games` เฉพาะเกมที่เดาผิดหรืออยู่นอกโฟลเดอร์เหล่านี้
-  รูปแบบ: `{ "id": "ชื่อสั้น", "title": "ชื่อโชว์", "cat": "Online|Mobile|Garena|Apps", "platform": "Garena", "exe": "X:\\...\\game.exe", "root": "X:\\...", "args": "" }`
+## 2. สัมภาษณ์เจ้าของร้าน (ต้องครบก่อนติดตั้ง)
+
+**วิธีถาม**
+- ถาม **ทีละหัวข้อ** (ก, ข, ค ...) ไม่ถามทั้งหมดในข้อความเดียว · แต่ละหัวข้อแสดงข้อมูลจากผลตรวจเครื่องให้ดูก่อน แล้วถามให้ยืนยันหรือแก้
+- หลังได้คำตอบ สรุปกลับ 1-3 บรรทัดให้เจ้าของร้านยืนยันว่าเข้าใจถูก
+- คำตอบไม่ตรงกับที่เครื่องแสดง (เช่น บอกว่าไดรฟ์ F แชร์ แต่ตารางขึ้น `NO`) ให้ชี้ให้ดูแล้วถามจนชัด ห้ามเลือกเอง
+- เจ้าของร้านไม่รู้คำตอบ: เสนอค่าที่แนะนำพร้อมเหตุผล แล้วจดว่า "ใช้ค่าแนะนำ"
+- ห้ามถามรหัสผ่าน · ถามได้แค่ว่าใช้บัญชีแบบไหน
+
+**ก. ร้านและเครื่องลูก**
+1. ชื่อร้าน (ขึ้นบนเมนูและเป็นชื่อโปรแกรมเมนู) · มีโลโก้ไหม ไฟล์อยู่ไหน
+2. โปรแกรม diskless ยี่ห้อ / รุ่นอะไร (เทียบกับบรรทัด `diskless server:`)
+3. เครื่องลูกกี่เครื่อง ตั้งชื่อแบบไหน (เช่น `PC01`-`PC40`) ใช้ IP ช่วงไหน (เครื่องที่ 1 ได้ IP อะไร) · เครื่องแม่ IP อะไร ตายตัวไหม · คำตอบนี้ใช้ตั้ง Sunshine (`SunshineIpBase`, `SunshinePcPrefix`, `SunshinePcCount` ดู [00 ข้อ 7.2](00-EASY-INSTALL.md#72-sunshine-ของสาขา-วง-ip-และชื่อเครื่อง))
+4. มี Image กี่ตัว Windows อะไรบ้าง (10 / 11) · ทำ Image ใหม่ได้ช่วงไหน
+5. ร้านเปิด-ปิดกี่โมง · ช่วงไหนปิด launcher / ย้ายไฟล์ / รีบูตเครื่องลูกได้โดยไม่กระทบลูกค้า
+
+**ข. ไดรฟ์ (แสดงตาราง `2. Drives` แล้วถามทีละไดรฟ์)**
+6. แต่ละไดรฟ์ใช้ทำอะไรตอนนี้: เกม, Image, write-back, cache, เก็บไฟล์ร้าน · ไดรฟ์ไหน **ห้ามแตะ**
+7. ไดรฟ์ที่เครื่องลูกเห็นตรงกับช่อง `clients` ไหม · เครื่องลูกเห็นเป็นอักษรเดียวกับเครื่องแม่ไหม
+8. ในแต่ละไดรฟ์มีอะไรอยู่แล้ว: เกมของค่ายไหน, launcher, เมนูเกมเดิม, ระบบโหลดเกมเดิม, โฟลเดอร์ร้าน · จะคงไว้ที่เดิมหรือย้าย
+9. จะวาง OSYNC ที่ที่แนะนำไหม (บอก `OsyncRoot` + เหตุผลจากผลตรวจ) หรืออยากได้ไดรฟ์อื่น
+10. เกมใหม่ของแต่ละค่ายจะลงไดรฟ์ไหน: Steam, Riot, EA, Epic, Garena, ค่ายอื่น, เกมที่เปิดจาก exe ตรง (เสนอตาม [00 ข้อ 3.6](00-EASY-INSTALL.md#36-ลง-launcher-และเกมแต่ละค่ายไว้ที่ไหน))
+11. ไดรฟ์ไหนใกล้เต็ม (ต่ำกว่า 10%) · จะย้ายเกม เพิ่มดิสก์ หรือปล่อยไว้ · เกมยอดนิยมอยากให้อยู่ SSD / NVMe ไหน
+
+**ค. launcher และเกม (แสดงส่วน `3. Launchers` และ `4. Steam games`)**
+12. launcher ที่ร้านใช้ **ครบแล้วหรือยัง** ตัวไหนยังไม่ได้ลง **ต้องการเพิ่มตัวไหน** (ที่ระบบรองรับ: Steam, Riot Client, EA app, Epic, Garena, Ubisoft Connect, Rockstar, HoYoPlay, Modrinth, Battle.net, GOG, Nexon Plug, Amazon Games)
+13. แต่ละ launcher ใช้บัญชีแบบไหน: บัญชีของร้านล็อกอินไว้ให้ / ลูกค้าล็อกอินเอง (ห้ามถามรหัสผ่าน)
+14. เกมที่ร้านต้องมี **ลงครบหรือยัง อัปเดตล่าสุดไหม** · เกมไหนยังไม่ได้ลง **ต้องการลงเพิ่มเกมไหน** (ขอรายชื่อ) · เกมไหนเลิกใช้แล้ว
+15. เกมที่ไม่ได้มาจาก launcher: เกมออนไลน์ไทย, Garena, เกมมือถือ / emulator, เกมออฟไลน์, โปรแกรม (Discord ฯลฯ) · อยู่โฟลเดอร์ไหน
+16. เกมที่มีกันโกงระดับ kernel (VALORANT / Vanguard, Delta Force / Arena Breakout (ACE), เกม BattlEye, FiveM) · เคยเล่นบนเครื่องลูกได้ไหม (ต้องลงใน Image)
+17. เกมที่ไม่อยากให้ขึ้นเมนู · เกมที่อยากให้แนะนำเป็นพิเศษ · ชื่อหมวดที่อยากเปลี่ยน
+
+**ง. งานตอนบูตเครื่องลูก (ตาราง [00 ข้อ 6](00-EASY-INSTALL.md#6-ค่าที่ร้านใหม่ควรตรวจใน-settingstxt))**
+18. ไมค์จากมือถือ (WO Mic / VB-CABLE) · เล่นทางไกล (Parsec, Sunshine, OSLink) · จอเสมือน · ล้างล็อกอินเกมตอนบูต · ห้ามลูกค้าปิดเครื่อง · ไอคอนบนเดสก์ท็อป: เปิดตัวไหน ปิดตัวไหน
+19. โปรแกรมเครื่องมือใน `Tools\`: ถ้าติดตั้งจาก `OSYNC-Setup.exe` ของร้านหลัก มาครบทุกตัวแล้ว (บอกรายชื่อจาก [00 ข้อ 7.1](00-EASY-INSTALL.md#71-สาขาที่ติดตั้งด้วย-osync-setupexe-ได้ครบเหมือนร้านต้นทาง-100)) ถามแค่ว่าใช้ OSLink ไหม (ต้องลงเองที่สาขา ขั้นตอนในข้อ 10) · ติดตั้งจาก zip: ตัวไหนต้องการ (แต่ละตัวต้องอนุญาตให้โหลด)
+
+**จ. ระบบเดิมและข้อห้าม**
+20. ตอนนี้ใช้เมนูเกม / ระบบอัปเดตเกมตัวไหนอยู่ · จะใช้คู่กันหรือแทน
+21. มีโปรแกรม โฟลเดอร์ หรือการตั้งค่าอะไรที่ **ห้ามยุ่งเด็ดขาด**
+
+**จบการสัมภาษณ์:** สรุปเป็นตารางเดียว (คำตอบทุกข้อ + ที่วาง OSYNC + ไดรฟ์เกมของแต่ละค่าย + launcher / เกมที่ต้องลงเพิ่ม + ฟีเจอร์ที่เปิด / ปิด + ข้อห้าม) แล้ว **[ถาม]** ว่า "แผนนี้ตกลงไหม" **ได้คำว่าตกลงก่อนจึงเริ่มข้อ 3** · หลังติดตั้งแล้วบันทึกตารางนี้ไว้ที่ `<ที่วาง>\System\Data\setup-answers.txt` (โฟลเดอร์นี้ไม่ขึ้น git)
+
+---
+
+## 3. ติดตั้ง
+
+ใช้คำตอบจากข้อ 2 (`<ที่วาง>` เช่น `E:\OSYNC`, `<ชื่อร้าน>`):
+
+- จาก zip: `"<โฟลเดอร์ที่แตก>\EASY-INSTALL.bat" -Target "<ที่วาง>" -ShopName "<ชื่อร้าน>" -Yes -NoWizard`
+- จาก exe: `"<ไฟล์>.exe" -Target "<ที่วาง>" -ShopName "<ชื่อร้าน>" -Yes -NoWizard`
+
+ตรวจผลหลังติดตั้ง (ต้องได้ตามนี้ทุกข้อ):
+- จอจบด้วย `OSYNC is in <ที่วาง>. Next: <ที่วาง>\OSYNC.bat > 4 (first-time setup)`
+- มีโฟลเดอร์ `Launchers`, `GAME`, `Tools`, `System\Data`, `Menu\data` และไฟล์ `System\Data\setup-plan.txt`
+- `Settings\settings.txt`: `MasterPC` = ชื่อเครื่องนี้, `MasterIP` = IP ของเครื่องนี้, `SharedDrives` = ไดรฟ์ที่เจ้าของร้านยืนยัน (ไม่ตรง → แก้ตามคำตอบข้อ 7), `ClientBlockCpuz` / `ClientSteamVerify` / `OnlineBind` / `GameFolders` ว่าง
+- ตั้งค่าตามคำตอบ: `GameFolders` (ไดรฟ์เกมเพิ่มจากข้อ 10), สวิตช์ `Client*` (ข้อ 18) **[ถาม]** ก่อนแก้
+- จาก exe: จอขึ้น `tools: all <จำนวน> files are the same as the pack (SHA256)` = เครื่องมือเหมือนร้านหลักทุกไฟล์ ถ้าขึ้น `NOT the same` ให้รายงานรายชื่อไฟล์
+- Sunshine: ถ้าวง IP / ชื่อเครื่องไม่ใช่แบบร้านหลัก (คำตอบข้อ 3) **[ถาม]** แก้ `SunshineIpBase`, `SunshinePcPrefix`, `SunshinePcCount` แล้วรัน `Tool-SunshineProfiles.ps1 -DryRun` ให้ดู แล้ว `Tool-SunshineProfiles.ps1` (= `OSYNC.bat` → `7` → `24`)
+- `Menu\config.json`: `brandName` = ชื่อร้าน · exe: `Menu\app\<ชื่อร้าน>.exe` (ติดตั้งจาก zip จะยังไม่มี ต้อง build ในข้อ 4)
+- `OSYNC.bat check` (= `Tool-Check.ps1 -Mode master`) รันได้ ข้อที่ FAIL ตอนนี้ส่วนใหญ่คือ launcher / เกมที่ยังไม่ได้ลง
+
+## 4. ตั้งค่าครั้งแรก
+
+ดูก่อนว่าแต่ละขั้นจะทำอะไร: `powershell -NoProfile -ExecutionPolicy Bypass -File "<ที่วาง>\System\Scripts\Master-Setup.ps1" -DryRun`
+
+จากนั้นเลือกทางใดทางหนึ่ง:
+- **ให้เจ้าของร้านกด [คนทำ]:** `<ที่วาง>\OSYNC.bat` → `4` ตอบตามตารางใน [00 ข้อ 5](00-EASY-INSTALL.md#5-ตั้งค่าครั้งแรก-osyncbat-เลข-4)
+- **AI รันทีละขั้น** (shell ต้องเป็น admin, ทุกขั้น **[ถาม]** ก่อน):
+  1. launcher แต่ละตัวที่ยังไม่อยู่ใน `Launchers\`: `Master-Move-Launcher.ps1 -Launcher <Key> -DryRun` → ให้เจ้าของร้านดู → `Master-Move-Launcher.ps1 -Launcher <Key>` (Key: `Steam`, `Riot`, `EA`, `Epic`, `Garena`, `Ubisoft`, `Rockstar`, `HoYoPlay`, `Modrinth`, `BattleNet`, `GOG`, `Nexon`, `Amazon`) → เปิดโปรแกรมจากที่ใหม่ดูว่าใช้ได้
+  2. เมนู (ติดตั้งจาก zip): **[ถาม]** ติดตั้ง Node.js LTS (`winget install OpenJS.NodeJS.LTS`) → `cd "<ที่วาง>\Menu\source"` → `npm ci` → `powershell -File "<ที่วาง>\Menu\tools\_system\Build-App.ps1"` → ดูรูป `Menu\_build\selftest\selftest-gamemenu.png` (ถ้าขึ้น "node_modules is missing" ทั้งที่ `npm ci` ผ่าน ดู KNOWLEDGE ข้อ 11)
+  3. โลโก้ร้าน (ถ้ามีรูปจากข้อ 1): `Menu\tools\_system\Make-Brand.ps1 -Image <รูป>` แล้ว build ใหม่
+  4. `Master-Update.ps1` → อ่านทุกบรรทัด WARNING (`exe ไม่เจอ`, `exe 0 ไบต์` = เกมยังลงไม่เสร็จ, `AUTO added` = ระบบเดา exe ให้ ตรวจว่าถูก)
+  5. **[ถาม]** ตัวเฝ้า: `Master-Watch.ps1 -Register`
+  6. `Tool-Check.ps1 -Mode master` ต้องไม่มี FAIL ที่เกี่ยวกับ OSYNC
+
+## 5. launcher และเกม
+
+ที่วางของแต่ละค่ายและวิธีที่ OSYNC หาเกมเจอ: **[00 ข้อ 3.6](00-EASY-INSTALL.md#36-ลง-launcher-และเกมแต่ละค่ายไว้ที่ไหน)** (ตารางเต็ม) ทำตามคำตอบข้อ 10, 12, 14:
+
+- launcher ที่ต้องลงเพิ่ม: **[ถาม]** ดาวน์โหลดจากเว็บทางการ → ลงตามปกติ → **[คนทำ]** ล็อกอิน → ย้ายเข้า `Launchers\<ชื่อ>` ด้วยตัวย้าย (ข้อ 4) · Riot ต้องอยู่ในโฟลเดอร์ชื่อ `Riot Client` เป๊ะ
+- ที่ลงเกม: ตั้งในแต่ละ launcher ตามข้อ 10 เช่น `<ที่วาง>\GAME\Steam`, `GAME\Riot`, `GAME\EA`, `GAME\Epic` · เกมที่เปิดจาก exe ตรง วางใน `GAME\Online|Garena|Mobile|Single Player|Gacha|Emulator|Web\<เกม>`
+- **Steam:** เพิ่ม library ตามข้อ 10 (Steam → Settings → Storage) ตั้งเป็นค่าเริ่มต้น · เกมที่อยู่ใน `Launchers\Steam\steamapps` ย้ายด้วย `OSYNC.bat` → `7` → `2` · โฟลเดอร์ใน `common\` ที่ไม่มี `appmanifest` = Steam ไม่เห็น ให้ถามเจ้าของร้าน
+- **Riot:** อัปเดต VALORANT / LoL / TFT ใน Riot Client จนขึ้น Play แล้วรัน `Master-Update.ps1` (ไม่ต้องปิด Riot Client)
+- **EA app / Epic:** ลงเกมลงไดรฟ์ที่แชร์แล้ว `Master-Update.ps1` · เกม EA ที่รู้ offer id ใส่ `Settings\extra-games.json` → `eaOffers` จะเปิดตรงได้
+- **HoYoPlay:** เกมอยู่ใน `Launchers\HoYoPlay\games` ได้ หรือย้ายไป `GAME\HoYoPlay\<เกม>` แล้ว **[คนทำ]** กด "Locate game" ใน HoYoPlay
+- **เกมที่ระบบเดา exe ผิด / อยู่นอกโฟลเดอร์ที่สแกน / เกมที่ไม่อยากให้ขึ้น (ข้อ 17):** ใส่ใน `Settings\extra-games.json` → `games`
+  `{ "id": "ชื่อสั้น", "title": "ชื่อโชว์", "cat": "Online|Mobile|Garena|Apps", "platform": "Garena", "exe": "X:\\...\\game.exe", "root": "X:\\...", "args": "" }` · ซ่อน: `{ "id": "auto-...", "hide": true }`
   - FC Online: เปิด `launcher\fco-th.exe` ในโฟลเดอร์เกม (ไฟล์ 0 ไบต์ข้างนอกเป็น symlink ไม่ใช่ไฟล์เสีย)
+- หลังลง / อัปเดตเกมเสร็จ: `Master-Update.ps1` แล้วเทียบเกมในเมนูกับรายชื่อจากข้อ 14 ให้เจ้าของร้านดูว่าครบ
+- ค่ายใหม่ที่ยังไม่มีในระบบ: เพิ่มใน `Common.ps1` (`$LauncherTable`) และ preset ใน `Master-Move-Launcher.ps1` (commit แยก branch ดูข้อ 8)
 
-## 4. เครื่องลูก (ให้เจ้าของร้านทำในโหมด super workstation / แก้ Image แล้วบันทึก Image)
-- เครื่องแม่: OSYNC.bat > 1 ก่อน ทุกผลต้อง OK
-- เครื่องลูก 1 เครื่อง **ต่อ 1 Image**: OSYNC.bat > 5 (หรือ `OSYNC.bat client`) → ดูตาราง RESULT (log `C:\Users\Public\OSYNC-Install-All.log`) → บันทึก Image
-  ได้: Riot เงียบตอนล็อกอิน, Steam first-run ของทุกเกม (กันโกง, Social Club, Rockstar Launcher, DirectX, VC++), EA app + EA AntiCheat, EasyAntiCheat, เมนูเกม, NEWTHINGS, งาน `OSYNC-Client-Boot` ที่เซ็ตเกมใหม่เองทุกครั้งที่บูต
-- ปุ่มทีละอย่าง (แก้ปัญหาเฉพาะจุด): OSYNC.bat > 7 > 4-14
-- Riot Vanguard ต้องอยู่ใน Image; เกมที่ใช้ ACE (Delta Force, Arena Breakout) / BattlEye ติดตั้งกันโกงตอนเปิดเกมครั้งแรก — ให้เปิดครั้งแรกในโหมดแก้ Image
-- ทดสอบที่เครื่องลูกจริง: เปิด VALORANT, เกม Steam, เกม EA, Fortnite และเกมออนไลน์ 1 เกม จากเมนู; OSYNC.bat > 6 ต้องไม่มี FAIL
-- Riot ขึ้น Repair: OSYNC.bat > 7 > 15 ที่เครื่องลูก แล้วอ่านรายงาน
+## 6. โปรแกรมเครื่องมือใน `Tools\`
 
-## 5. ส่งงาน
-สรุปให้เจ้าของร้าน: launcher ที่ย้าย, เกมในเมนู (จำนวนตามหมวด), เกมที่ข้าม/ยังไม่สมบูรณ์, ของที่ย้ายไป `_ลบได้` พร้อมคำสั่งลบ, และสิ่งที่เขาต้องทำต่อที่เครื่องลูก
-ถ้าแก้สคริปต์ ให้ commit แยก branch ของสาขา (เช่น `branch-<ชื่อสาขา>`) อย่า push ทับ `main` โดยไม่ถาม — repo นี้เป็น public ห้ามใส่รหัสผ่าน ข้อมูลสมาชิก token
+- ติดตั้งจาก `OSYNC-Setup.exe` ของร้านหลัก: มาครบแล้ว ไม่ต้องโหลดอะไร (ตรวจในข้อ 3) · `OSYNC.bat check` แถว `Tools` ต้องเป็น OK
+- OSLink (ถ้าใช้ ตามคำตอบข้อ 19): ทำตาม[ข้อ 10](#10-oslink-เล่นทางไกลของ-ldplayer-ติดตั้ง-แก้ไดรเวอร์-และใส่ในเมนู)
+- ติดตั้งจาก zip: ตามคำตอบข้อ 19 **[ถาม]** ก่อนดาวน์โหลดทุกตัว ใช้เว็บทางการของผู้ผลิตเท่านั้น วางตามชื่อใน [00 ข้อ 7.3](00-EASY-INSTALL.md#73-ติดตั้งจาก-zip-ของ-github-ร้านใส่เครื่องมือเอง) · ตัวที่ไม่มี งานตอนบูตข้ามเอง (`SKIP (no Tools\...)`) ไม่ต้องใส่ครบ
+
+## 7. เครื่องลูก [คนทำ] (AI บอกทีละขั้น ในช่วงเวลาจากข้อ 5)
+
+1. เครื่องแม่: `Master-Update.ps1` ก่อน ทุกผลต้อง OK
+2. เครื่องลูก **1 เครื่องต่อ 1 Image** (ตามข้อ 4) ในโหมด super: เปิด `<ที่วาง>\OSYNC.bat` (บนเครื่องลูกติดตั้งทันที ไม่มีเมนู) → ดูตาราง `RESULT` (log `C:\Users\Public\OSYNC-Install-All.log`) → บันทึก Image
+   ได้: Riot เงียบตอนล็อกอิน, Steam first-run ของทุกเกม (กันโกง, Social Club, Rockstar Launcher, DirectX, VC++), EA app + EA AntiCheat, EasyAntiCheat, เมนูเกม, งาน `OSYNC-Client-Boot` ที่เซ็ตเกมใหม่เองทุกครั้งที่บูต
+3. Riot Vanguard ต้องอยู่ใน Image · เกมที่ใช้ ACE / BattlEye ติดตั้งกันโกงตอนเปิดเกมครั้งแรก ให้เปิดครั้งแรกในโหมด super (เกมจากข้อ 16)
+4. ทดสอบที่เครื่องลูกจริง: เปิดเกมจากแต่ละค่ายอย่างน้อย 1 เกม (เลือกจากรายชื่อข้อ 14) จากเมนู · `OSYNC.bat check` ต้องไม่มี FAIL
+5. Riot ขึ้น Repair: `OSYNC.bat` → `7` → `15` ที่เครื่องลูก แล้วอ่านรายงาน · ปุ่มแก้ทีละอย่าง: `OSYNC.bat` → `7` → `4`-`14`
+
+## 8. ส่งงาน (ติดตั้งใหม่)
+
+สรุปให้เจ้าของร้าน:
+- ที่วาง OSYNC และเหตุผล, ไดรฟ์เกมของแต่ละค่าย, launcher ที่ย้าย / ลงเพิ่ม
+- เกมในเมนู (จำนวนตามหมวด) เทียบกับรายชื่อที่ต้องการ (ข้อ 14): ครบ / ยังขาดเกมไหน · เกม `AUTO added` ที่ตรวจแล้ว / ยังไม่ได้ตรวจ
+- สิ่งที่ข้าม (`SKIP`) หรือไม่ผ่าน พร้อมข้อความจริง, ของที่ย้ายไป `_ลบได้` พร้อมคำสั่งลบ
+- สิ่งที่เขาต้องทำต่อ (ข้อ [คนทำ] ที่ยังค้าง)
+
+ถ้าแก้สคริปต์ ให้ commit แยก branch ของร้าน (เช่น `branch-<ชื่อร้าน>`) อย่า push ทับ `main` โดยไม่ถาม
+
+---
+
+## 9. อัปเดตร้านที่ติดตั้ง OSYNC แล้ว (ได้ไฟล์ exe รุ่นใหม่ หรือ zip ใหม่)
+
+1. หาที่วาง OSYNC เดิม: `"<ไฟล์>.exe" -PlanOnly` (บรรทัด `OSYNC already installed here: ...`) หรือถามเจ้าของร้าน
+2. ตรวจของเดิมก่อน (อ่านอย่างเดียว): ตั้ง `OSYNC_NOPAUSE=1` (PowerShell: `$env:OSYNC_NOPAUSE='1'`) แล้ว `<ที่วาง>\OSYNC.bat check` · จดแถวที่ไม่ OK ไว้เทียบหลังอัปเดต
+3. **[ถาม]** เวลาที่อัปเดตได้ (ตัวอัปเดตหยุดตัวเฝ้าชั่วคราว ปิดเมนูบนเครื่องแม่ถ้าเปิดอยู่ และเครื่องลูกเห็นของใหม่หลังรีบูต) และบอกว่าจะเกิดอะไร:
+   - แทนที่: `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, โปรแกรมเมนู, ทุกโฟลเดอร์ใน `Tools\` ที่ exe มี (ของเดิมไป `System\Backup\upgrade-<วันที่>`)
+   - คงไว้: `Settings` (เพิ่มเฉพาะค่าใหม่), `Tools\Sunshine0J\config` ของร้าน, ชื่อร้าน / หน้าตาเมนู, เกม, launcher
+4. อัปเดต:
+   - exe: `"<ไฟล์>.exe" -Upgrade "<ที่วาง>" -Yes -NoWizard`
+   - zip: `"<โฟลเดอร์ที่แตก>\EASY-INSTALL.bat" -Upgrade "<ที่วาง>" -Yes -NoWizard`
+5. ตรวจผลจากจอ: รายการ `updated: ...`, `settings added: ...` (ค่าใหม่ อธิบายให้เจ้าของร้านทีละค่า **[ถาม]** ถ้าต้องเปลี่ยนจากค่าเริ่มต้น), `tools: all <n> files are the same as the pack (SHA256)`, `Tools\<ชื่อ> is in use - not updated` (ให้ปิดโปรแกรมนั้นแล้วอัปเดตซ้ำ)
+6. ค่าใหม่ที่เกี่ยวกับร้าน: ถ้ามี `SunshineIpBase` / `SunshinePcPrefix` / `SunshinePcCount` เป็นค่าใหม่ และวง IP / ชื่อเครื่องของร้านไม่ใช่ `192.168.51.100` / `KORI` / `72` **[ถาม]** แล้วตั้งตามจริง + `Tool-SunshineProfiles.ps1` (= `OSYNC.bat` → `7` → `24`)
+7. `<ที่วาง>\OSYNC.bat check` อีกรอบ เทียบกับข้อ 2 · `Master-Update.ps1` (= `OSYNC.bat` → `1`)
+8. **[คนทำ]** รีบูตเครื่องลูก (ช่วงที่ไม่มีลูกค้า) แล้วทดสอบเปิดเกม 1-2 เกม · ส่วนที่เครื่องลูกทำตอนบูต (ไมค์, Sunshine, launcher) ถ้ามีรายงานปัญหาให้ดู `C:\Users\Public\OSYNC-Boot-Setup.log` ของเครื่องนั้น
+9. สรุปให้เจ้าของร้าน: รุ่นที่อัปเดต (`System\VERSION.txt`), อะไรเปลี่ยน, ค่าใหม่ที่ตั้ง, ผลตรวจก่อน / หลัง, ที่เก็บของเดิม (`System\Backup\upgrade-<วันที่>`)
+
+---
+
+## 10. OSLink (เล่นทางไกลของ LDPlayer): ติดตั้ง แก้ไดรเวอร์ และใส่ในเมนู
+
+OSLink ให้ลูกค้าเล่นเครื่องในร้านจากที่บ้าน ต้องมีไดรเวอร์ 3 ตัวบนเครื่องลูก (เมาส์ `LdVMou`, คีย์บอร์ด `LdVKbd`, จอย `LdScpVBus`) ถ้าไม่มี OSLink ขึ้น "driver error" · OSYNC ใส่ให้เองทุกบูต (ขั้น 1l) และทำการ์ดในเมนูให้เอง เมื่อ OSLink อยู่ในที่ที่ระบบหาเจอ
+
+**ถามก่อน:** ร้านใช้ OSLink ไหม (คำตอบข้อ 18-19) · ใช้บัญชี OSLink อะไรบนเครื่องแม่ (ห้ามถามรหัสผ่าน)
+
+1. **[ถาม] [คนทำ] ติดตั้ง OSLink บนเครื่องแม่:** ลงจากเว็บทางการของ LDPlayer ไว้ที่ `<ไดรฟ์ที่แชร์>:\LDPlayer\OSLink` (เช่น `E:\LDPlayer\OSLink` แบบร้าน 0JAYSHOP) **ไม่ใช่ C:** เครื่องลูกต้องเห็นไดรฟ์นั้น แล้วเจ้าของร้านล็อกอินบัญชีของร้านในโปรแกรมเอง
+   - ตรวจ: มี `<ไดรฟ์>:\LDPlayer\OSLink\bin\ldremote.exe`, `LdVMou.inf`, `devcon.exe` และเซอร์วิส `LDRemoteSvc` บนเครื่องแม่
+2. **ค่าใน `settings.txt`** (ค่าเริ่มของร้าน 0JAYSHOP = on ทั้งหมด ร้านที่ไม่มี OSLink ทุกขั้นข้ามเอง):
+
+   | ค่า | ทำอะไรตอนบูตเครื่องลูก |
+   |---|---|
+   | `ClientOslinkDrivers` | ใส่ไดรเวอร์ 3 ตัวที่ยังไม่โหลด ด้วย `devcon.exe` ของ OSLink (ขั้น 1l) |
+   | `ClientOslinkReset` | ลบ MAC ของเครื่องแม่ที่ติดมากับไดรฟ์เกม ให้เครื่องลูกลงทะเบียนเป็นเครื่องของตัวเอง (ขั้น 1j) |
+   | `ClientOslinkLogin` | คืนล็อกอิน OSLink ของเครื่องนี้ที่เก็บไว้บนเครื่องแม่ (พอร์ต `OslinkLoginPort`, ขั้น 1k) |
+   | `ClientOslinkStart` | เปิด OSLink พับไว้ในถาดตอนล็อกอิน (ขั้น 1m) |
+   | `ClientOslinkReport` | ส่งรายงานไดรเวอร์ / OSLink ไปเครื่องแม่หลังบูต (คอนโซลหน้าเครื่องลูกใช้ค่านี้แสดงปัญหา) |
+3. **บนเครื่องแม่:** `Master-Update.ps1` (= `OSYNC.bat` → `1`)
+   - ขั้น `7 OSLink` ตรวจลายเซ็นไฟล์ของ OSLink ด้วยใบรับรองครบของเครื่องแม่ แล้วเขียน `System\Data\Oslink\trusted.txt` เครื่องลูกจึงยอมใช้ `devcon.exe` / ไดรเวอร์ของ OSLink รุ่นนี้ แม้ตอนบูตตรวจลายเซ็นไม่จบ (`signature UnknownError`) หรือเป็น OSLink รุ่นใหม่กว่าที่โค้ดรู้จัก · ต้องเห็น `<n> files trusted for the clients`
+   - ขั้น `5 Menu` ใส่การ์ด **OSLink** (หมวด Apps) ให้เอง ถ้า `extra-games.json` ยังไม่มี `app-oslink`
+4. **[คนทำ] รีบูตเครื่องลูก** 1 เครื่อง ช่วงไม่มีลูกค้า แล้วตรวจ:
+   - คอนโซลแอดมินหน้าเครื่องลูก: ไม่มีปัญหา "OSLink (ไดรเวอร์เมาส์/คีย์บอร์ด)"
+   - log `C:\Users\Public\OSYNC-Boot-Setup.log` ของเครื่องนั้น: `1l OSLink - drivers ... OK` และบรรทัด `OSLink drivers: installed virtual mouse, virtual keyboard, virtual gamepad bus` หรือ `... are loaded - nothing to do`
+   - เปิดการ์ด OSLink ในเมนู ต้องไม่ขึ้น driver error
+5. **ทาง Image (ถ้าเจ้าของร้านต้องการให้บูตเร็วขึ้น):** **[คนทำ]** เครื่องลูก 1 เครื่องต่อ 1 Image โหมด super → บูตให้ขั้น 1l ใส่ไดรเวอร์ → บันทึก Image แล้วขั้น 1l เหลือแค่เช็กไม่กี่มิลลิวินาที
+
+**ปัญหาที่พบบ่อย:**
+
+| ข้อความ / อาการ | สาเหตุ | แก้ |
+|---|---|---|
+| OSLink ขึ้น "driver error" บนเครื่องลูก | ไดรเวอร์ 3 ตัวไม่โหลด | ดูขั้น 1l ใน log ของเครื่องนั้น แล้วไล่ตามแถวข้างล่าง · `OSYNC.bat` → `5` ในโหมด super ใส่ซ้ำได้ |
+| `OSLink not found (no LDRemoteSvc / LDPlayer\OSLink\bin with LdVMou.inf) - skipped` | OSLink อยู่ C: หรือไดรฟ์ที่เครื่องลูกไม่เห็น | ลงใหม่ที่ `<ไดรฟ์ที่แชร์>:\LDPlayer\OSLink` |
+| `devcon.exe: signature UnknownError` และ `installed nothing` | เครื่องลูกยังไม่มีใบรับรองรากตอนบูต และไฟล์ไม่อยู่ในรายการที่เชื่อถือ | `OSYNC.bat` → `1` บนเครื่องแม่ (ขั้น 7 เขียน `trusted.txt`) แล้วรีบูตเครื่องลูก |
+| `signed by a certificate that is not pinned` | OSLink รุ่นใหม่เซ็นด้วยใบรับรองอื่น | `OSYNC.bat` → `1` บนเครื่องแม่ (เครื่องแม่ตรวจลายเซ็นให้) · ถ้าขั้น 7 ขึ้น `not trusted: <ไฟล์>` ให้รายงานเจ้าของร้าน ห้ามข้ามการตรวจ |
+| `OSLink: <bin> is not on a drive the clients see` (ขั้น 7) | ติดตั้งไว้ไดรฟ์ที่ไม่ได้แชร์ | ย้ายไปลงใหม่ที่ไดรฟ์ที่แชร์ |
+| ลูกค้าเชื่อมต่อแล้วเป็นเครื่องแม่ / เครื่องอื่น | MAC ของเครื่องแม่ติดมา | `ClientOslinkReset=on` แล้วรีบูต (ขั้น 1j) |
+
+รายละเอียดทุกฟังก์ชัน: [05-CLIENT-GAMES.md ข้อ 18-22](05-CLIENT-GAMES.md#18-client-oslinkdriversps1--ไดรเวอร์-oslink)
+
+---
+[← สารบัญเอกสาร](README.md) · [00 Easy Install (คู่มือฝั่งคน)](00-EASY-INSTALL.md)

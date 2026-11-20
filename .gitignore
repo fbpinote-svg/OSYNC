@@ -6,6 +6,7 @@
 !/README.md
 !/OSYNC.bat
 !/Clear-Logins.bat
+!/EASY-INSTALL.bat
 # forwarder for client images made before the new layout (old task runs _system\Install-All.ps1)
 !/_system/
 /_system/*

@@ -21,6 +21,21 @@ else { Add 'OK' 'Shared drives' "SharedDrives=$shared" }
 if ($shared.IndexOf($Root.Substring(0, 1).ToUpper()) -lt 0) { Add 'FAIL' 'OSYNC drive' "$Root is not on a shared drive ($shared)" 'clients cannot see it: put OSYNC on a shared game drive' }
 try { [void](Read-ExtraGames); Add 'OK' 'extra-games.json' 'valid' } catch { Add 'FAIL' 'extra-games.json' $_.Exception.Message 'fix the JSON in Settings\extra-games.json (a missing comma or quote)' }
 
+# Tools\ the same as the OSYNC-Setup.exe it came with (Tools\TOOLS-MANIFEST.txt, Tool-Pack): every file there, same size.
+# The setup checks the SHA256 once; this quick check finds a tool that was changed or removed later.
+$tm = Join-Path $ToolsDir 'TOOLS-MANIFEST.txt'
+if (Test-Path -LiteralPath $tm) {
+    $tbad = @(); $tn = 0
+    foreach ($l in [IO.File]::ReadAllLines($tm)) {
+        if ($l.StartsWith('#') -or -not $l.Trim()) { continue }
+        $tp = $l -split "`t", 3; if ($tp.Count -lt 3) { continue }; $tn++
+        $tf = Get-Item -LiteralPath (Join-Path $ToolsDir $tp[2]) -Force -ErrorAction SilentlyContinue
+        if (-not $tf -or $tf.Length -ne [long]$tp[1]) { $tbad += $tp[2] }
+    }
+    $tfrom = ([IO.File]::ReadAllLines($tm)[0] -replace '^#\s*', '' -replace '\s+-\s+sha256.*$', '')
+    if ($tbad) { Add 'WARN' 'Tools' "$($tbad.Count) of $tn files differ from the pack ($tfrom): $(($tbad | Select-Object -First 3) -join ', ')" 'run the newest OSYNC-Setup.exe again (it puts every tool folder back)' }
+    else { Add 'OK' 'Tools' "$tn files as in the pack ($tfrom)" }
+}
 # ---------- master ----------
 if ($isMaster) {
     # launchers: in Launchers\, or installed somewhere else (registry), or not installed

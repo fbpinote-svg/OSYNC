@@ -4,16 +4,23 @@
 # Nothing to download.
 # In the file: OSYNC.bat, README.md, System\Scripts + Client + Docs, Settings (this shop's values blanked: the setup
 # writes the new shop's), the built game menu (Menu\app, one exe) + Menu\tools + a neutral Menu\config.json.
-# Not in it: games, launchers, Tools, client data (System\Data), backups, Menu\source, this shop's game list / logo.
+# + Tools\ (20 Nov 2026: a branch gets the SAME tool programs as this shop - Sunshine0J, WO Mic, VB-CABLE, Parsec, VDD,
+#   WinRAR, WebView2, Node.js, Python, Medal, aria2, DepotDownloader, FiveM-ReShade ...) with Tools\TOOLS-MANIFEST.txt
+#   (SHA256 + size of every file) so the setup and Tool-Check can prove they are the same. The file is then ~1.2 GB and
+#   holds other makers' programs and the Sunshine web login: give it to your own branches only, never publish it.
+# Not in it: games, launchers, client data (System\Data), backups, Menu\source, this shop's game list / logo, logs.
 #   Tool-Pack.ps1                 -> System\Dist\OSYNC-Setup-<date>.exe
 #   -Out <folder>   -NoExe        (-NoExe: stop after payload.zip + Setup files, e.g. to test the setup by hand)
-param([string]$Out = '', [switch]$NoExe)
+#   -NoTools                      leave Tools\ out (small file, e.g. for another shop that brings its own programs)
+param([string]$Out = '', [switch]$NoExe, [switch]$NoTools)
 . (Join-Path $PSScriptRoot 'Common.ps1')
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $stamp = Get-Date -Format 'yyyyMMdd-HHmm'
 if (-not $Out) { $Out = Join-Path $SystemDir 'Dist' }
-$stage = Join-Path $env:TEMP "osync-pack-$stamp"
+# the long form of TEMP: a short 8.3 TEMP (C:\Users\LONGNA~1, user names over 8 letters) made every entry name in payload.zip
+# start with 'd/' (the files are listed with the long form), so OSYNC-Setup.exe could not find Setup-Install.ps1
+$stage = Join-Path (Get-Item -LiteralPath $env:TEMP).FullName "osync-pack-$stamp"
 $pl = Join-Path $stage 'payload'
 if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $pl, $Out | Out-Null
@@ -33,14 +40,17 @@ Write-Host '  system: OSYNC.bat, README.md, System\Scripts, Client, Docs'
 # 2 Settings for a NEW shop: this shop's values blanked (the setup fills SharedDrives / MasterIP / MasterPC), games list empty
 New-Item -ItemType Directory -Force -Path (Join-Path $pl 'Settings') | Out-Null
 $set = [IO.File]::ReadAllText($SettingsFile, [Text.Encoding]::UTF8)
-$set = [regex]::Replace($set, '(?m)^(\s*(SharedDrives|MasterIP|MasterPC)\s*=).*$', '$1')
-$set = [regex]::Replace($set, '(?m)^(\s*Role\s*=).*$', '${1}auto')
+# the values only THIS shop has (same list as Setup-Install.ps1 $ShopKeys): PC names, IPs, branch name, extra game folders
+$set = [regex]::Replace($set, '(?m)^(\s*(SharedDrives|MasterIP|MasterPC|GameFolders|ClientBlockCpuz|ClientApexClean|ClientApexMinimal|ClientSteamVerify|ClientSteamVerifyApps|OnlineBranch|OnlineBranchName|OnlineBind|OnlineExternalIP)\s*=)[^\r\n]*', '$1')
+$set = [regex]::Replace($set, '(?m)^(\s*Role\s*=)[^\r\n]*', '${1}auto')
 [IO.File]::WriteAllText((Join-Path $pl 'Settings\settings.txt'), $set, (New-Object Text.UTF8Encoding $false))
 $xg = [IO.File]::ReadAllText($ExtraGamesFile, [Text.Encoding]::UTF8)
 $xg = [regex]::Replace($xg, '"games"\s*:\s*\[[\s\S]*?\r?\n  \]', '"games": []')
 [void]($xg | ConvertFrom-Json)                                                       # still valid JSON
 [IO.File]::WriteAllText((Join-Path $pl 'Settings\extra-games.json'), $xg, (New-Object Text.UTF8Encoding $false))
-Write-Host '  settings: blank for the new shop'
+# the other files of Settings (already in git, nothing of this shop's PCs in them): game-start.json, gta5_settings*.xml
+Get-ChildItem -LiteralPath $SettingsDir -File | Where-Object { $_.Name -notin 'settings.txt', 'extra-games.json' -and $_.Extension -in '.json', '.xml' } | Copy-Item -Destination (Join-Path $pl 'Settings')
+Write-Host '  settings: blank for the new shop (+ game-start.json, gta5_settings*.xml)'
 
 # 3 the game menu: the built program (one exe; the old 0JAYSHOP.exe copy is left out), its tools, a neutral config
 $mi = Get-MenuInfo
@@ -59,6 +69,25 @@ $cfg = [regex]::Replace($cfg, '("featured"\s*:\s*)\[[^\]]*\]', '${1}[]')
 [IO.File]::WriteAllText((Join-Path $pl 'Menu\config.json'), $cfg, (New-Object Text.UTF8Encoding $false))
 New-Item -ItemType Directory -Force -Path (Join-Path $pl 'Menu\data') | Out-Null
 Write-Host "  menu: $(Split-Path -Leaf $mi.Exe) (renamed to the shop name at setup), tools, neutral config.json"
+
+# 3b Tools\: every tool folder as it is on this master (no logs). Sunshine0J\config goes too (this shop's Sunshine settings
+#    for a new branch - its PC profiles are redone there: OSYNC.bat > 7 > 24); it is the branch's own after that, so it is
+#    not in the manifest and an update keeps the branch's copy.
+if (-not $NoTools -and (Test-Path -LiteralPath $ToolsDir)) {
+  $tl = Join-Path $pl 'Tools'
+  Copy-Dir $ToolsDir $tl @('*.log', '*.log.*', 'TOOLS-MANIFEST.txt')
+  Write-Host '  tools: hashing every file (SHA256) for TOOLS-MANIFEST.txt ...'
+  $man = New-Object System.Collections.Generic.List[string]
+  $man.Add("# OSYNC Tools $stamp from $env:COMPUTERNAME - sha256<TAB>size<TAB>path; Sunshine0J\config is the shop's own and not listed")
+  $tn = 0; $tb = 0.0
+  foreach ($f in @(Get-ChildItem -LiteralPath $tl -Recurse -File -Force | Sort-Object FullName)) {
+    $rel = $f.FullName.Substring($tl.Length + 1)
+    if ($rel -like 'Sunshine0J\config\*') { continue }
+    $man.Add((Get-FileHash -LiteralPath $f.FullName -Algorithm SHA256).Hash + "`t" + $f.Length + "`t" + $rel); $tn++; $tb += $f.Length
+  }
+  [IO.File]::WriteAllLines((Join-Path $tl 'TOOLS-MANIFEST.txt'), [string[]]$man, (New-Object Text.UTF8Encoding $false))
+  Write-Host ("  tools: {0} folders, {1} files, {2:N0} MB ({3})" -f @(Get-ChildItem -LiteralPath $tl -Directory).Count, $tn, ($tb / 1MB), ((Get-ChildItem -LiteralPath $tl -Directory | ForEach-Object Name) -join ', '))
+} else { Write-Host '  tools: left out (-NoTools)' }
 
 # 4 payload.zip + the setup files
 $zip = Join-Path $stage 'payload.zip'
@@ -131,4 +160,7 @@ try {
 } finally { $fs.Dispose() }
 Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host ("`nOSYNC-Setup: {0}  ({1:N0} MB)" -f $exe, ((Get-Item -LiteralPath $exe).Length / 1MB)) -ForegroundColor Green
+# the guides for the person / AI at the branch, next to the exe (SETUP-AI.md: what an AI does first, before anything is installed)
+foreach ($g in 'SETUP-AI.md', '00-EASY-INSTALL.md') { Copy-Item -LiteralPath (Join-Path $DocsDir $g) -Destination (Join-Path $Out $g) -Force }
 Write-Host 'Copy this one file to a master PC and run it: it installs OSYNC there, or updates the OSYNC that is already there.'
+Write-Host "With an AI: copy SETUP-AI.md and 00-EASY-INSTALL.md from $Out too (the AI reads them first; OSYNC-Setup.exe -PlanOnly = check only)."

@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 83 ไฟล์ · ฟังก์ชัน 626 ตัว · สร้างเมื่อ 20 Nov 2026 13:44 จากโค้ดใน repo นี้
+ไฟล์โค้ด 88 ไฟล์ · ฟังก์ชัน 646 ตัว · สร้างเมื่อ 20 Nov 2026 23:09 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -14,12 +14,14 @@
   - [System/Scripts/Master-ClientReports.ps1](#system-scripts-master-clientreports-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Master-FiveMShare.ps1](#system-scripts-master-fivemshare-ps1) — 14 ฟังก์ชัน
   - [System/Scripts/Master-GameList.ps1](#system-scripts-master-gamelist-ps1) — 10 ฟังก์ชัน
+  - [System/Scripts/Master-Move-BlueStacks.ps1](#system-scripts-master-move-bluestacks-ps1) — 6 ฟังก์ชัน
   - [System/Scripts/Master-Move-Launcher.ps1](#system-scripts-master-move-launcher-ps1) — 7 ฟังก์ชัน
   - [System/Scripts/Master-OslinkLogins.ps1](#system-scripts-master-oslinklogins-ps1) — 7 ฟังก์ชัน
   - [System/Scripts/Master-Setup.ps1](#system-scripts-master-setup-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-BattleNet.ps1](#system-scripts-master-snapshot-battlenet-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-EA.ps1](#system-scripts-master-snapshot-ea-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-Epic.ps1](#system-scripts-master-snapshot-epic-ps1) — 0 ฟังก์ชัน
+  - [System/Scripts/Master-Snapshot-Oslink.ps1](#system-scripts-master-snapshot-oslink-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-Riot.ps1](#system-scripts-master-snapshot-riot-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Steam-Library.ps1](#system-scripts-master-steam-library-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-SteamQueue.ps1](#system-scripts-master-steamqueue-ps1) — 11 ฟังก์ชัน
@@ -32,7 +34,7 @@
   - [System/Scripts/Client-Firewall.ps1](#system-scripts-client-firewall-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Client-Install.ps1](#system-scripts-client-install-ps1) — 3 ฟังก์ชัน
   - [System/Scripts/Client-Menu.ps1](#system-scripts-client-menu-ps1) — 0 ฟังก์ชัน
-  - [System/Scripts/Client-Mic.ps1](#system-scripts-client-mic-ps1) — 17 ฟังก์ชัน
+  - [System/Scripts/Client-Mic.ps1](#system-scripts-client-mic-ps1) — 20 ฟังก์ชัน
   - [System/Scripts/Client-Parsec.ps1](#system-scripts-client-parsec-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-PopupGuard.ps1](#system-scripts-client-popupguard-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Client-Runtimes.ps1](#system-scripts-client-runtimes-ps1) — 4 ฟังก์ชัน
@@ -40,6 +42,7 @@
   - [System/Scripts/Client-Vdd.ps1](#system-scripts-client-vdd-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-WinRAR.ps1](#system-scripts-client-winrar-ps1) — 0 ฟังก์ชัน
 - **[เครื่องลูก: เกม ตัวเปิดเกม บัญชี](05-CLIENT-GAMES.md)**
+  - [System/Scripts/Client-BlueStacks.ps1](#system-scripts-client-bluestacks-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Client-ClearLogins.ps1](#system-scripts-client-clearlogins-ps1) — 8 ฟังก์ชัน
   - [System/Scripts/Client-EA-AntiCheat.ps1](#system-scripts-client-ea-anticheat-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-EA.ps1](#system-scripts-client-ea-ps1) — 1 ฟังก์ชัน
@@ -87,10 +90,11 @@
   - [System/Tests/Test-Console.ps1](#system-tests-test-console-ps1) — 4 ฟังก์ชัน
 - **[แกนกลางและเครื่องมือ](08-CORE-TOOLS.md)**
   - [System/Scripts/Branch-Runner.ps1](#system-scripts-branch-runner-ps1) — 10 ฟังก์ชัน
-  - [System/Scripts/Common.ps1](#system-scripts-common-ps1) — 34 ฟังก์ชัน
+  - [System/Scripts/Common.ps1](#system-scripts-common-ps1) — 35 ฟังก์ชัน
   - [System/Scripts/Http-Lib.ps1](#system-scripts-http-lib-ps1) — 10 ฟังก์ชัน
   - [System/Scripts/OSYNC.ps1](#system-scripts-osync-ps1) — 5 ฟังก์ชัน
-  - [System/Scripts/Setup-Install.ps1](#system-scripts-setup-install-ps1) — 6 ฟังก์ชัน
+  - [System/Scripts/Setup-Install.ps1](#system-scripts-setup-install-ps1) — 13 ฟังก์ชัน
+  - [System/Scripts/Setup-Plan.ps1](#system-scripts-setup-plan-ps1) — 3 ฟังก์ชัน
   - [System/Scripts/Tool-Check.ps1](#system-scripts-tool-check-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Tool-Folder-Icons.ps1](#system-scripts-tool-folder-icons-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Tool-LinkScan.ps1](#system-scripts-tool-linkscan-ps1) — 0 ฟังก์ชัน
@@ -98,6 +102,7 @@
   - [System/Scripts/Tool-Organize-Drive.ps1](#system-scripts-tool-organize-drive-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Tool-Pack.ps1](#system-scripts-tool-pack-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Tool-RiotDiag.ps1](#system-scripts-tool-riotdiag-ps1) — 1 ฟังก์ชัน
+  - [System/Scripts/Tool-SunshineProfiles.ps1](#system-scripts-tool-sunshineprofiles-ps1) — 0 ฟังก์ชัน
 
 ## เครื่องแม่
 
@@ -142,7 +147,7 @@
 <a id="system-scripts-master-gamelist-ps1"></a>
 ### System/Scripts/Master-GameList.ps1
 
-330 บรรทัด · 10 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out` · [เปิดไฟล์](../Scripts/Master-GameList.ps1)
+340 บรรทัด · 10 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out` · [เปิดไฟล์](../Scripts/Master-GameList.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -156,6 +161,20 @@
 | 8 | [`Find-StartExe`](../Scripts/Master-GameList.ps1#L187) | 187-191 | `folderPath`, `name` |  |
 | 9 | [`Test-Covered`](../Scripts/Master-GameList.ps1#L200) | 200-200 | `fp` | a folder already listed: a listed path is the folder, inside it, or the folder is inside a listed game |
 | 10 | [`Add-AutoGame`](../Scripts/Master-GameList.ps1#L201) | 201-210 | `fp`, `idName`, `title`, `cat`, `platform`, `exe` |  |
+
+<a id="system-scripts-master-move-bluestacks-ps1"></a>
+### System/Scripts/Master-Move-BlueStacks.ps1
+
+220 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `DryRun`, `ExportOnly` · [เปิดไฟล์](../Scripts/Master-Move-BlueStacks.ps1)
+
+| # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
+|---|---|---|---|---|
+| 1 | [`Get-Size`](../Scripts/Master-Move-BlueStacks.ps1#L44) | 44-44 | `d` | ---------- helpers ---------- |
+| 2 | [`Find-RegKeys`](../Scripts/Master-Move-BlueStacks.ps1#L46) | 46-54 | `needles` | registry keys (reg.exe paths) under these roots with a value that names one of the folders |
+| 3 | [`Update-RegKey`](../Scripts/Master-Move-BlueStacks.ps1#L56) | 56-71 | `regExePath`, `map` | one registry key: every string value that names an old folder gets the new one (same value kind) |
+| 4 | [`Get-Instances`](../Scripts/Master-Move-BlueStacks.ps1#L73) | 73-77 | `data` | the instance names (Engine\Manager\BstkGlobal.xml MachineEntry ...\&lt;name&gt;\&lt;name&gt;.bstk), first one = the menu card's |
+| 5 | [`Export-ForClients`](../Scripts/Master-Move-BlueStacks.ps1#L80) | 80-113 | - | System\Data\BlueStacks\bluestacks.reg for the clients: HKLM\SOFTWARE\BlueStacks_nxt, its COM classes (found by the program path), their ProgIDs and TypeLib, ... |
+| 6 | [`Add-MenuCard`](../Scripts/Master-Move-BlueStacks.ps1#L115) | 115-128 | `prog`, `root`, `instance` | the menu card (Settings\extra-games.json "games"), written once; text inserted so the file keeps its own layout |
 
 <a id="system-scripts-master-move-launcher-ps1"></a>
 ### System/Scripts/Master-Move-Launcher.ps1
@@ -190,7 +209,7 @@
 <a id="system-scripts-master-setup-ps1"></a>
 ### System/Scripts/Master-Setup.ps1
 
-93 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `DryRun` · [เปิดไฟล์](../Scripts/Master-Setup.ps1)
+100 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `DryRun` · [เปิดไฟล์](../Scripts/Master-Setup.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -211,6 +230,11 @@
 ### System/Scripts/Master-Snapshot-Epic.ps1
 
 27 บรรทัด · 0 ฟังก์ชัน · [เปิดไฟล์](../Scripts/Master-Snapshot-Epic.ps1)
+
+<a id="system-scripts-master-snapshot-oslink-ps1"></a>
+### System/Scripts/Master-Snapshot-Oslink.ps1
+
+37 บรรทัด · 0 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Check` · [เปิดไฟล์](../Scripts/Master-Snapshot-Oslink.ps1)
 
 <a id="system-scripts-master-snapshot-riot-ps1"></a>
 ### System/Scripts/Master-Snapshot-Riot.ps1
@@ -244,11 +268,11 @@
 <a id="system-scripts-master-update-ps1"></a>
 ### System/Scripts/Master-Update.ps1
 
-42 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `GameListOut` · [เปิดไฟล์](../Scripts/Master-Update.ps1)
+44 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `GameListOut` · [เปิดไฟล์](../Scripts/Master-Update.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Step`](../Scripts/Master-Update.ps1#L24) | 24-29 | `name`, `file`, `extra` |  |
+| 1 | [`Step`](../Scripts/Master-Update.ps1#L25) | 25-30 | `name`, `file`, `extra` |  |
 
 <a id="system-scripts-master-watch-ps1"></a>
 ### System/Scripts/Master-Watch.ps1
@@ -308,13 +332,13 @@
 <a id="system-scripts-client-install-ps1"></a>
 ### System/Scripts/Client-Install.ps1
 
-574 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Boot` · [เปิดไฟล์](../Scripts/Client-Install.ps1)
+591 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Boot` · [เปิดไฟล์](../Scripts/Client-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Run-Script`](../Scripts/Client-Install.ps1#L47) | 47-55 | `file`, `extra` |  |
-| 2 | [`Step`](../Scripts/Client-Install.ps1#L57) | 57-64 | `name`, `body` |  |
-| 3 | [`Stop-WoMicDriver`](../Scripts/Client-Install.ps1#L68) | 68-83 | - | 19 Nov 2026 (Apex): WO Mic's driver WOVAD off for this boot. Turning its device off was not enough (KORI23 15:03: "WOVAD Running" - Windows Audio still held ... |
+| 2 | [`Step`](../Scripts/Client-Install.ps1#L62) | 62-73 | `name`, `body` |  |
+| 3 | [`Stop-WoMicDriver`](../Scripts/Client-Install.ps1#L77) | 77-92 | - | 19 Nov 2026 (Apex): WO Mic's driver WOVAD off for this boot. Turning its device off was not enough (KORI23 15:03: "WOVAD Running" - Windows Audio still held ... |
 
 <a id="system-scripts-client-menu-ps1"></a>
 ### System/Scripts/Client-Menu.ps1
@@ -324,27 +348,30 @@
 <a id="system-scripts-client-mic-ps1"></a>
 ### System/Scripts/Client-Mic.ps1
 
-379 บรรทัด · 17 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `WatchDefaults`, `WatchMinutes` · [เปิดไฟล์](../Scripts/Client-Mic.ps1)
+441 บรรทัด · 20 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `WatchDefaults`, `WatchMinutes` · [เปิดไฟล์](../Scripts/Client-Mic.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L28) | 28-28 | `p` | x64 program? (PE machine 0x8664) |
-| 2 | [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L35) | 35-39 | `Pattern` |  |
-| 3 | [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L42) | 42-44 | `Pattern` | 20 Nov 2026: only a device that WORKS counts - Windows can keep a root device with no driver (empty class and name, only the HardwareID; the master has one f... |
-| 4 | [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L45) | 45-57 | - |  |
-| 5 | [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L60) | 60-68 | `Exe`, `Arguments`, `Seconds` | runs a setup hidden; stops it (and what it started) when it is still busy after $Seconds - a setup waiting on a window nobody can see (SYSTEM at boot) must n... |
-| 6 | [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L133) | 133-137 | `Id` |  |
-| 7 | [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L138) | 138-143 | - |  |
-| 8 | [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L144) | 144-147 | `When` |  |
-| 9 | [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L151) | 151-155 | `Flow` | the PC's own active speaker (flow 0) / mic (flow 1): not ours, not another program's virtual device |
-| 10 | [`WLog`](../Scripts/Client-Mic.ps1#L159) | 159-159 | `s` |  |
-| 11 | [`Get-Devcon`](../Scripts/Client-Mic.ps1#L188) | 188-195 | - | x64 client) - then OSLink's x64 devcon is used (game disk, signed by its maker, the same one Client-OslinkDrivers uses) 19 Nov 2026: "UnknownError" = its roo... |
-| 12 | [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L197) | 197-197 | `r` | devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed |
-| 13 | [`Show-Sound`](../Scripts/Client-Mic.ps1#L202) | 202-205 | `When` | Owner, 20 Nov 2026: only the sound / mic drivers of OUR menu system (WO Mic, VB-CABLE) are handled here - never the PC's own sound card, Windows' sound servi... |
-| 14 | [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L264) | 264-264 | - | root device(s) with VB-CABLE's HardwareID but no working driver (the setup / an old install left them) |
-| 15 | [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L266) | 266-280 | `before` | Windows may switch the default to the new CABLE device a moment after it appears: watch ~20 s, put the old one back |
-| 16 | [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L344) | 344-355 | - | on "CABLE Output". A VB-CABLE speaker / mic that was disabled (in the image; several PCs show one renamed "NOT USE") is not seen at all - so they are enabled... |
-| 17 | [`Format-EpState`](../Scripts/Client-Mic.ps1#L356) | 356-356 | `s` |  |
+| 1 | [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L33) | 33-33 | `p` | x64 program? (PE machine 0x8664) |
+| 2 | [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L40) | 40-44 | `Pattern` |  |
+| 3 | [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L47) | 47-49 | `Pattern` | 20 Nov 2026: only a device that WORKS counts - Windows can keep a root device with no driver (empty class and name, only the HardwareID; the master has one f... |
+| 4 | [`Wait-WoMic`](../Scripts/Client-Mic.ps1#L52) | 52-56 | `Seconds` | 20 Nov 2026 evening: at boot the image's own WO Mic device can need well over a minute to start. Wait for it: returns the working device(s) and the seconds w... |
+| 5 | [`Show-WoMicState`](../Scripts/Client-Mic.ps1#L57) | 57-62 | - |  |
+| 6 | [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L63) | 63-75 | - |  |
+| 7 | [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L78) | 78-86 | `Exe`, `Arguments`, `Seconds` | runs a setup hidden; stops it (and what it started) when it is still busy after $Seconds - a setup waiting on a window nobody can see (SYSTEM at boot) must n... |
+| 8 | [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L151) | 151-155 | `Id` |  |
+| 9 | [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L156) | 156-161 | - |  |
+| 10 | [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L162) | 162-165 | `When` |  |
+| 11 | [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L169) | 169-173 | `Flow` | the PC's own active speaker (flow 0) / mic (flow 1): not ours, not another program's virtual device |
+| 12 | [`WLog`](../Scripts/Client-Mic.ps1#L177) | 177-177 | `s` |  |
+| 13 | [`Get-Devcon`](../Scripts/Client-Mic.ps1#L206) | 206-213 | - | x64 client) - then OSLink's x64 devcon is used (game disk, signed by its maker, the same one Client-OslinkDrivers uses) 19 Nov 2026: "UnknownError" = its roo... |
+| 14 | [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L217) | 217-229 | - | WO Mic's x64 driver for the direct install (Tools\WOMic\driver): 2.1.0.0 out of WOMicClientSetup6.4.exe, signed by Microsoft (Windows Hardware Compatibility ... |
+| 15 | [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L231) | 231-231 | `r` | devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed |
+| 16 | [`Show-Sound`](../Scripts/Client-Mic.ps1#L236) | 236-239 | `When` | Owner, 20 Nov 2026: only the sound / mic drivers of OUR menu system (WO Mic, VB-CABLE) are handled here - never the PC's own sound card, Windows' sound servi... |
+| 17 | [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L326) | 326-326 | - | root device(s) with VB-CABLE's HardwareID but no working driver (the setup / an old install left them) |
+| 18 | [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L328) | 328-342 | `before` | Windows may switch the default to the new CABLE device a moment after it appears: watch ~20 s, put the old one back |
+| 19 | [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L406) | 406-417 | - | on "CABLE Output". A VB-CABLE speaker / mic that was disabled (in the image; several PCs show one renamed "NOT USE") is not seen at all - so they are enabled... |
+| 20 | [`Format-EpState`](../Scripts/Client-Mic.ps1#L418) | 418-418 | `s` |  |
 
 <a id="system-scripts-client-parsec-ps1"></a>
 ### System/Scripts/Client-Parsec.ps1
@@ -380,11 +407,11 @@
 <a id="system-scripts-client-sunshine0j-ps1"></a>
 ### System/Scripts/Client-Sunshine0J.ps1
 
-94 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Stop`, `Check`, `AutoStart`, `Service` · [เปิดไฟล์](../Scripts/Client-Sunshine0J.ps1)
+96 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Stop`, `Check`, `AutoStart`, `Service` · [เปิดไฟล์](../Scripts/Client-Sunshine0J.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Log`](../Scripts/Client-Sunshine0J.ps1#L20) | 20-20 | `m` |  |
+| 1 | [`Log`](../Scripts/Client-Sunshine0J.ps1#L21) | 21-21 | `m` |  |
 
 <a id="system-scripts-client-vdd-ps1"></a>
 ### System/Scripts/Client-Vdd.ps1
@@ -404,6 +431,11 @@
 ## เครื่องลูก: เกม ตัวเปิดเกม บัญชี
 
 คำอธิบายเต็ม: [05-CLIENT-GAMES.md](05-CLIENT-GAMES.md)
+
+<a id="system-scripts-client-bluestacks-ps1"></a>
+### System/Scripts/Client-BlueStacks.ps1
+
+45 บรรทัด · 0 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Check` · [เปิดไฟล์](../Scripts/Client-BlueStacks.ps1)
 
 <a id="system-scripts-client-clearlogins-ps1"></a>
 ### System/Scripts/Client-ClearLogins.ps1
@@ -506,15 +538,15 @@
 <a id="system-scripts-client-oslinkdrivers-ps1"></a>
 ### System/Scripts/Client-OslinkDrivers.ps1
 
-204 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `TestDir` · [เปิดไฟล์](../Scripts/Client-OslinkDrivers.ps1)
+217 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `TestDir` · [เปิดไฟล์](../Scripts/Client-OslinkDrivers.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Get-FakeState`](../Scripts/Client-OslinkDrivers.ps1#L59) | 59-59 | `d` |  |
-| 2 | [`Test-Loaded`](../Scripts/Client-OslinkDrivers.ps1#L62) | 62-67 | `d` | loaded = Windows runs the driver for at least one device (volatile Services\&lt;driver&gt;\Enum, written when it loads it) |
-| 3 | [`Find-OslinkBin`](../Scripts/Client-OslinkDrivers.ps1#L74) | 74-86 | - | ---------- OSLink's bin folder ---------- |
-| 4 | [`Test-PinnedSignature`](../Scripts/Client-OslinkDrivers.ps1#L91) | 91-102 | `File`, `Pins` | '' = valid signature made with a pinned certificate; else why not |
-| 5 | [`Invoke-Tool`](../Scripts/Client-OslinkDrivers.ps1#L155) | 155-168 | `Exe`, `Arguments`, `Seconds` | ---------- install (hidden, at most 90 s each) ---------- |
+| 1 | [`Get-FakeState`](../Scripts/Client-OslinkDrivers.ps1#L64) | 64-64 | `d` |  |
+| 2 | [`Test-Loaded`](../Scripts/Client-OslinkDrivers.ps1#L67) | 67-72 | `d` | loaded = Windows runs the driver for at least one device (volatile Services\&lt;driver&gt;\Enum, written when it loads it) |
+| 3 | [`Find-OslinkBin`](../Scripts/Client-OslinkDrivers.ps1#L79) | 79-91 | - | ---------- OSLink's bin folder ---------- |
+| 4 | [`Test-PinnedSignature`](../Scripts/Client-OslinkDrivers.ps1#L96) | 96-115 | `File`, `Pins` | '' = valid signature made with a pinned certificate; else why not |
+| 5 | [`Invoke-Tool`](../Scripts/Client-OslinkDrivers.ps1#L168) | 168-181 | `Exe`, `Arguments`, `Seconds` | ---------- install (hidden, at most 90 s each) ---------- |
 
 <a id="system-scripts-client-oslinkhelper-ps1"></a>
 ### System/Scripts/Client-OslinkHelper.ps1
@@ -549,7 +581,7 @@
 <a id="system-scripts-client-oslinkreport-ps1"></a>
 ### System/Scripts/Client-OslinkReport.ps1
 
-305 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Phase`, `DelaySeconds`, `Print`, `WaitSteamMinutes`, `WaitFiveMMinutes`, `WaitRiotMinutes`, `WaitApexMinutes` · [เปิดไฟล์](../Scripts/Client-OslinkReport.ps1)
+320 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Phase`, `DelaySeconds`, `Print`, `WaitSteamMinutes`, `WaitFiveMMinutes`, `WaitRiotMinutes`, `WaitApexMinutes` · [เปิดไฟล์](../Scripts/Client-OslinkReport.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -1216,7 +1248,7 @@
 <a id="system-scripts-common-ps1"></a>
 ### System/Scripts/Common.ps1
 
-407 บรรทัด · 34 ฟังก์ชัน · [เปิดไฟล์](../Scripts/Common.ps1)
+417 บรรทัด · 35 ฟังก์ชัน · [เปิดไฟล์](../Scripts/Common.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -1229,31 +1261,32 @@
 | 7 | [`Read-ExtraGames`](../Scripts/Common.ps1#L85) | 85-88 | - |  |
 | 8 | [`Run-Ps`](../Scripts/Common.ps1#L91) | 91-95 | `File`, `ArgList` | run another script of System\Scripts in this console (its output and colors go straight to the screen, it can ask questions); returns only its exit code |
 | 9 | [`Get-LanIP`](../Scripts/Common.ps1#L97) | 97-102 | - | this PC's shop-LAN IPv4: the adapter that has the default gateway, else the first private address |
-| 10 | [`Test-Admin`](../Scripts/Common.ps1#L103) | 103-103 | - |  |
-| 11 | [`Test-IsMaster`](../Scripts/Common.ps1#L108) | 108-119 | - |  |
-| 12 | [`Find-UninstallPath`](../Scripts/Common.ps1#L140) | 140-150 | `NamePattern` | install folder of a program from its uninstall entry (DisplayName matched as a regex): InstallLocation, else the folder of its icon / uninstaller |
-| 13 | [`Get-Launcher`](../Scripts/Common.ps1#L151) | 151-151 | `Key` |  |
-| 14 | [`Get-LauncherDir`](../Scripts/Common.ps1#L152) | 152-157 | `Key` |  |
-| 15 | [`Get-LauncherExe`](../Scripts/Common.ps1#L158) | 158-158 | `Key` |  |
-| 16 | [`Get-RobloxExe`](../Scripts/Common.ps1#L161) | 161-166 | - | Roblox (per-user app, not in the table: nothing keeps it open): Launchers\Roblox\Versions\version-&lt;hash&gt;\RobloxPlayerBeta.exe, newest one; the master's... |
-| 17 | [`Get-LauncherInstallPath`](../Scripts/Common.ps1#L168) | 168-187 | `Key` | where the launcher is installed according to its own registry/config (wherever that is), '' = not installed |
-| 18 | [`RegVal`](../Scripts/Common.ps1#L169) | 169-169 | `k`, `n` |  |
-| 19 | [`Get-SteamDir`](../Scripts/Common.ps1#L191) | 191-197 | - | ---------- Steam ---------- the Steam folder in Launchers (shared, so clients use it too); on a master not set up yet: where Steam says it is |
-| 20 | [`Get-SteamLibraries`](../Scripts/Common.ps1#L199) | 199-218 | - | every Steam library folder on the shared drives (read from Steam's libraryfolders.vdf, plus X:\Games\Steam / X:\SteamLibrary / X:\Steam) |
-| 21 | [`Test-CfxGameDir`](../Scripts/Common.ps1#L230) | 230-234 | `g`, `dir` | a game folder FiveM / RedM can use: on a drive the clients see, with the game exe (and for FiveM not the Enhanced one) |
-| 22 | [`Find-CfxGameDir`](../Scripts/Common.ps1#L236) | 236-249 | `g` | where the game is: Steam libraries (appmanifest), then Rockstar's registry keys, then GAME\Rockstar / GAME\Epic |
-| 23 | [`Get-RealCasePath`](../Scripts/Common.ps1#L251) | 251-260 | `p` | the same path with the folders' real upper / lower case (Steam's libraryfolders.vdf keeps library paths in lower case) |
-| 24 | [`Get-CfxApps`](../Scripts/Common.ps1#L262) | 262-279 | - | FiveM / RedM on the game disk: where the menu starts them (Menu\data\games.json), and the game folders (not Steam) |
-| 25 | [`Read-CfxIni`](../Scripts/Common.ps1#L281) | 281-286 | `Ini` | CitizenFX.ini lines (Windows INI: ANSI, or UTF-16 with a BOM) |
-| 26 | [`Get-CfxIVPath`](../Scripts/Common.ps1#L287) | 287-291 | `Ini` |  |
-| 27 | [`Set-CfxIVPath`](../Scripts/Common.ps1#L293) | 293-305 | `Ini`, `Path` | sets [Game] IVPath= and keeps every other line of the file |
-| 28 | [`Get-CfxStatus`](../Scripts/Common.ps1#L307) | 307-313 | - | per FiveM / RedM: the game folder found, what CitizenFX.ini says, and whether that is usable |
-| 29 | [`Get-GameFolderStamp`](../Scripts/Common.ps1#L317) | 317-335 | - | what the watcher compares to notice a new / removed game without a launcher telling it: the game folders (GAME\&lt;kind&gt;\&lt;game&gt;, X:\Games\&lt;kind&g... |
-| 30 | [`Get-MenuInfo`](../Scripts/Common.ps1#L339) | 339-348 | - | ---------- game menu ---------- the menu program is Menu\app\&lt;brandName&gt;.exe (Menu\config.json brandName), or the older Menu\app\0JAYSHOP.exe |
-| 31 | [`Show-Live`](../Scripts/Common.ps1#L353) | 353-363 | `text` | ---------- console helpers ---------- Live status line, redrawn in place (and in the window title) so a long install visibly moves; '' clears it. Never logge... |
-| 32 | [`Format-Sec`](../Scripts/Common.ps1#L364) | 364-364 | `s` |  |
-| 33 | [`Invoke-Installer`](../Scripts/Common.ps1#L368) | 368-391 | `Exe`, `ArgList`, `Label`, `TimeoutSec` | Run an installer hidden and wait at most $TimeoutSec, with a live line while it runs; on timeout kill the whole process tree (a leftover child keeps Windows ... |
-| 34 | [`Get-RiotBusy`](../Scripts/Common.ps1#L396) | 396-407 | - | Riot products still downloading/patching on this PC: &lt;name&gt;.manifest is written when a patch starts, &lt;name&gt;.ok when it is done. A manifest older ... |
+| 10 | [`Get-SunshinePlan`](../Scripts/Common.ps1#L106) | 106-113 | - | Sunshine 0JAYSHOP port plan (Tools\Sunshine0J; Client-Sunshine0J.ps1 and Tool-SunshineProfiles.ps1): client PC n has the IP &lt;net&gt;.(offset + n) and the ... |
+| 11 | [`Test-Admin`](../Scripts/Common.ps1#L113) | 113-113 | - |  |
+| 12 | [`Test-IsMaster`](../Scripts/Common.ps1#L118) | 118-129 | - |  |
+| 13 | [`Find-UninstallPath`](../Scripts/Common.ps1#L150) | 150-160 | `NamePattern` | install folder of a program from its uninstall entry (DisplayName matched as a regex): InstallLocation, else the folder of its icon / uninstaller |
+| 14 | [`Get-Launcher`](../Scripts/Common.ps1#L161) | 161-161 | `Key` |  |
+| 15 | [`Get-LauncherDir`](../Scripts/Common.ps1#L162) | 162-167 | `Key` |  |
+| 16 | [`Get-LauncherExe`](../Scripts/Common.ps1#L168) | 168-168 | `Key` |  |
+| 17 | [`Get-RobloxExe`](../Scripts/Common.ps1#L171) | 171-176 | - | Roblox (per-user app, not in the table: nothing keeps it open): Launchers\Roblox\Versions\version-&lt;hash&gt;\RobloxPlayerBeta.exe, newest one; the master's... |
+| 18 | [`Get-LauncherInstallPath`](../Scripts/Common.ps1#L178) | 178-197 | `Key` | where the launcher is installed according to its own registry/config (wherever that is), '' = not installed |
+| 19 | [`RegVal`](../Scripts/Common.ps1#L179) | 179-179 | `k`, `n` |  |
+| 20 | [`Get-SteamDir`](../Scripts/Common.ps1#L201) | 201-207 | - | ---------- Steam ---------- the Steam folder in Launchers (shared, so clients use it too); on a master not set up yet: where Steam says it is |
+| 21 | [`Get-SteamLibraries`](../Scripts/Common.ps1#L209) | 209-228 | - | every Steam library folder on the shared drives (read from Steam's libraryfolders.vdf, plus X:\Games\Steam / X:\SteamLibrary / X:\Steam) |
+| 22 | [`Test-CfxGameDir`](../Scripts/Common.ps1#L240) | 240-244 | `g`, `dir` | a game folder FiveM / RedM can use: on a drive the clients see, with the game exe (and for FiveM not the Enhanced one) |
+| 23 | [`Find-CfxGameDir`](../Scripts/Common.ps1#L246) | 246-259 | `g` | where the game is: Steam libraries (appmanifest), then Rockstar's registry keys, then GAME\Rockstar / GAME\Epic |
+| 24 | [`Get-RealCasePath`](../Scripts/Common.ps1#L261) | 261-270 | `p` | the same path with the folders' real upper / lower case (Steam's libraryfolders.vdf keeps library paths in lower case) |
+| 25 | [`Get-CfxApps`](../Scripts/Common.ps1#L272) | 272-289 | - | FiveM / RedM on the game disk: where the menu starts them (Menu\data\games.json), and the game folders (not Steam) |
+| 26 | [`Read-CfxIni`](../Scripts/Common.ps1#L291) | 291-296 | `Ini` | CitizenFX.ini lines (Windows INI: ANSI, or UTF-16 with a BOM) |
+| 27 | [`Get-CfxIVPath`](../Scripts/Common.ps1#L297) | 297-301 | `Ini` |  |
+| 28 | [`Set-CfxIVPath`](../Scripts/Common.ps1#L303) | 303-315 | `Ini`, `Path` | sets [Game] IVPath= and keeps every other line of the file |
+| 29 | [`Get-CfxStatus`](../Scripts/Common.ps1#L317) | 317-323 | - | per FiveM / RedM: the game folder found, what CitizenFX.ini says, and whether that is usable |
+| 30 | [`Get-GameFolderStamp`](../Scripts/Common.ps1#L327) | 327-345 | - | what the watcher compares to notice a new / removed game without a launcher telling it: the game folders (GAME\&lt;kind&gt;\&lt;game&gt;, X:\Games\&lt;kind&g... |
+| 31 | [`Get-MenuInfo`](../Scripts/Common.ps1#L349) | 349-358 | - | ---------- game menu ---------- the menu program is Menu\app\&lt;brandName&gt;.exe (Menu\config.json brandName), or the older Menu\app\0JAYSHOP.exe |
+| 32 | [`Show-Live`](../Scripts/Common.ps1#L363) | 363-373 | `text` | ---------- console helpers ---------- Live status line, redrawn in place (and in the window title) so a long install visibly moves; '' clears it. Never logge... |
+| 33 | [`Format-Sec`](../Scripts/Common.ps1#L374) | 374-374 | `s` |  |
+| 34 | [`Invoke-Installer`](../Scripts/Common.ps1#L378) | 378-401 | `Exe`, `ArgList`, `Label`, `TimeoutSec` | Run an installer hidden and wait at most $TimeoutSec, with a live line while it runs; on timeout kill the whole process tree (a leftover child keeps Windows ... |
+| 35 | [`Get-RiotBusy`](../Scripts/Common.ps1#L406) | 406-417 | - | Riot products still downloading/patching on this PC: &lt;name&gt;.manifest is written when a patch starts, &lt;name&gt;.ok when it is done. A manifest older ... |
 
 <a id="system-scripts-http-lib-ps1"></a>
 ### System/Scripts/Http-Lib.ps1
@@ -1276,34 +1309,52 @@
 <a id="system-scripts-osync-ps1"></a>
 ### System/Scripts/OSYNC.ps1
 
-168 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
+189 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L15) | 15-15 | - |  |
-| 2 | [`Ask`](../Scripts/OSYNC.ps1#L16) | 16-16 | `q` |  |
-| 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L17) | 17-23 | - |  |
-| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L25) | 25-97 | `a`, `x` |  |
-| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L99) | 99-131 | - |  |
+| 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L24) | 24-24 | - |  |
+| 2 | [`Ask`](../Scripts/OSYNC.ps1#L25) | 25-25 | `q` |  |
+| 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26-32 | - |  |
+| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34-115 | `a`, `x` |  |
+| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L117) | 117-152 | - |  |
 
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1
 
-169 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Yes`, `NoWizard`, `BranchCommand` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
+277 บรรทัด · 13 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand`, `PlanOnly` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Ask`](../Scripts/Setup-Install.ps1#L16) | 16-16 | `q`, `def` |  |
-| 2 | [`YesNo`](../Scripts/Setup-Install.ps1#L17) | 17-17 | `q` |  |
-| 3 | [`Head`](../Scripts/Setup-Install.ps1#L18) | 18-18 | `t` |  |
-| 4 | [`Set-Line`](../Scripts/Setup-Install.ps1#L19) | 19-24 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
-| 5 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L26) | 26-30 | `file`, `name` | set "brandName" in config.json without reformatting the file |
-| 6 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L32) | 32-32 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
+| 1 | [`Test-Installed`](../Scripts/Setup-Install.ps1#L19) | 19-19 | `dir` | an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither |
+| 2 | [`Ask`](../Scripts/Setup-Install.ps1#L31) | 31-31 | `q`, `def` |  |
+| 3 | [`YesNo`](../Scripts/Setup-Install.ps1#L32) | 32-32 | `q` |  |
+| 4 | [`Head`](../Scripts/Setup-Install.ps1#L33) | 33-33 | `t` |  |
+| 5 | [`Set-Line`](../Scripts/Setup-Install.ps1#L34) | 34-39 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
+| 6 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L41) | 41-45 | `file`, `name` | set "brandName" in config.json without reformatting the file |
+| 7 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L47) | 47-47 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
+| 8 | [`Expand-Files`](../Scripts/Setup-Install.ps1#L51) | 51-55 | `to` | the files to put in place: payload.zip unpacked, or a copy of the -Source folder (no .git, nothing a master made) |
+| 9 | [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L59) | 59-64 | `file` |  |
+| 10 | [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L66) | 66-73 | `file` | the game menu's config without the other shop's badge, logo, banner, server address and featured games |
+| 11 | [`Sync-Tools`](../Scripts/Setup-Install.ps1#L78) | 78-96 | `from`, `root`, `bk` |  |
+| 12 | [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L98) | 98-110 | `root` | proof that Tools\ is the same as the pack: every file in TOOLS-MANIFEST.txt there, same size and SHA256 |
+| 13 | [`Quit`](../Scripts/Setup-Install.ps1#L139) | 139-139 | `rc` | leave nothing in TEMP when the person stops at a question |
+
+<a id="system-scripts-setup-plan-ps1"></a>
+### System/Scripts/Setup-Plan.ps1
+
+164 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `SharedDrives`, `OutFile`, `PassThru`, `Quiet` · [เปิดไฟล์](../Scripts/Setup-Plan.ps1)
+
+| # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
+|---|---|---|---|---|
+| 1 | [`Out`](../Scripts/Setup-Plan.ps1#L15) | 15-15 | `t`, `c` |  |
+| 2 | [`GB`](../Scripts/Setup-Plan.ps1#L16) | 16-16 | `b` |  |
+| 3 | [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L57) | 57-57 | `dir` | ---------- OSYNC already here? (installed = has Launchers\ or System\Data\; a download of the project has neither) ---------- |
 
 <a id="system-scripts-tool-check-ps1"></a>
 ### System/Scripts/Tool-Check.ps1
 
-197 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Mode` · [เปิดไฟล์](../Scripts/Tool-Check.ps1)
+212 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Mode` · [เปิดไฟล์](../Scripts/Tool-Check.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -1347,11 +1398,11 @@
 <a id="system-scripts-tool-pack-ps1"></a>
 ### System/Scripts/Tool-Pack.ps1
 
-134 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
+166 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe`, `NoTools` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L20) | 20-24 | `from`, `to`, `xf` |  |
+| 1 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L27) | 27-31 | `from`, `to`, `xf` |  |
 
 <a id="system-scripts-tool-riotdiag-ps1"></a>
 ### System/Scripts/Tool-RiotDiag.ps1
@@ -1361,6 +1412,11 @@
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`A`](../Scripts/Tool-RiotDiag.ps1#L7) | 7-7 | `s` |  |
+
+<a id="system-scripts-tool-sunshineprofiles-ps1"></a>
+### System/Scripts/Tool-SunshineProfiles.ps1
+
+44 บรรทัด · 0 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `DryRun`, `Gateway` · [เปิดไฟล์](../Scripts/Tool-SunshineProfiles.ps1)
 
 ---
 [← กลับสารบัญเอกสาร](README.md)

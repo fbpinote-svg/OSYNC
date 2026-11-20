@@ -112,6 +112,7 @@ flowchart TD
 | [1v](#st-1v) | Battle.net Update Agent | ในไฟล์ | `ClientBattleNet` (`on`) | ไม่มีในไฟล์ = `on` |
 | [1s](#st-1s) | WinRAR (ลงเมื่อยังไม่มี) | [`Client-WinRAR.ps1`](#s11) | `ClientWinRAR` (`on`) | `on` |
 | [1t](#st-1t) | Rockstar Games Launcher บนดิสก์เกม | ในไฟล์ | `ClientRockstar` (`on`) | ไม่มีในไฟล์ = `on` |
+| 1w | BlueStacks 5 จากไดรฟ์เกม | [`Client-BlueStacks.ps1`](../Scripts/Client-BlueStacks.ps1) | `ClientBlueStacks` on / off (`on`) | `on` · ข้ามจนกว่าเครื่องแม่จะย้าย BlueStacks (`OSYNC.bat` → 7 → 25) |
 | [2](#st-2) | Steam first-run ของทุกเกม | `Client-Steam-FirstRun.ps1` → [05](05-CLIENT-GAMES.md) | ไม่มีค่า | — |
 | [3](#st-3) | EA app / เกม EA / EA AntiCheat | `Client-EA.ps1` → [05](05-CLIENT-GAMES.md) | ไม่มีค่า (ทำเมื่อมี `System\Data\EA\ea-client.reg`) | — |
 | [4](#st-4) | EasyAntiCheat (Epic และอื่น ๆ) | `Client-EAC.ps1` → [05](05-CLIENT-GAMES.md) | ไม่มีค่า | — |
@@ -120,6 +121,7 @@ flowchart TD
 | [7](#st-7) | สร้างงาน `OSYNC-Client-Boot` · เฉพาะทำอิมเมจ | ในไฟล์ | ไม่มีค่า (ปิดได้ด้วย OSYNC.bat > 7 Tools > 14) | — |
 | [8](#st-8) | เดสก์ท็อปเหลือแค่ไอคอนเมนู | [`Client-DesktopClean.ps1`](#s12) | `ClientDesktopMenuOnly` (`off`) · `ClientDesktopIcons` | `on` · `app-discordptb,fivem,launcher-steam,launcher-rockstar,launcher-roblox` |
 | [9](#st-9) | Apex: เครื่องทดสอบแบบสะอาด | ในไฟล์ | `ClientApexClean` on / ชื่อเครื่อง (ว่าง) | ว่าง → มีในโค้ด แต่ร้านนี้ปิดอยู่: `ClientApexClean=` |
+| (ทุกขั้น) | Apex: เครื่องทดสอบแบบเปล่า | ในไฟล์ (`Step`) | `ClientApexMinimal` ชื่อเครื่อง (ว่าง) | `KORI23` (20 พ.ย. 2026) → บูตแล้วทำแค่ขั้น 0a, 1q, 1r, 1u, 2, 3 ขั้นอื่นขึ้น `SKIP (ClientApexMinimal)` |
 
 ขั้นที่ข้ามบนเครื่องแม่ (`SKIP (this is the master)`): ทุกขั้น ยกเว้น 1, 1b, 1c, 1d, 1e, 2, 3, 4, 5, 6 ซึ่งไม่มีการตรวจนี้ในโค้ด (OSYNC.bat จะถามก่อนถ้าสั่ง client บนเครื่องที่ดูเหมือนเครื่องแม่)
 
@@ -195,8 +197,8 @@ flowchart TD
 - **แบบบูต** (`-Boot`): รันทุกครั้งที่บูตผ่าน `Boot.ps1` ไม่ถามอะไร ลงเฉพาะของที่ยังไม่มี (เกมใหม่ไม่ต้องแก้อิมเมจ แค่รีบูตเครื่องลูก) ไม่ทำขั้น 5, 6, 7
 
 **เรียกจาก / ทำงานเมื่อไหร่:**
-- `OSYNC.bat` > 5 "Install everything on this client", หรือ `OSYNC.bat client` (`OSYNC.ps1` บรรทัด 44-47)
-- ดับเบิลคลิก `OSYNC.bat` บนเครื่องลูกโดยไม่ใส่คำสั่ง = `client` (`OSYNC.ps1` บรรทัด 134)
+- `OSYNC.bat` > 5 "Install everything on this client", หรือ `OSYNC.bat client` (`OSYNC.ps1` บรรทัด 53-56)
+- ดับเบิลคลิก `OSYNC.bat` บนเครื่องลูกโดยไม่ใส่คำสั่ง = `client` (`OSYNC.ps1` บรรทัด 150)
 - `Boot.ps1` → `-Boot` (งาน `OSYNC-Client-Boot`)
 
 **พารามิเตอร์:**
@@ -223,8 +225,8 @@ flowchart TD
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
 | [`Run-Script`](../Scripts/Client-Install.ps1#L47) | 47 | รันสคริปต์ลูกด้วย `powershell.exe -NoProfile -ExecutionPolicy Bypass -File` (รับ `$extra` เป็นพารามิเตอร์เพิ่ม) รวม stderr เข้ามา; บรรทัดที่ขึ้นต้นด้วย `~` = สถานะสดของตัวติดตั้ง วาดทับที่เดิมด้วย `Show-Live` ไม่ลง log; บรรทัดอื่นพิมพ์เยื้อง 4 ช่อง; คืน exit code |
-| [`Step`](../Scripts/Client-Install.ps1#L57) | 57 | พิมพ์หัว `== ชื่อขั้น`, ตั้งชื่อหน้าต่าง, จับเวลา, รัน scriptblock; ผลว่างหรือ 0 = `OK`, ตัวเลขอื่น = `FAIL (exit n)`, error = `FAIL: ข้อความ`, ข้อความ = ใช้ตามนั้น (`SKIP (...)` ฯลฯ) แล้วเก็บลงตารางผล |
-| [`Stop-WoMicDriver`](../Scripts/Client-Install.ps1#L68) | 68 | ถอด WO Mic ออกในบูตนี้ (ใช้ในขั้น 1f และ 9) — ดูหัวข้อย่อยด้านล่าง |
+| [`Step`](../Scripts/Client-Install.ps1#L62) | 62 | พิมพ์หัว `== ชื่อขั้น`, ตั้งชื่อหน้าต่าง, จับเวลา, รัน scriptblock; ผลว่างหรือ 0 = `OK`, ตัวเลขอื่น = `FAIL (exit n)`, error = `FAIL: ข้อความ`, ข้อความ = ใช้ตามนั้น (`SKIP (...)` ฯลฯ) แล้วเก็บลงตารางผล |
+| [`Stop-WoMicDriver`](../Scripts/Client-Install.ps1#L77) | 77 | ถอด WO Mic ออกในบูตนี้ (ใช้ในขั้น 1f และ 9) — ดูหัวข้อย่อยด้านล่าง |
 
 ### `Stop-WoMicDriver` (บรรทัด 68)
 - **ใช้เมื่อ:** เครื่องอยู่ใน `ClientNoWoMic` หรือ `ClientApexClean` เท่านั้น (ตอนนี้ทั้งสองค่าว่าง จึงไม่ถูกเรียก)
@@ -236,7 +238,7 @@ flowchart TD
 ### ขั้นตอนการทำงาน ทีละขั้น (ตามลำดับในโค้ด)
 
 <a id="st-0a"></a>
-#### ขั้น `0a Apex  - no CPU-Z driver (EA Javelin denylist)` ([บรรทัด 93](../Scripts/Client-Install.ps1#L93))
+#### ขั้น `0a Apex  - no CPU-Z driver (EA Javelin denylist)` ([บรรทัด 102](../Scripts/Client-Install.ps1#L102))
 - **ทำไม:** Apex ดับตรง "Starting EA Javelin Anticheat..." บนเครื่องลูก เพราะตัวอ่านฮาร์ดแวร์/อุณหภูมิของโปรแกรม diskless (`C:\lwserver\client\lwclient64\lwhardware64.exe` → `khwsdk64.dll`) โหลดไดรเวอร์ CPU-Z `C:\Windows\Temp\cpuz160\cpuz160_x64.sys` ซึ่งอยู่ในรายการห้ามของ EA Javelin · ไดรเวอร์ CPU-Z ที่โหลดแล้วหยุดไม่ได้ ขั้นนี้จึงอยู่แรกสุด ก่อนตัวอ่านทำงาน
 - **ทำ:** ข้ามบนเครื่องแม่ · ทำเมื่อ `ClientBlockCpuz` = on หรือมีชื่อเครื่องนี้ หรือเครื่องนี้อยู่ใน `ClientApexClean` · สำหรับ `cpuz152` และ `cpuz160`:
   1. ไดรเวอร์รันอยู่แล้ว → จดไว้ (สุดท้ายจะ FAIL)
@@ -248,34 +250,34 @@ flowchart TD
 - **ร้านนี้:** `ClientBlockCpuz=KORI34,KORI23`
 
 <a id="st-0"></a>
-#### ขั้น `0 Sunshine - 0JAYSHOP from the start of Windows (PCs without their own)` ([บรรทัด 118](../Scripts/Client-Install.ps1#L118))
+#### ขั้น `0 Sunshine - 0JAYSHOP from the start of Windows (PCs without their own)` ([บรรทัด 127](../Scripts/Client-Install.ps1#L127))
 - **ทำไม:** เจ้าของร้าน 18 พ.ย. 2026: Sunshine 0JAYSHOP พับไว้ในถาดตั้งแต่ Windows โหลด แต่ไม่เปิดบนเครื่องที่มี Sunshine อยู่แล้ว
 - **ทำ:** ข้ามบนเครื่องแม่ → ลบงานตอนล็อกอิน `OSYNC-Sunshine0J` ของเวอร์ชันแรกทิ้งเสมอ → อ่าน `ClientSunshineAutoStart` (off = ข้าม, ไม่ใช่ on และไม่มีชื่อเครื่องนี้ = ข้าม) → ไม่มี `Tools\Sunshine0J\sunshine.exe` = ข้าม → เครื่องมี Sunshine ของตัวเอง (เซอร์วิสที่ชื่อหรือ path มี sunshine อยู่นอกชุดของร้านและไม่ disabled, หรือมี `sunshine.exe` ใน `C:\Program Files\Sunshine`, `C:\Sunshine`, `C:\Users\*\Sunshine`) = ข้าม → ไม่มี WebView2 (อ่าน `pv` ใต้ `EdgeUpdate\Clients\{F3017226-...}`) → รัน [`Client-Runtimes.ps1`](#s9) ก่อน → รัน [`Client-Sunshine0J.ps1 -Service`](#s4)
 - **ร้านนี้:** `ClientSunshineAutoStart=on`
 
 <a id="st-0b"></a>
-#### ขั้น `0b FiveM - hand new server files to the master (background)` ([บรรทัด 135](../Scripts/Client-Install.ps1#L135))
+#### ขั้น `0b FiveM - hand new server files to the master (background)` ([บรรทัด 144](../Scripts/Client-Install.ps1#L144))
 - ข้ามบนเครื่องแม่ · เฉพาะบูต · `ClientFiveMShare` เป็น on → เปิด `Client-FiveMShare.ps1` แบบซ่อนหน้าต่างเบื้องหลัง (log `C:\Users\Public\OSYNC-FiveMShare.log`) รายละเอียดใน [05](05-CLIENT-GAMES.md)
 - **ร้านนี้:** `ClientFiveMShare=on`
 
 <a id="st-1"></a>
-#### ขั้น `1 Riot  - silent start at logon` ([บรรทัด 142](../Scripts/Client-Install.ps1#L142))
+#### ขั้น `1 Riot  - silent start at logon` ([บรรทัด 151](../Scripts/Client-Install.ps1#L151))
 - ไม่มี Riot Client ใน `Launchers` (`Get-LauncherExe 'Riot'`) → ข้าม
 - เขียน Run `RiotStart` = `wscript.exe "<OSYNC>\System\Client\Riot.vbs" background` · ลบ `RiotClient` และ `RiotStart` ใต้ HKCU Run
 - ไม่มีค่าเปิด/ปิด (OSYNC.bat > 7 Tools > 9 / 10 ตั้ง/ลบ `RiotStart` เองได้)
 
 <a id="st-1b"></a>
-#### ขั้น `1b Menu - menu shortcuts (repair, before logon)` ([บรรทัด 155](../Scripts/Client-Install.ps1#L155))
+#### ขั้น `1b Menu - menu shortcuts (repair, before logon)` ([บรรทัด 164](../Scripts/Client-Install.ps1#L164))
 - เฉพาะบูต · ไม่มีโปรแกรมเมนู → ข้าม · รัน [`Client-Menu.ps1 -NoStart`](#s5)
 - **ทำไม:** ทำทางลัดใหม่ทันที (ไม่กี่วินาที) ก่อนตัวติดตั้งช้า ๆ จึงทันก่อน Windows ล็อกอิน · อิมเมจที่ทำด้วยโครงเก่า (ทางลัดชี้ `GCafe\app`) จะเปิดเมนูผ่าน `Menu.vbs` ตั้งแต่บูตนี้
 
 <a id="st-1c"></a>
-#### ขั้น `1c Roblox - play from the game disk (links at logon)` ([บรรทัด 161](../Scripts/Client-Install.ps1#L161))
+#### ขั้น `1c Roblox - play from the game disk (links at logon)` ([บรรทัด 170](../Scripts/Client-Install.ps1#L170))
 - ไม่มี Roblox ใน `Launchers\Roblox` (`Get-RobloxExe`) → ข้าม
 - เขียน Run `RobloxPrep` = `wscript.exe "<OSYNC>\System\Client\Roblox.vbs" background` (ตอนล็อกอินชี้ลิงก์ `roblox://` ของผู้ใช้ไปที่ดิสก์เกม ไม่ต้องติดตั้ง) รายละเอียด `Client-Roblox.ps1` ใน [05](05-CLIENT-GAMES.md)
 
 <a id="st-1d"></a>
-#### ขั้น `1d Win  - Resume off (CrossDeviceResume error popup)` ([บรรทัด 171](../Scripts/Client-Install.ps1#L171))
+#### ขั้น `1d Win  - Resume off (CrossDeviceResume error popup)` ([บรรทัด 180](../Scripts/Client-Install.ps1#L180))
 - **ทำไม:** Windows 11 "Resume" (`CrossDeviceResume.exe`) ไม่ได้ลงทะเบียนให้ผู้ใช้บนอิมเมจ diskless แล้วเด้ง "The parameter is incorrect"
 - ไม่มี `C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\CrossDeviceResume.exe` → ข้าม
 - **เขียน:**
@@ -287,40 +289,40 @@ flowchart TD
   6. ตัวปิดป๊อปอัป: Run `OSYNC-PopupGuard` = `wscript.exe "<OSYNC>\System\Client\PopupGuard.vbs"` และงาน `OSYNC-PopupGuard` (At logon, กลุ่ม `S-1-5-32-545` BUILTIN\Users, RunLevel Limited, จำกัด 5 นาที, IgnoreNew) — ใช้งานตอนล็อกอินเพราะรายการ Run เริ่มช้ากว่าป๊อปอัป
 
 <a id="st-1e"></a>
-#### ขั้น `1e Power - customers cannot shut down / restart` ([บรรทัด 211](../Scripts/Client-Install.ps1#L211))
+#### ขั้น `1e Power - customers cannot shut down / restart` ([บรรทัด 220](../Scripts/Client-Install.ps1#L220))
 - `ClientPowerLock` ไม่ใช่ off = on
 - **เขียนทุกครั้ง (ทั้ง on และ off):** `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer` `NoClose` = 1 (on) / 0 (off) · `...\Policies\System` `shutdownwithoutlogon` = 0 (on) / 1 (off)
 - on = ซ่อน Shut down / Restart / Sleep ใน Start, Alt+F4, Ctrl+Alt+Del และหน้าล็อกอิน · ร้านยังสั่งปิด/รีสตาร์ตจากหลังบ้านได้ (agent ใช้ `shutdown.exe` เป็น SYSTEM)
 - **ร้านนี้:** `ClientPowerLock=on`
 
 <a id="st-1h"></a>
-#### ขั้น `1h GTA   - GTA V / FiveM graphics (shop file)` ([บรรทัด 223](../Scripts/Client-Install.ps1#L223))
+#### ขั้น `1h GTA   - GTA V / FiveM graphics (shop file)` ([บรรทัด 232](../Scripts/Client-Install.ps1#L232))
 - ข้ามบนเครื่องแม่ · `ClientGtaSettings=off` = ข้าม · ไม่มี `Settings\gta5_settings.xml` = ข้าม · รัน `Client-GtaSettings.ps1` → [05](05-CLIENT-GAMES.md) · ใช้เวลาไม่กี่วินาที จึงอยู่ก่อนตัวติดตั้ง
 - **ร้านนี้:** `ClientGtaSettings=on`
 
 <a id="st-1i"></a>
-#### ขั้น `1i Logins - clear saved game logins` ([บรรทัด 232](../Scripts/Client-Install.ps1#L232))
+#### ขั้น `1i Logins - clear saved game logins` ([บรรทัด 241](../Scripts/Client-Install.ps1#L241))
 - ข้ามบนเครื่องแม่ · `ClientClearLogins=off` = ข้าม · รัน `Client-ClearLogins.ps1` (บูตส่ง `-Boot`: ไม่ปิดอะไร; ทำอิมเมจ: ปิด launcher ก่อน) → [05](05-CLIENT-GAMES.md)
 - **ร้านนี้:** `ClientClearLogins=on`
 
 <a id="st-1l"></a>
-#### ขั้น `1l OSLink - drivers (virtual mouse / keyboard / gamepad)` ([บรรทัด 242](../Scripts/Client-Install.ps1#L242))
+#### ขั้น `1l OSLink - drivers (virtual mouse / keyboard / gamepad)` ([บรรทัด 251](../Scripts/Client-Install.ps1#L251))
 - ข้ามบนเครื่องแม่ · `ClientOslinkDrivers` off = ข้าม, ไม่ใช่ on และไม่มีชื่อเครื่องนี้ = ข้าม · รัน `Client-OslinkDrivers.ps1` (LdVMou, LdVKbd, LdScpVBus) → [05](05-CLIENT-GAMES.md)
 - อยู่ก่อน 1j / 1k เพราะ OSLink ตรวจไดรเวอร์ตอนเริ่ม และสองขั้นนั้นรีสตาร์ต OSLink
 - **ร้านนี้:** `ClientOslinkDrivers=on`
 
 <a id="st-1j"></a>
-#### ขั้น `1j OSLink - own MAC, not the master's` ([บรรทัด 251](../Scripts/Client-Install.ps1#L251))
+#### ขั้น `1j OSLink - own MAC, not the master's` ([บรรทัด 260](../Scripts/Client-Install.ps1#L260))
 - ข้ามบนเครื่องแม่ · `ClientOslinkReset` แบบเดียวกับ 1l · รัน `Client-OslinkReset.ps1` → [05](05-CLIENT-GAMES.md)
 - **ร้านนี้:** `ClientOslinkReset=on`
 
 <a id="st-1k"></a>
-#### ขั้น `1k OSLink - this PC's own sign-in (from the master)` ([บรรทัด 261](../Scripts/Client-Install.ps1#L261))
+#### ขั้น `1k OSLink - this PC's own sign-in (from the master)` ([บรรทัด 270](../Scripts/Client-Install.ps1#L270))
 - ข้ามบนเครื่องแม่ · `ClientOslinkLogin` แบบเดียวกับ 1l · รัน `Client-OslinkLogin.ps1` (สร้างงาน `OSYNC-OslinkHelper` ด้วย) → [05](05-CLIENT-GAMES.md)
 - **ร้านนี้:** `ClientOslinkLogin=on`
 
 <a id="st-1m"></a>
-#### ขั้น `1m OSLink - in the tray at logon (no window)` ([บรรทัด 273](../Scripts/Client-Install.ps1#L273))
+#### ขั้น `1m OSLink - in the tray at logon (no window)` ([บรรทัด 282](../Scripts/Client-Install.ps1#L282))
 - **ทำไม:** เจ้าของร้าน 17 พ.ย.: OSLink อยู่ในถาดตั้งแต่ล็อกอิน ไม่มีหน้าต่าง · `ldremote.exe` ต้องการสิทธิ์ admin ถ้าใส่ใน Run Windows จะถามหรือข้าม จึงใช้งานตั้งเวลาแบบสิทธิ์สูงสุด
 - ข้ามบนเครื่องแม่ · `ClientOslinkStart` off หรือไม่มีชื่อเครื่องนี้ → **ลบงาน `OSYNC-OslinkStart`** แล้วข้าม
 - ไม่มี `System\Client\OslinkStart.vbs` → `FAIL`
@@ -329,42 +331,42 @@ flowchart TD
 - **ร้านนี้:** `ClientOslinkStart=on`
 
 <a id="st-report"></a>
-#### บล็อกรายงาน OSLink (ไม่ใช่ `Step`, [บรรทัด 297](../Scripts/Client-Install.ps1#L297))
+#### บล็อกรายงาน OSLink (ไม่ใช่ `Step`, [บรรทัด 306](../Scripts/Client-Install.ps1#L306))
 - คอมเมนต์ 17 พ.ย.: **ชั่วคราว** เพื่อหาสาเหตุ OSLink ขึ้น "driver error" · เฉพาะบูต, ไม่ใช่เครื่องแม่, `ClientOslinkReport` เป็น on
 - เปิด `Client-OslinkReport.ps1` แบบซ่อน 6 ตัว: `-Phase boot+150s`, `boot+360s`, `steam` (รอ 180 นาที), `fivem` (180), `riot` (180), `apex` (720) · ส่งไปเครื่องแม่ทาง LAN พอร์ต 4670 (ตามคอมเมนต์) → [05](05-CLIENT-GAMES.md)
 - ไม่ลงตาราง RESULT (ไม่ได้อยู่ใน `Step`)
 - **ร้านนี้:** `ClientOslinkReport=on` (คอมเมนต์ในโค้ดและ settings บอกให้เปลี่ยนเป็น off เมื่อแก้ OSLink เสร็จ)
 
 <a id="st-verify"></a>
-#### บล็อกตรวจไฟล์เกม Steam (ไม่ใช่ `Step`, [บรรทัด 317](../Scripts/Client-Install.ps1#L317))
+#### บล็อกตรวจไฟล์เกม Steam (ไม่ใช่ `Step`, [บรรทัด 326](../Scripts/Client-Install.ps1#L326))
 - 20 พ.ย. 2026 (Apex, กฎข้อ 1 ของคู่มือ iPlay: ไฟล์เกมต้องตรงกับที่ค่ายส่งมา) · เฉพาะบูต, ไม่ใช่เครื่องแม่, `ClientSteamVerify` = on หรือมีชื่อเครื่องนี้
 - AppID จาก `ClientSteamVerifyApps` (เฉพาะตัวเลข) → เปิด PowerShell ซ่อนตัวเดียว รัน `Client-SteamVerify.ps1 -AppId <id> -Report` ทีละเกม (ตัวแรก `-DelaySeconds 240` = รอ 4 นาที) → [05](05-CLIENT-GAMES.md)
 - อ่านทั้งเกมทุกบูต (Apex 68 GB ราว 10-12 นาทีผ่าน 1 Gbit ตามคอมเมนต์) จึงควรใส่รายชื่อสั้น ๆ
 - **ร้านนี้:** `ClientSteamVerify=KORI23`, `ClientSteamVerifyApps=1172470`
 
 <a id="st-1f"></a>
-#### ขั้น `1f Mic   - WO Mic + VB-CABLE (only if missing)` ([บรรทัด 332](../Scripts/Client-Install.ps1#L332))
+#### ขั้น `1f Mic   - WO Mic + VB-CABLE (only if missing)` ([บรรทัด 341](../Scripts/Client-Install.ps1#L341))
 - ข้ามบนเครื่องแม่
 - เครื่องอยู่ใน `ClientApexClean` หรือ `ClientNoWoMic` (on หรือชื่อเครื่อง) → `Stop-WoMicDriver` แล้วจบขั้น (`OK (WO Mic taken out ...)` หรือ `FAIL`) · เหตุผล 19 พ.ย.: ไดรเวอร์ WO Mic (`WOVAD`, `womic.sys`) เซ็นด้วยใบรับรองที่หมดอายุปี 2020 และ EA บอกว่า Javelin ปิดเกมเมื่อมีไดรเวอร์แบบนี้ · ปุ่มไมค์มือถือใช้ไม่ได้บนเครื่องนั้น VB-CABLE ยังอยู่
 - `ClientMicDrivers=off` → ข้าม · ไม่มีทั้ง `Tools\WOMic` และ `Tools\VBCABLE` → ข้าม · รัน [`Client-Mic.ps1`](#s7)
 - **ร้านนี้:** `ClientMicDrivers=on`, `ClientNoWoMic=` (ว่าง), `ClientApexClean=` (ว่าง) → ทุกเครื่องลูกรัน `Client-Mic.ps1` · การถอด WO Mic มีในโค้ด แต่ร้านนี้ปิดอยู่
 
 <a id="st-1g"></a>
-#### ขั้น `1g Parsec - Parsec app (only if missing)` ([บรรทัด 352](../Scripts/Client-Install.ps1#L352))
+#### ขั้น `1g Parsec - Parsec app (only if missing)` ([บรรทัด 361](../Scripts/Client-Install.ps1#L361))
 - ข้ามบนเครื่องแม่ · `ClientParsec=off` = ข้าม · ไม่มี `Tools\Parsec\parsec-windows*.exe` = ข้าม · รัน [`Client-Parsec.ps1`](#s8)
 - **ร้านนี้:** `ClientParsec=on`
 
 <a id="st-1o"></a>
-#### ขั้น `1o Runtimes - WebView2, Node.js, Python` ([บรรทัด 361](../Scripts/Client-Install.ps1#L361))
+#### ขั้น `1o Runtimes - WebView2, Node.js, Python` ([บรรทัด 370](../Scripts/Client-Install.ps1#L370))
 - ข้ามบนเครื่องแม่ · รัน [`Client-Runtimes.ps1`](#s9) เสมอ (สวิตช์เปิด/ปิดอยู่ในสคริปต์นั้น)
 
 <a id="st-1p"></a>
-#### ขั้น `1p VDD   - virtual monitor 1920x1080 (only if missing)` ([บรรทัด 367](../Scripts/Client-Install.ps1#L367))
+#### ขั้น `1p VDD   - virtual monitor 1920x1080 (only if missing)` ([บรรทัด 376](../Scripts/Client-Install.ps1#L376))
 - ข้ามบนเครื่องแม่ · `ClientVdd=off` = ข้าม · รัน [`Client-Vdd.ps1`](#s10)
 - **ร้านนี้:** `ClientVdd=on`
 
 <a id="st-1q"></a>
-#### ขั้น `1q Steam - start without self-update (steam.cfg)` ([บรรทัด 378](../Scripts/Client-Install.ps1#L378))
+#### ขั้น `1q Steam - start without self-update (steam.cfg)` ([บรรทัด 387](../Scripts/Client-Install.ps1#L387))
 - **ทำไม (18 พ.ย. 2026):** Steam บนเครื่องลูกติดตั้งตัวเองใหม่ทุกครั้งที่เปิด ("Updating Steam... Extracting package" ราว 1 นาที; log: "Unable to read and verify install manifest ...steam_client_win64.installed") ทั้งที่ไฟล์ตรงกับเครื่องแม่ทุกไบต์ (ตรวจ SHA256 บน KORI05) เพราะ Steam ไม่ยอมรับรายการติดตั้งบนเครื่องอื่นที่ไม่ใช่เครื่องที่เขียน
 - ข้ามบนเครื่องแม่ · `ClientSteamNoUpdate` = on หรือมีชื่อเครื่องนี้ ไม่งั้นข้าม
 - ทุกโฟลเดอร์ `<ไดรฟ์ใน SharedDrives>:\Steam` และ `Launchers\Steam` ที่มี `steam.exe` → เขียน `steam.cfg` (ASCII) = `BootStrapperInhibitAll=enable` และ `BootStrapperForceSelfUpdate=disable` (เขียนเฉพาะเมื่อเนื้อหาต่าง)
@@ -373,14 +375,14 @@ flowchart TD
 - **ร้านนี้:** `ClientSteamNoUpdate=on`, `SharedDrives=DEFGHIJ`
 
 <a id="st-1r"></a>
-#### ขั้น `1r Steam - no master accounts in the sign-in list` ([บรรทัด 400](../Scripts/Client-Install.ps1#L400))
+#### ขั้น `1r Steam - no master accounts in the sign-in list` ([บรรทัด 409](../Scripts/Client-Install.ps1#L409))
 - **ทำไม (18 พ.ย. 2026, เจ้าของร้าน):** Steam บนดิสก์เกมเก็บรายชื่อบัญชีที่ล็อกอินบนเครื่องแม่ (`config\loginusers.vdf`) ทุกเครื่องลูกจึงเห็นใน "Who's playing?" · token ไม่ได้อยู่บนดิสก์เกม (อยู่ใน AppData ของเครื่องแม่)
 - ข้ามบนเครื่องแม่ · `ClientClearLogins=off` = ข้าม
 - ทุกโฟลเดอร์ Steam (แบบเดียวกับ 1q) ที่มี `steam.exe` และ `config\loginusers.vdf`: นับ `"AccountName"` ถ้ามี → เขียนทับเป็น `"users"` ว่าง (UTF-8 ไม่มี BOM) ในสำเนาของเครื่องนี้เท่านั้น
 - **ร้านนี้:** `ClientClearLogins=on`
 
 <a id="st-1u"></a>
-#### ขั้น `1u Steam - Steam Client Service (PLAY needs it)` ([บรรทัด 418](../Scripts/Client-Install.ps1#L418))
+#### ขั้น `1u Steam - Steam Client Service (PLAY needs it)` ([บรรทัด 427](../Scripts/Client-Install.ps1#L427))
 - **ทำไม (18 พ.ย. 2026):** กด PLAY ใน Steam แล้วไม่มีอะไรเกิดขึ้นเกือบทุกเกม · อิมเมจของบางเครื่อง (KORI06 / 12 / 13 / 19) ไม่มีเซอร์วิสนี้
 - ข้ามบนเครื่องแม่ · `ClientSteamService=off` = ข้าม
 - มีเซอร์วิส `Steam Client Service` และไฟล์ `C:\Program Files (x86)\Common Files\Steam\steamservice.exe` แล้ว → จบ
@@ -389,19 +391,19 @@ flowchart TD
 - **ร้านนี้:** ไม่มี `ClientSteamService` ในไฟล์ = `on`
 
 <a id="st-1v"></a>
-#### ขั้น `1v Battle.net - Update Agent (Battle.net, Overwatch on Steam)` ([บรรทัด 442](../Scripts/Client-Install.ps1#L442))
+#### ขั้น `1v Battle.net - Update Agent (Battle.net, Overwatch on Steam)` ([บรรทัด 451](../Scripts/Client-Install.ps1#L451))
 - **ทำไม (18 พ.ย. 2026):** Battle.net และ Overwatch บน Steam ต้องใช้ Update Agent ใน `C:\ProgramData\Battle.net\Agent` ซึ่งเครื่องลูกไม่มี
 - ข้ามบนเครื่องแม่ · `ClientBattleNet=off` = ข้าม · ไม่มี `System\Data\BattleNet\Agent\Agent.exe` (เครื่องแม่ทำด้วย `Master-Snapshot-BattleNet.ps1` ใน OSYNC.bat > 1 / watcher) = ข้าม
 - `robocopy /E` ไปที่ `C:\ProgramData\Battle.net\Agent` (ราว 21 MB) · robocopy ≥ 8 = `FAIL` · ไม่คัดลอก registry (คีย์เข้ารหัสไว้สำหรับเครื่องแม่เท่านั้น)
 - **ร้านนี้:** ไม่มี `ClientBattleNet` ในไฟล์ = `on`
 
 <a id="st-1s"></a>
-#### ขั้น `1s WinRAR - archives (only if missing)` ([บรรทัด 456](../Scripts/Client-Install.ps1#L456))
+#### ขั้น `1s WinRAR - archives (only if missing)` ([บรรทัด 465](../Scripts/Client-Install.ps1#L465))
 - ข้ามบนเครื่องแม่ · `ClientWinRAR=off` = ข้าม · รัน [`Client-WinRAR.ps1`](#s11)
 - **ร้านนี้:** `ClientWinRAR=on`
 
 <a id="st-1t"></a>
-#### ขั้น `1t Rockstar - launcher on the game disk (FiveM / GTA V)` ([บรรทัด 465](../Scripts/Client-Install.ps1#L465))
+#### ขั้น `1t Rockstar - launcher on the game disk (FiveM / GTA V)` ([บรรทัด 474](../Scripts/Client-Install.ps1#L474))
 - **ทำไม (18 พ.ย. 2026):** FiveM และ GTA V ขึ้น "Rockstar Games Launcher could not be found!" เพราะอิมเมจยังชี้ที่เก่า (launcher ย้ายไป `Launchers\Rockstar` ตั้งแต่ step B 17 พ.ย.)
 - ข้ามบนเครื่องแม่ · `ClientRockstar=off` = ข้าม · ไม่มี `Launchers\Rockstar\Launcher.exe` = ข้าม
 - `HKLM\SOFTWARE\WOW6432Node\Rockstar Games\Launcher`: `InstallFolder` = `Launchers\Rockstar` (ถ้าต่าง), `Version` = เวอร์ชันของ `Launcher.exe` (ถ้าต่าง), `Language` = ว่าง (ถ้ายังไม่มี)
@@ -409,29 +411,34 @@ flowchart TD
 - **ร้านนี้:** ไม่มี `ClientRockstar` ในไฟล์ = `on`
 
 <a id="st-2"></a>
-#### ขั้น `2 Steam - first-run setup of every game` ([บรรทัด 493](../Scripts/Client-Install.ps1#L493))
+#### ขั้น `1w BlueStacks - Android emulator from the game disk` ([บรรทัด 505](../Scripts/Client-Install.ps1#L505)) · [`Client-BlueStacks.ps1`](../Scripts/Client-BlueStacks.ps1)
+- 20 พ.ย. 2026 เจ้าของร้านให้ย้าย BlueStacks 5 ออกจาก C: ของเครื่องแม่เข้าเมนู: `Master-Move-BlueStacks.ps1` (`OSYNC.bat` → 7 → 25) ย้ายไป `<ไดรฟ์>:\Emulator\BlueStacks` แล้วทำ `System\Data\BlueStacks\bluestacks.reg` (`HKLM\SOFTWARE\BlueStacks_nxt` + คลาส COM, ProgID, TypeLib และ interface ทุกตัวที่ใช้ proxy stub ของ BlueStacks ตามที่เครื่องแม่ลงทะเบียนไว้) และ `bluestacks.txt` (ที่อยู่โปรแกรม, รุ่น)
+- ขั้นนี้บนเครื่องลูก: ข้ามบนเครื่องแม่ / `ClientBlueStacks=off` / ยังไม่มี `bluestacks.reg` · `reg import` ไฟล์นั้น (ข้ามถ้า `InstallDir` ตรงและนำเข้าไฟล์รุ่นเดียวกันแล้ว เครื่อง diskless จึงนำเข้าทุกบูต) · สร้างหรือแก้เซอร์วิสไดรเวอร์ `BlueStacksDrv_nxt` (kernel, demand) ให้ชี้ `\??\<โปรแกรม>\BstkDrv_nxt.sys` บนไดรฟ์เกม แล้ว start · ไม่คัดลอกอะไรลง C:
+- การ์ดเมนู "BlueStacks 5" (หมวด Mobile) เปิด `<โปรแกรม>\HD-Player.exe --instance <ชื่อ instance>` เหมือนทางลัดบนเครื่องแม่
+- **ร้านนี้:** `ClientBlueStacks=on` · รอเครื่องแม่ย้ายก่อน (ขั้นนี้ขึ้น SKIP) · ยังไม่ได้ทดสอบบนเครื่องลูก
+#### ขั้น `2 Steam - first-run setup of every game` ([บรรทัด 502](../Scripts/Client-Install.ps1#L502))
 - รัน `Client-Steam-FirstRun.ps1` (บูตส่ง `-SkipFailed`) → [05](05-CLIENT-GAMES.md) · ไม่มีการข้ามบนเครื่องแม่ในขั้นนี้
 
 <a id="st-3"></a>
-#### ขั้น `3 EA    - EA app, games, EA AntiCheat` ([บรรทัด 496](../Scripts/Client-Install.ps1#L496))
+#### ขั้น `3 EA    - EA app, games, EA AntiCheat` ([บรรทัด 513](../Scripts/Client-Install.ps1#L513))
 - ไม่มี `System\Data\EA\ea-client.reg` → `SKIP (no EA data yet: OSYNC.bat > 1 on the master first)` · รัน `Client-EA.ps1` → [05](05-CLIENT-GAMES.md)
 
 <a id="st-4"></a>
-#### ขั้น `4 EAC   - EasyAntiCheat (Epic and others)` ([บรรทัด 500](../Scripts/Client-Install.ps1#L500))
+#### ขั้น `4 EAC   - EasyAntiCheat (Epic and others)` ([บรรทัด 517](../Scripts/Client-Install.ps1#L517))
 - รัน `Client-EAC.ps1` → [05](05-CLIENT-GAMES.md)
 
 <a id="st-5"></a>
-#### ขั้น `5 Menu  - game menu` ([บรรทัด 505](../Scripts/Client-Install.ps1#L505)) · เฉพาะทำอิมเมจ
+#### ขั้น `5 Menu  - game menu` ([บรรทัด 522](../Scripts/Client-Install.ps1#L522)) · เฉพาะทำอิมเมจ
 - ไม่มีโปรแกรมเมนู → `SKIP (build the menu on the master: OSYNC.bat > Tools)` · รัน [`Client-Menu.ps1 -NoStart`](#s5)
 - **ทำไม `-NoStart`:** หน้าล็อกของเมนูอยู่บนสุดเสมอ ถ้าเปิดตอนนี้จะบังหน้าต่างนี้และ "Press Enter" จนรีบูต · เมนูเปิดเองหลังรีบูต
 
 <a id="st-6"></a>
-#### ขั้น `6 NT    - NEWTHINGS-GAMES (GTA SA)` ([บรรทัด 511](../Scripts/Client-Install.ps1#L511)) · เฉพาะทำอิมเมจ
+#### ขั้น `6 NT    - NEWTHINGS-GAMES (GTA SA)` ([บรรทัด 528](../Scripts/Client-Install.ps1#L528)) · เฉพาะทำอิมเมจ
 - รัน `Client-NEWTHINGS.ps1` (ส่ง `-FixThaiText` เมื่อคำถามตอนต้นตอบแก้) → [05](05-CLIENT-GAMES.md)
 - **ร้านนี้:** `ClientThaiFix=on` = แก้โดยไม่ถาม (มีผลหลังรีสตาร์ต)
 
 <a id="st-7"></a>
-#### ขั้น `7 Boot  - set up new games at every boot` ([บรรทัด 514](../Scripts/Client-Install.ps1#L514)) · เฉพาะทำอิมเมจ
+#### ขั้น `7 Boot  - set up new games at every boot` ([บรรทัด 531](../Scripts/Client-Install.ps1#L531)) · เฉพาะทำอิมเมจ
 - ข้ามบนเครื่องแม่
 - สร้างงาน **`OSYNC-Client-Boot`**:
   - Action: `powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -EncodedCommand <...>` — คำสั่งข้างในคือ วนรอสูงสุด 90 รอบ x 2 วินาที (3 นาที) จนเห็น `<OSYNC>\System\Client\Boot.ps1` แล้วรันไฟล์นั้น (ดิสก์เกมอาจโผล่หลังเครื่องเริ่มไม่นาน)
@@ -441,13 +448,19 @@ flowchart TD
 - path ของ `Boot.ps1` ถูกฝังลงในงาน ถ้าย้ายโฟลเดอร์ OSYNC ต้องทำอิมเมจใหม่
 
 <a id="st-8"></a>
-#### ขั้น `8 Desktop - only the game menu icon` ([บรรทัด 531](../Scripts/Client-Install.ps1#L531))
+#### ขั้น `8 Desktop - only the game menu icon` ([บรรทัด 548](../Scripts/Client-Install.ps1#L548))
 - คอมเมนต์ 17 พ.ย. (เจ้าของร้าน): เดสก์ท็อปมีแค่ไอคอนเมนู · อยู่ท้าย ๆ ทั้งตอนบูตและทำอิมเมจ เพราะต้องรอหลังตัวติดตั้งที่เพิ่มไอคอน (WO Mic, Parsec ...)
 - ข้ามบนเครื่องแม่ · `ClientDesktopMenuOnly` off = ข้าม · รัน [`Client-DesktopClean.ps1`](#s12)
 - **ร้านนี้:** `ClientDesktopMenuOnly=on`
 
 <a id="st-9"></a>
-#### ขั้น `9 Apex  - clean test PC (ClientApexClean)` ([บรรทัด 540](../Scripts/Client-Install.ps1#L540))
+#### เครื่องทดสอบแบบเปล่า `ClientApexMinimal` ([บรรทัด 61](../Scripts/Client-Install.ps1#L61))
+- 20 พ.ย. 2026: เจ้าของร้านบอกว่าใช้ iPlay แล้ว Apex เล่นได้บนระบบ diskless แบบเดียวกัน ต้นเหตุจึงน่าจะอยู่ที่สิ่งที่ระบบเราทำกับเครื่องลูก ไม่ใช่ไดรเวอร์ของ LW
+- เครื่องในค่านี้: ตอนบูตทำเฉพาะขั้นที่ Steam และ EA AntiCheat ต้องใช้ (`0a` กัน CPU-Z, `1q` `1r` `1u` Steam, `2` Steam first-run, `3` EA) ขั้นอื่นทั้งหมด (Sunshine, OSLink, ไมค์, Parsec, จอเสมือน, runtime, เมนู, เดสก์ท็อป ...) ขึ้น `SKIP (ClientApexMinimal)` · รายงาน Apex ยังส่งตามปกติ
+- อ่านผล: Apex เข้าได้ = ต้นเหตุอยู่ในขั้นที่ข้าม (เปิดคืนทีละขั้นเพื่อหาตัว) · ยังดับ = อยู่ที่ Image / Steam / วิธีเปิด
+- **ร้านนี้:** `ClientApexMinimal=KORI23` (20 พ.ย. 2026) · ผลเสียบนเครื่องนั้นระหว่างทดสอบ: ไม่มี Sunshine / ไมค์ / OSLink จากระบบเรา
+
+#### ขั้น `9 Apex  - clean test PC (ClientApexClean)` ([บรรทัด 557](../Scripts/Client-Install.ps1#L557))
 - 19 พ.ย. 2026: Apex ดับบนเครื่องลูกแต่เปิดได้บนเครื่องแม่ เครื่องใน `ClientApexClean` จึงเป็นเครื่องทดสอบแบบสะอาด
 - ข้ามบนเครื่องแม่ · ไม่มีชื่อเครื่องนี้ (หรือไม่ใช่ on) → ข้าม
 - ปิด (`Disable-PnpDevice`) อุปกรณ์ที่ใช้เซอร์วิส `WOVAD`, `ViGEmBus`, `VBAudioVACMME` หรือ HardwareID มี `zako` → รอ 3 วินาที → รายงานสถานะไดรเวอร์ (รวมไดรเวอร์ชื่อ zako / cpuz*) → WOVAD ยังรัน → `Stop-WoMicDriver` อีกครั้ง → ยังมีตัวไหนโหลดอยู่ = `FAIL (still loaded: ...)`
@@ -485,7 +498,7 @@ flowchart TD
 - เซอร์วิส `SunshineService` (`sc create` / `sc config`, start= auto, DisplayName `Sunshine Service`) ในโหมด `-Service`
 - โหมดการ์ด: หยุดเซอร์วิส/โปรเซส Sunshine ของอิมเมจ (แค่หยุด เซอร์วิสกลับมาในบูตถัดไป)
 
-**พอร์ต:** IP `192.168.51.(100+n)` โดย n = 1-99 → พอร์ต `20000 + n x 100`, หน้าเว็บ = พอร์ต + 1 (เช่น `.123` → `22300`, เว็บ `22301`) · IP อื่น → ค่าเริ่มต้นของ Sunshine `47989` (เว็บ `47990`)
+**พอร์ต:** IP `<net>.(offset+n)` โดย n = 1-99 → พอร์ต `20000 + n x 100`, หน้าเว็บ = พอร์ต + 1 · แผนจาก Settings `SunshineIpBase` ([`Get-SunshinePlan`](../Scripts/Common.ps1#L106), เพิ่ม 20 พ.ย. 2026 ให้สาขาที่วง IP ต่างกันตั้งได้) ร้านนี้ `192.168.51.100` (เช่น `.123` → `22300`, เว็บ `22301`) · IP อื่น → ค่าเริ่มต้นของ Sunshine `47989` (เว็บ `47990`)
 
 **Log:** `C:\Users\Public\OSYNC-Sunshine0J.log` (และ log ของ Sunshine เองใน `Tools\Sunshine0J\config`)
 
@@ -525,7 +538,7 @@ flowchart TD
 **ฟังก์ชัน:**
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Log`](../Scripts/Client-Sunshine0J.ps1#L20) | 20 | ใส่เวลา พิมพ์ขึ้นจอ และต่อท้าย `C:\Users\Public\OSYNC-Sunshine0J.log` (UTF-8) |
+| [`Log`](../Scripts/Client-Sunshine0J.ps1#L21) | 21 | ใส่เวลา พิมพ์ขึ้นจอ และต่อท้าย `C:\Users\Public\OSYNC-Sunshine0J.log` (UTF-8) |
 
 **ค่าในร้านนี้ตอนนี้:** `ClientSunshineAutoStart=on` · มี `Tools\Sunshine0J\sunshine.exe` และ `tools\sunshinesvc.exe`
 
@@ -598,9 +611,9 @@ flowchart TD
 <a id="s7"></a>
 ## 7. `Client-Mic.ps1` — WO Mic + VB-CABLE (ขั้น 1f)
 
-ไฟล์: [`System/Scripts/Client-Mic.ps1`](../Scripts/Client-Mic.ps1) (379 บรรทัด)
+ไฟล์: [`System/Scripts/Client-Mic.ps1`](../Scripts/Client-Mic.ps1) (417 บรรทัด)
 
-> **กฎของเจ้าของร้าน (20 พ.ย. 2026, คอมเมนต์บรรทัด 17 และ 199-201):** สคริปต์นี้แตะเฉพาะไดรเวอร์ไมค์/เสียงของ **ระบบเมนูเรา = WO Mic และ VB-CABLE** เท่านั้น **ไม่แตะการ์ดเสียงของเครื่อง ไม่แตะเซอร์วิสเสียงของ Windows และไม่แตะอุปกรณ์เสียงของโปรแกรมอื่น**
+> **กฎของเจ้าของร้าน (20 พ.ย. 2026, คอมเมนต์บรรทัด 17 และ 220-222):** สคริปต์นี้แตะเฉพาะไดรเวอร์ไมค์/เสียงของ **ระบบเมนูเรา = WO Mic และ VB-CABLE** เท่านั้น **ไม่แตะการ์ดเสียงของเครื่อง ไม่แตะเซอร์วิสเสียงของ Windows และไม่แตะอุปกรณ์เสียงของโปรแกรมอื่น**
 > - `Show-Sound` แค่ **อ่าน** รายการลำโพง/ไมค์มาใส่รายงาน ไม่เปลี่ยนอะไร
 > - การคืนลำโพง/ไมค์หลัก ทำเฉพาะเมื่อค่าหลักกลายเป็น **CABLE ของเรา** เท่านั้น แล้วเลือกกลับไปที่อุปกรณ์จริงของเครื่อง (แค่ตั้งเป็นค่าหลัก ไม่แก้ไดรเวอร์) · ไม่เลือกอุปกรณ์เสมือนของโปรแกรมอื่น (Parsec, Steam Streaming, Sunshine, Zako, Voicemeeter ...) และไม่เปลี่ยนค่าหลักที่ลูกค้าเลือกไว้ถ้าไม่ใช่ CABLE
 > - การเปิด endpoint ที่ถูกปิด ทำเฉพาะ endpoint ที่ adapter เป็น VB-Audio เท่านั้น
@@ -619,14 +632,14 @@ flowchart TD
 
 **อ่านค่า:**
 - `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion` `CurrentBuildNumber` (เลือก .inf ของ VB-CABLE)
-- `Tools\WOMic\WOMicClientSetup*.exe`, `Tools\WOMic\driver\` (`womic.cat`, `womic.inf`, `devcon.exe`)
+- `Tools\WOMic\WOMicClientSetup*.exe`, `Tools\WOMic\driver\` (`womic.inf` / `womic.sys` / `womic.cat` = ไดรเวอร์ 2.1.0.0 ที่ Microsoft เซ็น, `wolicheng-publisher.cer`, `devcon.exe`)
 - `Tools\VBCABLE\` (`VBCABLE_Setup_x64.exe`, `vbaudio_cable64_win7.cat`, `vbMmeCable64_win10.inf` / `vbMmeCable64_win7.inf`)
 - `HKLM\SOFTWARE\(WOW6432Node\)Wolicheng\WOMic` `Install_Dir`, รายการ Uninstall ที่ชื่อ `WO Mic*`
 - อุปกรณ์ PnP (Get-PnpDevice), `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render|Capture`
 - `<ไดรฟ์>:\LDPlayer\OSLink\bin\devcon.exe` (devcon สำรอง)
 
 **เขียน / เปลี่ยน:**
-- ใบรับรองผู้เซ็นลง `LocalMachine\TrustedPublisher`: Beijing Wolicheng (thumbprint ที่ปักไว้ในโค้ด) และ Vincent Burel (จาก `.cat` ของ VB-CABLE) — เหมือนติ๊ก "Always trust" ตอนลงเอง
+- ใบรับรองผู้เซ็นลง `LocalMachine\TrustedPublisher`: Beijing Wolicheng (จาก `wolicheng-publisher.cer` thumbprint ที่ปักไว้ในโค้ด) และ Vincent Burel (จาก `.cat` ของ VB-CABLE) — เหมือนติ๊ก "Always trust" ตอนลงเอง
 - ติดตั้ง WO Mic (`/S`) → `Program Files (x86)\WOMic`, ไอคอนเดสก์ท็อป, ไดรเวอร์ · ติดตั้ง VB-CABLE (`-i -h`) · หรือลงไดรเวอร์ตรงด้วย `devcon install/update`
 - ตั้งลำโพง/ไมค์หลัก (IPolicyConfig `SetDefaultEndpoint`) เฉพาะเมื่อกลายเป็น CABLE · เปิด endpoint VB-CABLE ที่ถูกปิด (`SetEndpointVisibility 1`)
 
@@ -637,7 +650,7 @@ flowchart TD
 2. อ่าน build ของ Windows · คอมไพล์คลาส C# `OsyncAudio.Defaults` (Core Audio) ได้ → `$audioOk`
 3. **`-WatchDefaults`** (ส่วนเบื้องหลัง): วนจนครบ `WatchMinutes` หรือจนลำโพงและไมค์เสร็จ — ทุก 15 วินาที ดูค่าหลัก (role console) ถ้ามีและไม่ใช่ CABLE → ปล่อยไว้ (เสร็จ) · ถ้าเป็น CABLE หรือไม่มี และเจออุปกรณ์จริงของเครื่อง (`Get-RealEndpoint`) → ตั้งเป็นค่าหลักทั้ง 3 role แล้วเขียน log · จบ exit 0
 4. `Show-Sound 'before'` (อ่านอย่างเดียว)
-5. **WO Mic:** มีโปรแกรม (`Find-WoMicClient`) และอุปกรณ์ที่ทำงาน → จบ · ไม่งั้น: หาตัวติดตั้งตัวใหม่สุด → เชื่อถือผู้เซ็น Wolicheng (ถ้า `womic.cat` เซ็นถูกและ thumbprint ตรง) → `WOMicClientSetup*.exe /S` (รอสูงสุด 180 วิ) → ยังไม่มีอุปกรณ์และมี devcon + `womic.inf` → `devcon install womic.inf *WOMic` (90 วิ) → ตรวจซ้ำ ไม่ครบ = ตั้ง `$failed`
+5. **WO Mic:** มีโปรแกรม (`Find-WoMicClient`) และอุปกรณ์ที่ทำงาน → จบ · ไม่งั้น: หาตัวติดตั้งตัวใหม่สุด → เชื่อถือผู้เซ็น Wolicheng (ถ้า `wolicheng-publisher.cer` thumbprint ตรง) → `WOMicClientSetup*.exe /S` (รอสูงสุด 180 วิ) → **รออุปกรณ์ของตัวติดตั้งให้ทำงาน สูงสุด 45 วิ** (ตรวจทุก 3 วิ) → ยังไม่ทำงาน และไฟล์ใน `Tools\WOMic\driver` ตรง SHA256 ที่ปักไว้ (`Test-WoMicPackage`) และมี devcon → `devcon update` (มีอุปกรณ์ WO Mic แต่ไม่ทำงาน) หรือ `devcon install` `womic.inf Root\WOMic` (90 วิ) → ตรวจซ้ำ ไม่ครบ = ตั้ง `$failed`
 6. **VB-CABLE:** มีอุปกรณ์ที่ทำงาน (`VBAudioVACWDM` / `VB-Audio Virtual Cable`) → จบ · ไม่งั้น: รายงานอุปกรณ์ที่ไม่มีไดรเวอร์ (`Get-VbBroken`) → ต้องมีทั้งตัวติดตั้งและ `.cat` → ตรวจลายเซ็นทั้งคู่ต้องเป็น `Vincent Burel` หรือ `BUREL VINCENT Entrepreneur individuel` (ไม่ผ่าน = ไม่ลง, `$failed`) → เชื่อถือผู้เซ็น → จำลำโพง/ไมค์หลักเดิม → `VBCABLE_Setup_x64.exe -i -h` → `Restore-AudioDefaults` → ยังไม่มีอุปกรณ์ทำงาน (เช่น Windows 11) → `devcon update` (มีอุปกรณ์ที่ไม่มีไดรเวอร์) หรือ `devcon install` `<inf> VBAudioVACWDM` (90 วิ) → `Restore-AudioDefaults` อีกครั้ง → ยังไม่มี = `$failed`
 7. **endpoint VB-CABLE ที่ถูกปิด:** อ่าน MMDevices (`DeviceState` 1 active, 2 disabled, 4 not present, 8 unplugged) เฉพาะ adapter ที่มี `VB-Audio` → ตัวที่ disabled → เปิด (ชื่อเดิมคงไว้) · ไม่มีฝั่งลำโพง (Render) เลย → แจ้งว่า Sunshine ส่งไมค์ของคนเล่นทางไกลไม่ได้
 8. ไม่ใช่ `-CheckOnly`: ลำโพงหรือไมค์หลักเป็น CABLE หรือ `(none)` → เปิดสำเนาตัวเองเบื้องหลัง `-WatchDefaults -WatchMinutes 20`
@@ -650,9 +663,9 @@ flowchart TD
   M -->|"ไม่"| W{"-WatchDefaults?"}
   W -->|"ใช่"| WD["เฝ้าลำโพง/ไมค์หลัก 20 นาที<br/>เป็น CABLE = คืนไปอุปกรณ์จริงของเครื่อง"]
   W -->|"ไม่"| WM{"WO Mic มีโปรแกรม<br/>และอุปกรณ์ทำงาน?"}
-  WM -->|"ไม่มี"| WI["เชื่อถือผู้เซ็น Wolicheng<br/>WOMicClientSetup /S"]
+  WM -->|"ไม่มี"| WI["เชื่อถือผู้เซ็น Wolicheng<br/>WOMicClientSetup /S<br/>รออุปกรณ์สูงสุด 45 วิ"]
   WI --> WC{"มีอุปกรณ์แล้ว?"}
-  WC -->|"ยัง"| WDC["devcon install womic.inf"]
+  WC -->|"ยัง หลังรอ 45 วิ"| WDC["devcon install หรือ update womic.inf<br/>ไดรเวอร์ที่ Microsoft เซ็น"]
   WM -->|"มี"| VB
   WC -->|"มี"| VB
   WDC --> VB{"VB-CABLE อุปกรณ์ทำงาน?"}
@@ -671,46 +684,59 @@ flowchart TD
 **ฟังก์ชัน:**
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L28) | 28 | อ่าน PE header ของไฟล์ ตรวจว่า machine = `0x8664` (x64) |
-| [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L35) | 35 | อุปกรณ์ที่มีอยู่ (PresentOnly) ทุก class ที่ชื่อหรือ HardwareID ตรง pattern (เพราะ Windows อาจแสดง VB-CABLE แบบ class และชื่อว่าง) |
-| [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L42) | 42 | กรองจาก `Get-MediaDevice` เฉพาะ Status `OK` และ class `MEDIA` หรือ `AudioEndpoint` = ทำงานจริง |
-| [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L45) | 45 | หา `WOMicClient.exe` จาก registry Wolicheng, รายการ Uninstall `WO Mic*`, `Program Files (x86)` / `Program Files` `\WOMic` หรือ `\WO Mic`; คืนตัวแรกที่มีจริง |
-| [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L60) | 60 | รันตัวติดตั้งซ่อนหน้าต่าง รอ `$Seconds` (ค่าเริ่มต้น 180) เกินเวลา `taskkill /T /F`; คืน `exit n` หรือ `still running ... - stopped` |
-| [`OsyncAudio.Defaults.Get`](../Scripts/Client-Mic.ps1#L108) (C#) | 108 | id ของลำโพง (flow 0) / ไมค์ (flow 1) หลัก ตาม role 0-2 ผ่าน `IMMDeviceEnumerator.GetDefaultAudioEndpoint` |
-| [`OsyncAudio.Defaults.Set`](../Scripts/Client-Mic.ps1#L116) (C#) | 116 | ตั้ง id เป็นค่าหลักทั้ง 3 role ผ่าน `IPolicyConfig.SetDefaultEndpoint` (สิ่งที่หน้าต่าง Sound ใช้) |
-| [`OsyncAudio.Defaults.Enable`](../Scripts/Client-Mic.ps1#L123) (C#) | 123 | "Enable" ใน Sound panel = `SetEndpointVisibility(id, 1)` |
-| [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L133) | 133 | แปลง endpoint id เป็นชื่อ (อุปกรณ์ `SWD\MMDEVAPI\<id>`); ว่าง = `(none)` |
-| [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L138) | 138 | เก็บค่าหลักทั้ง 6 ช่อง (flow 0/1 x role 0/1/2) เป็น hashtable |
-| [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L144) | 144 | พิมพ์ชื่อลำโพงและไมค์หลักตอนนี้ |
-| [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L151) | 151 | ลำโพง/ไมค์จริงของเครื่อง: class `AudioEndpoint`, Status OK, flow ตรง, ชื่อไม่ตรง `$notReal` (CABLE, VB-Audio, WO Mic, Parsec, Steam Streaming, Virtual, Sunshine, Zako, Remote Audio, Voicemeeter, Broadcast) |
-| [`WLog`](../Scripts/Client-Mic.ps1#L159) | 159 | ต่อท้าย `C:\Users\Public\OSYNC-AudioDefaults.log` (เฉพาะโหมด `-WatchDefaults`) |
-| [`Get-Devcon`](../Scripts/Client-Mic.ps1#L188) | 188 | devcon สำหรับลงไดรเวอร์ตรง — ดูหัวข้อย่อย |
-| [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L197) | 197 | แปล exit ของ devcon: 0 เสร็จ, 1 เสร็จแต่ Windows ขอรีสตาร์ต, 2 ล้มเหลว |
-| [`Show-Sound`](../Scripts/Client-Mic.ps1#L202) | 202 | **อ่านอย่างเดียว:** พิมพ์ลำโพง/ไมค์ทั้งหมดที่ Windows เห็น พร้อม build |
-| [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L264) | 264 | อุปกรณ์ `ROOT\*` ที่มี HardwareID `VBAudioVACWDM` แต่ไม่ทำงาน (ไม่ใช่ OK + MEDIA) |
-| [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L266) | 266 | หลังลง VB-CABLE: เฝ้า ~20 วินาที (10 x 2) ถ้าค่าหลักเดิมไม่ใช่ CABLE แต่ตอนนี้กลายเป็น CABLE → ตั้งกลับเป็นตัวเดิม |
-| [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L344) | 344 | อ่าน MMDevices Render/Capture เฉพาะ adapter ที่มี `VB-Audio`: flow, ชื่อ, adapter, state, id |
-| [`Format-EpState`](../Scripts/Client-Mic.ps1#L356) | 356 | แปล `DeviceState` เป็นคำ (active / DISABLED / not present / unplugged) |
+| [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L33) | 33 | อ่าน PE header ของไฟล์ ตรวจว่า machine = `0x8664` (x64) |
+| [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L40) | 40 | อุปกรณ์ที่มีอยู่ (PresentOnly) ทุก class ที่ชื่อหรือ HardwareID ตรง pattern (เพราะ Windows อาจแสดง VB-CABLE แบบ class และชื่อว่าง) |
+| [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L47) | 47 | กรองจาก `Get-MediaDevice` เฉพาะ Status `OK` และ class `MEDIA` หรือ `AudioEndpoint` = ทำงานจริง |
+| [`Wait-WoMic`](../Scripts/Client-Mic.ps1#L52) | 52 | รอให้อุปกรณ์ WO Mic ทำงาน (ตรวจทุก 3 วินาที สูงสุดตามที่ส่งมา) คืนอุปกรณ์ที่ทำงาน + จำนวนวินาทีที่รอ |
+| [`Show-WoMicState`](../Scripts/Client-Mic.ps1#L57) | 57 | พิมพ์อุปกรณ์ WO Mic ทุกตัว: InstanceId, ชื่อ, สถานะ, class, problem code (ไว้ดูในรายงานเมื่อไม่ทำงาน) |
+| [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L63) | 63 | หา `WOMicClient.exe` จาก registry Wolicheng, รายการ Uninstall `WO Mic*`, `Program Files (x86)` / `Program Files` `\WOMic` หรือ `\WO Mic`; คืนตัวแรกที่มีจริง |
+| [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L78) | 78 | รันตัวติดตั้งซ่อนหน้าต่าง รอ `$Seconds` (ค่าเริ่มต้น 180) เกินเวลา `taskkill /T /F`; คืน `exit n` หรือ `still running ... - stopped` |
+| [`OsyncAudio.Defaults.Get`](../Scripts/Client-Mic.ps1#L126) (C#) | 113 | id ของลำโพง (flow 0) / ไมค์ (flow 1) หลัก ตาม role 0-2 ผ่าน `IMMDeviceEnumerator.GetDefaultAudioEndpoint` |
+| [`OsyncAudio.Defaults.Set`](../Scripts/Client-Mic.ps1#L134) (C#) | 121 | ตั้ง id เป็นค่าหลักทั้ง 3 role ผ่าน `IPolicyConfig.SetDefaultEndpoint` (สิ่งที่หน้าต่าง Sound ใช้) |
+| [`OsyncAudio.Defaults.Enable`](../Scripts/Client-Mic.ps1#L141) (C#) | 128 | "Enable" ใน Sound panel = `SetEndpointVisibility(id, 1)` |
+| [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L151) | 151 | แปลง endpoint id เป็นชื่อ (อุปกรณ์ `SWD\MMDEVAPI\<id>`); ว่าง = `(none)` |
+| [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L156) | 156 | เก็บค่าหลักทั้ง 6 ช่อง (flow 0/1 x role 0/1/2) เป็น hashtable |
+| [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L162) | 162 | พิมพ์ชื่อลำโพงและไมค์หลักตอนนี้ |
+| [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L169) | 169 | ลำโพง/ไมค์จริงของเครื่อง: class `AudioEndpoint`, Status OK, flow ตรง, ชื่อไม่ตรง `$notReal` (CABLE, VB-Audio, WO Mic, Parsec, Steam Streaming, Virtual, Sunshine, Zako, Remote Audio, Voicemeeter, Broadcast) |
+| [`WLog`](../Scripts/Client-Mic.ps1#L177) | 177 | ต่อท้าย `C:\Users\Public\OSYNC-AudioDefaults.log` (เฉพาะโหมด `-WatchDefaults`) |
+| [`Get-Devcon`](../Scripts/Client-Mic.ps1#L206) | 206 | devcon สำหรับลงไดรเวอร์ตรง — ดูหัวข้อย่อย |
+| [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L217) | 217 | ไฟล์ `womic.inf` / `womic.sys` / `womic.cat` ใน `Tools\WOMic\driver` ต้องมีครบและ SHA256 ตรงกับไดรเวอร์ 2.1.0.0 ที่ Microsoft เซ็น (ค่าที่ปักไว้) ไม่ตรง = ไม่ลงตรง |
+| [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L231) | 231 | แปล exit ของ devcon: 0 เสร็จ, 1 เสร็จแต่ Windows ขอรีสตาร์ต, 2 ล้มเหลว |
+| [`Show-Sound`](../Scripts/Client-Mic.ps1#L236) | 236 | **อ่านอย่างเดียว:** พิมพ์ลำโพง/ไมค์ทั้งหมดที่ Windows เห็น พร้อม build |
+| [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L326) | 326 | อุปกรณ์ `ROOT\*` ที่มี HardwareID `VBAudioVACWDM` แต่ไม่ทำงาน (ไม่ใช่ OK + MEDIA) |
+| [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L328) | 328 | หลังลง VB-CABLE: เฝ้า ~20 วินาที (10 x 2) ถ้าค่าหลักเดิมไม่ใช่ CABLE แต่ตอนนี้กลายเป็น CABLE → ตั้งกลับเป็นตัวเดิม |
+| [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L406) | 406 | อ่าน MMDevices Render/Capture เฉพาะ adapter ที่มี `VB-Audio`: flow, ชื่อ, adapter, state, id |
+| [`Format-EpState`](../Scripts/Client-Mic.ps1#L418) | 418 | แปล `DeviceState` เป็นคำ (active / DISABLED / not present / unplugged) |
 
-### `Get-Devcon` (บรรทัด 188)
+### `Get-Devcon` (บรรทัด 193)
 - **คืนค่า:** path ของ `devcon.exe` ที่ใช้ได้ หรือว่าง
 - **ลำดับ:** (1) `Tools\WOMic\driver\devcon.exe` ถ้าเป็น x64 (2) `<ไดรฟ์ใน SharedDrives>:\LDPlayer\OSLink\bin\devcon.exe` ที่เป็น x64 และ (เซ็นถูกโดย `Shanghai Chang Zhi` หรือ SHA256 ตรงกับค่าที่ปักไว้ของ OSLink 1.3.29.5)
 - **ทำไม:** 18 พ.ย. 2026 devcon ในชุด WO Mic เป็น ARM64 เท่านั้น ("not a valid application for this OS platform" บนทุกเครื่อง x64) · 19 พ.ย. 2026 "UnknownError" เพราะเครื่องยังไม่มี root DigiCert Trusted Root G4 จึงยอมรับด้วย hash แทน (เหมือน `Client-OslinkDrivers.ps1`)
 
-### ทางสำรอง devcon สำหรับ Windows 11 (บรรทัด 314-327)
+### ไดรเวอร์ WO Mic ที่ลงตรง (20 พ.ย. 2026 เย็น, บรรทัด 25-29, 204-216, 229-295)
+- **เจอจากรายงานตอนบูต** (บล็อก WO Mic ที่เพิ่มใน `Client-OslinkReport.ps1`): ตัวติดตั้ง `WOMicClientSetup6.4.exe /S` ลงไดรเวอร์ WO Mic **2.1.0.0 ที่ Microsoft เซ็น** ให้เองอยู่แล้ว แต่อุปกรณ์ต้องใช้เวลาสักครู่กว่าจะขึ้นสถานะ OK
+- โค้ดเดิมตรวจทันทีหลังตัวติดตั้งจบ เห็นว่ายังไม่มี → ลงซ้ำทันทีด้วย devcon จาก `Tools\WOMic\driver` ซึ่งตอนนั้นเป็น **ไดรเวอร์เก่าปี 2017 (1.5.0.0) ที่ผู้ผลิตเซ็นเอง ใบรับรองหมดอายุ 2020**
+- ผลบนเครื่องลูก ~15 เครื่อง: `womic.sys` ถูกทับเป็นไฟล์เก่า (35,696 ไบต์ เวอร์ชัน 6.3.9600.17246) · มีอุปกรณ์ WO Mic ตัวที่สองค้างแบบเสีย (problem 14) · Windows 10 จำนวน 10 เครื่องขึ้น 1f FAIL ทั้งที่ WO Mic ตัวแรกทำงานได้ในอีกไม่กี่นาที
+- **ตอนนี้:** รออุปกรณ์ของตัวติดตั้งก่อน (สูงสุด 45 วิ) · `Tools\WOMic\driver` เปลี่ยนเป็นไดรเวอร์ x64 2.1.0.0 ที่ Microsoft เซ็น (ดึงจากตัวติดตั้งตัวเดียวกัน ไม่ได้แก้ไฟล์) และโค้ดลงตรงเฉพาะเมื่อ SHA256 ทั้ง 3 ไฟล์ตรงค่าที่ปักไว้ · HardwareID `Root\WOMic` ตรงกับที่ตัวติดตั้งใช้ · ไฟล์เก่าย้ายไป `H:\_ลบได้\womic-2017-driver-20261120`
+- การเชื่อถือผู้เซ็น Wolicheng ยังทำเหมือนเดิม (อ่านใบรับรองจาก `wolicheng-publisher.cer`) เพราะเคยเห็นตัวติดตั้งค้างรอคำถามเมื่อไม่มี (17 พ.ย. KORI12)
+### รออุปกรณ์ WO Mic ของ Image ก่อน (20 พ.ย. 2026 ดึก)
+- คอนโซลขึ้น "ไมค์มือถือ (WO Mic + VB-CABLE)" 9 เครื่อง (KORI02/04/06/07/11/14/15/18/19, Windows 10) รายงานของ KORI04 / 07 / 19 ที่บูตหลังแก้รอบก่อน: Image มีโปรแกรม WO Mic และอุปกรณ์ `ROOT\MEDIA\0001 WO Mic Device` อยู่แล้ว แต่ตอนขั้น 1f อุปกรณ์ยังเริ่มไม่เสร็จ → ลงตัวติดตั้งซ้ำ → รอ 45 วิ → `devcon update` → เช็กหลัง 3 วิ ยังไม่พร้อม → FAIL · รายงานไม่กี่นาทีต่อมาอุปกรณ์เดียวกันสถานะ OK และ `womic.sys` เป็นตัวที่ Microsoft เซ็น (51,192 ไบต์)
+- **ตอนนี้:** มีโปรแกรมและมีอุปกรณ์ WO Mic อยู่ (สถานะใดก็ได้) = รออุปกรณ์นั้นก่อนสูงสุด 120 วิ ไม่ลงอะไร · หลัง `devcon` รอสูงสุด 60 วิ (เดิม 3 วิ) · ไม่ผ่านจริง = พิมพ์สถานะ / problem code ของทุกอุปกรณ์ WO Mic ลงรายงาน
+- ทดสอบ: `-CheckOnly` บนเครื่องแม่ผ่าน · ผลจริงดูจากรายงานบูตครั้งถัดไปของ 9 เครื่องนี้
+### ทางสำรอง devcon สำหรับ Windows 11 (บรรทัด 352-365)
 - คอมเมนต์ 20 พ.ย. 2026: เครื่องลูกบูตได้ 2 อิมเมจ (Windows 10 IoT LTSC 2021 build 19045 หรือ Windows 11 Pro 26300 — เห็นบน KORI06/11/23/25) · บน Windows 11 ตัวติดตั้ง VB-CABLE บอก exit 0 แต่ไม่สร้างอุปกรณ์
 - ตอนนี้ "มีอยู่แล้ว" นับเฉพาะอุปกรณ์ที่มีไดรเวอร์ทำงาน และถ้าตัวติดตั้งไม่สร้างอุปกรณ์ จะลงไดรเวอร์ตรงแบบที่ Windows ทำ (devcon = SetupAPI) ด้วยแพ็กเกจ Windows 10+ ของ VB-Audio ที่ Microsoft เซ็น: build ≥ 16299 ใช้ `vbMmeCable64_win10.inf` (ทั้งสองอิมเมจของร้านเข้าเงื่อนไขนี้) ต่ำกว่านั้นใช้ `vbMmeCable64_win7.inf`
 - มีอุปกรณ์ root ที่ไม่มีไดรเวอร์ค้างอยู่ → `devcon update` ไม่งั้น `devcon install` (HardwareID `VBAudioVACWDM`)
 
-### ตัวเฝ้าลำโพงหลัก `-WatchDefaults` (บรรทัด 156-182, 369-377)
+### ตัวเฝ้าลำโพงหลัก `-WatchDefaults` (บรรทัด 161-187, 407-415)
 - คอมเมนต์ 20 พ.ย. 2026 (KORI06, Windows 11): ตอนนี้ของการบูต Windows 11 ยังไม่แสดงลำโพง/ไมค์ของเครื่องเลย CABLE ที่เพิ่งลงจึงกลายเป็นลำโพงหลัก (ลูกค้าจะไม่ได้ยินเสียงเมื่อหูฟังโผล่)
 - ตัวเฝ้ารันเบื้องหลัง 20 นาที ตรวจทุก 15 วินาที เปลี่ยนค่าหลัก **เฉพาะตอนที่เป็น CABLE ของเรา (หรือไม่มี)** และเปลี่ยนไปที่อุปกรณ์จริงของเครื่องเท่านั้น
 - ค่าหลักที่ไม่ใช่ CABLE → "left as it is" ไม่แตะ
 
-### เปิด endpoint ของ VB-CABLE (บรรทัด 338-368)
+### เปิด endpoint ของ VB-CABLE (บรรทัด 376-406)
 - คอมเมนต์ 20 พ.ย. 2026 (เจ้าของร้าน: "Sunshine หา VB-CABLE ไม่เจอ"): ไมค์ของคนเล่นทางไกลใน Sunshine 0JAYSHOP (0JayMic, `mic_backend` auto / vb_cable) เขียนเสียงลงลำโพงที่ **active** และ adapter เป็น "VB-Audio Virtual Cable" แล้วเกมได้ยินทาง "CABLE Output" · endpoint ที่ถูกปิดไว้ในอิมเมจ (บางเครื่องเปลี่ยนชื่อเป็น "NOT USE") Sunshine มองไม่เห็น จึงเปิดกลับ (ชื่อเดิมคงไว้)
 
-**ค่าในร้านนี้ตอนนี้:** `ClientMicDrivers=on` · `ClientNoWoMic=` (ว่าง) · มี `Tools\WOMic\WOMicClientSetup6.4.exe` และ `Tools\WOMic\driver\` (`devcon.exe`, `womic.cat`, `womic.inf`, `womic.sys`) · มี `Tools\VBCABLE\` ครบ (`VBCABLE_Setup_x64.exe`, `vbaudio_cable64_win7.cat`, `vbMmeCable64_win10.inf`, `vbMmeCable64_win7.inf` ...)
+**ค่าในร้านนี้ตอนนี้:** `ClientMicDrivers=on` · `ClientNoWoMic=` (ว่าง) · มี `Tools\WOMic\WOMicClientSetup6.4.exe` และ `Tools\WOMic\driver\` (`devcon.exe`, `womic.inf` / `womic.sys` / `womic.cat` 2.1.0.0 ที่ Microsoft เซ็น, `wolicheng-publisher.cer`, `SOURCE.txt`) · มี `Tools\VBCABLE\` ครบ (`VBCABLE_Setup_x64.exe`, `vbaudio_cable64_win7.cat`, `vbMmeCable64_win10.inf`, `vbMmeCable64_win7.inf` ...)
 
 <a id="s8"></a>
 ## 8. `Client-Parsec.ps1` — Parsec (ขั้น 1g)
@@ -1145,7 +1171,7 @@ flowchart TD
 
 **หน้าที่:** เปิด Windows Firewall บนเครื่องลูก แต่ยังให้คอนโซล diskless บนเครื่องแม่รีโมตได้ · ใช้ในโหมด super workstation (แก้อิมเมจ) แล้วบันทึกอิมเมจ ไม่ได้อยู่ในบูต
 
-**เรียกจาก / ทำงานเมื่อไหร่:** OSYNC.bat > 7 Tools > 11 (`master`) / 12 (`lan`) / 13 (`off`) หรือ `OSYNC.bat firewall <master|lan|off>` (`OSYNC.ps1` บรรทัด 82)
+**เรียกจาก / ทำงานเมื่อไหร่:** OSYNC.bat > 7 Tools > 11 (`master`) / 12 (`lan`) / 13 (`off`) หรือ `OSYNC.bat firewall <master|lan|off>` (`OSYNC.ps1` บรรทัด 91)
 
 **พารามิเตอร์:**
 | พารามิเตอร์ | ความหมาย |

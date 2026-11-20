@@ -22,6 +22,11 @@
 # as soon as a real speaker / mic of the PC shows up, puts the default back on it. Only away from OUR CABLE device - another
 # program's device is never chosen, a default the customer picked that is not CABLE is never changed.
 #   -WatchDefaults [-WatchMinutes 20]: that background part only. Log C:\Users\Public\OSYNC-AudioDefaults.log
+# 20 Nov 2026 (evening, from the boot reports' WO Mic block): the setup installs WO Mic's Microsoft-signed driver 2.1.0.0, but
+# its device needs some seconds to start; the script installed the driver again at once from Tools\WOMic\driver, which held the
+# setup's OLD 2017 driver (signed only by its maker) - ~15 PCs got that old womic.sys plus a second broken WO Mic device, and
+# step 1f said FAIL on 10 Windows 10 PCs. Now: wait up to 45 s for the setup's device; the direct install (rarely needed) uses
+# only the Microsoft-signed 2.1.0.0 package, pinned by SHA256 (Test-WoMicPackage), with the setup's hardware ID Root\WOMic.
 param([switch]$CheckOnly, [switch]$WatchDefaults, [int]$WatchMinutes = 20)
 . (Join-Path $PSScriptRoot 'Common.ps1')
 # x64 program? (PE machine 0x8664)
@@ -41,6 +46,19 @@ function Get-MediaDevice([string]$Pattern) {
 # HardwareID; the master has one for VB-CABLE since May), which looked "already on this PC" and was never repaired
 function Get-WorkingDevice([string]$Pattern) {
   @(Get-MediaDevice $Pattern | Where-Object { "$($_.Status)" -eq 'OK' -and @('MEDIA', 'AudioEndpoint') -contains "$($_.Class)" })
+}
+# 20 Nov 2026 evening: at boot the image's own WO Mic device can need well over a minute to start. Wait for it: returns the
+# working device(s) and the seconds waited. Show-WoMicState prints every WO Mic device with its status and problem code.
+function Wait-WoMic([int]$Seconds) {
+  $w = 0; $d = Get-WorkingDevice '(?i)WOMic|WO Mic'
+  while (-not $d.Count -and $w -lt $Seconds) { Start-Sleep -Seconds 3; $w += 3; $d = Get-WorkingDevice '(?i)WOMic|WO Mic' }
+  [pscustomobject]@{ Dev = $d; Waited = $w }
+}
+function Show-WoMicState {
+  foreach ($x in @(Get-MediaDevice '(?i)WOMic|WO Mic')) {
+    $pc = (Get-PnpDeviceProperty -InstanceId $x.InstanceId -KeyName 'DEVPKEY_Device_ProblemCode' -ErrorAction SilentlyContinue).Data
+    Write-Host "  $($x.InstanceId) | $($x.FriendlyName) | status $($x.Status) | class $($x.Class) | problem $pc"
+  }
 }
 function Find-WoMicClient {
   $c = @()
@@ -193,6 +211,22 @@ function Get-Devcon {
     $sg = Get-AuthenticodeSignature -LiteralPath $_
     ($sg.Status -eq 'Valid' -and "$($sg.SignerCertificate.Subject)" -match 'Shanghai Chang Zhi') -or ((Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash -eq $dcHash)) } | Select-Object -First 1
 }
+# WO Mic's x64 driver for the direct install (Tools\WOMic\driver): 2.1.0.0 out of WOMicClientSetup6.4.exe, signed by Microsoft
+# (Windows Hardware Compatibility Publisher) - the same driver the setup installs. 20 Nov 2026: it replaced the setup's 2017
+# driver (signed only by its maker). The three files are pinned (SHA256, read on the master): nothing else is installed from here.
+function Test-WoMicPackage {
+  $want = [ordered]@{
+    'womic.inf' = '8F2F3339A3CFD98742295B9C5864CE40922C1F6C783AAF70CE31A8DEFC720764'
+    'womic.sys' = '75F080F206FF0C13701FF66388C4A404529D9EC71B2BA0F1FADD4B71481C0475'
+    'womic.cat' = '24AE3420B9EF53B55B6D5DA957B11FDD526D35C28033FC967EA27155B374D200'
+  }
+  foreach ($n in $want.Keys) {
+    $p = Join-Path $WoMicDir "driver\$n"
+    if (-not (Test-Path -LiteralPath $p)) { return $false }
+    if ((Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash -ne $want[$n]) { return $false }
+  }
+  $true
+}
 # devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed
 function Format-DevconExit([string]$r) { switch ($r) { 'exit 0' { 'exit 0 (done)' } 'exit 1' { 'exit 1 (done, Windows wants a restart - the device can work already)' } 'exit 2' { 'exit 2 (FAILED)' } default { $r } } }
 
@@ -208,6 +242,16 @@ Show-Sound 'before'
 # ---------- WO Mic ----------
 $wmExe = Find-WoMicClient
 $wmDev = Get-WorkingDevice '(?i)WOMic|WO Mic'
+# 20 Nov 2026 evening (9 Windows 10 PCs "mic problem" in the console): the image has WO Mic (program + device ROOT\MEDIA\0001
+# with the Microsoft-signed womic.sys), but at step 1f the device had not started yet. The setup ran again, 45 s, devcon update,
+# 3 s, still not started -> FAIL; the report a few minutes later showed the same device OK. So: program here and its device
+# present = wait for that device first (up to 120 s); nothing is installed when it starts.
+if ($wmExe -and -not $wmDev.Count -and @(Get-MediaDevice '(?i)WOMic|WO Mic').Count -and -not $CheckOnly) {
+  Write-Host 'WO Mic: program here and its device present, not started yet - waiting for it (up to 120 s)'
+  Show-WoMicState
+  $ww = Wait-WoMic 120; $wmDev = $ww.Dev
+  Write-Host "  after $($ww.Waited) s: $(if ($wmDev.Count) { 'working' } else { 'still not working' })"
+}
 if ($wmExe -and $wmDev.Count) {
   Write-Host "WO Mic: already on this PC ($wmExe; device: $($wmDev[0].FriendlyName))"
 } else {
@@ -216,41 +260,59 @@ if ($wmExe -and $wmDev.Count) {
     Write-Host "WO Mic: missing on this PC, and no installer in $WoMicDir - skipped"
   } elseif ($CheckOnly) {
     Write-Host "WO Mic: missing on this PC (program: $(if ($wmExe) { 'yes' } else { 'no' }), device: $(if ($wmDev.Count) { 'yes' } else { 'no' })) - would install $($setup.Name)"
+    Write-Host "  direct-install driver (only if the setup's device does not work after 45 s): $(if (Test-WoMicPackage) { 'Microsoft-signed 2.1.0.0 OK' } else { 'NOT the pinned Microsoft-signed package - would not install' }); devcon: $(if (Get-Devcon) { Get-Devcon } else { 'NONE FOUND' })"
   } else {
     Write-Host "WO Mic: missing (program: $(if ($wmExe) { 'yes' } else { 'no' }), device: $(if ($wmDev.Count) { 'yes' } else { 'no' })) - installing $($setup.Name) silently"
     Show-AudioDefaults 'before'
-    # WO Mic 6.x's driver is signed by its maker (Beijing Wolicheng), not by Microsoft: trust that publisher first - the same
-    # as ticking "Always trust" by hand - or the silent driver install waits on a question nobody sees (2026-11-17, KORI12)
+    # Trust WO Mic's maker (Beijing Wolicheng) as before - the same as ticking "Always trust" by hand: without it the silent setup
+    # was seen waiting on a question nobody sees (2026-11-17, KORI12). 20 Nov 2026: on Windows 10 / 11 the setup installs its
+    # Microsoft-signed driver; the maker's certificate now comes from driver\wolicheng-publisher.cer (thumbprint pinned), because
+    # womic.cat is the Microsoft-signed one now (see Test-WoMicPackage).
     $wmDrv = Join-Path $WoMicDir 'driver'
-    $wmCat = Join-Path $wmDrv 'womic.cat'
+    $wmCer = Join-Path $wmDrv 'wolicheng-publisher.cer'
     $wmThumb = 'DBFE96736ED5A71652ED4F6A2554B9135DA246DE'
-    if (Test-Path -LiteralPath $wmCat) {
-      $sg = Get-AuthenticodeSignature -LiteralPath $wmCat
-      if ($sg.Status -eq 'Valid' -and $sg.SignerCertificate.Thumbprint -eq $wmThumb) {
+    if (Test-Path -LiteralPath $wmCer) {
+      $wmCert = $null
+      try { $wmCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2($wmCer) } catch { }
+      if ($wmCert -and $wmCert.Thumbprint -eq $wmThumb) {
         $st = New-Object Security.Cryptography.X509Certificates.X509Store('TrustedPublisher', 'LocalMachine')
         $st.Open('ReadWrite')
         if (@($st.Certificates | Where-Object { $_.Thumbprint -eq $wmThumb }).Count) { Write-Host "  publisher already trusted ($wmThumb)" }
-        else { $st.Add($sg.SignerCertificate); Write-Host "  publisher 'Beijing Wolicheng' added to Trusted Publishers ($wmThumb)" }
+        else { $st.Add($wmCert); Write-Host "  publisher 'Beijing Wolicheng' added to Trusted Publishers ($wmThumb)" }
         $st.Close()
-      } else { Write-Host "  $wmCat is not validly signed by Wolicheng (signature $($sg.Status)) - publisher not trusted" }
+      } else { Write-Host "  $wmCer is not Wolicheng's certificate $wmThumb - publisher not trusted" }
     }
     $r = Invoke-Setup $setup.FullName '/S'
     $wmExe = Find-WoMicClient
+    # 20 Nov 2026: the setup's own WO Mic device needs some seconds to start - wait for it (up to 45 s) before installing anything.
+    # Before, the driver was installed again at once from an OLD package (2017, signed only by its maker): that put the old
+    # womic.sys under the setup's running device, left a second broken WO Mic device (problem 14) and made step 1f say FAIL on
+    # 10 Windows 10 PCs although their WO Mic worked a minute later.
     $wmDev = Get-WorkingDevice '(?i)WOMic|WO Mic'
-    $dc = Get-Devcon
-    if ($dc -and $dc -ne (Join-Path $wmDrv 'devcon.exe')) { Write-Host "  WO Mic's own devcon is not x64 - using $dc" }
-    $wmInf = Join-Path $wmDrv 'womic.inf'
-    if (-not $wmDev.Count -and $dc -and (Test-Path -LiteralPath $dc) -and (Test-Path -LiteralPath $wmInf)) {
-      Write-Host '  device still missing - installing the driver directly: devcon install womic.inf *WOMic'
-      # 19 Nov 2026: built outside the "..." - the nested quotes inside $( ) split it, and 'Seconds' got the .inf path (FAIL on 8 PCs)
-      $dcArgs = 'install "' + $wmInf + '" *WOMic'
-      $dcRes = Invoke-Setup $dc $dcArgs 90
-      Write-Host "  devcon: $(Format-DevconExit $dcRes)"
-      Start-Sleep -Seconds 3
-      $wmDev = Get-WorkingDevice '(?i)WOMic|WO Mic'
+    $waited = 0
+    while (-not $wmDev.Count -and $waited -lt 45) { Start-Sleep -Seconds 3; $waited += 3; $wmDev = Get-WorkingDevice '(?i)WOMic|WO Mic' }
+    if ($waited) { Write-Host "  waited $waited s for the setup's WO Mic device: $(if ($wmDev.Count) { 'working' } else { 'still not working' })" }
+    if (-not $wmDev.Count) {
+      $dc = Get-Devcon
+      $wmInf = Join-Path $wmDrv 'womic.inf'
+      if (-not (Test-WoMicPackage)) { Write-Host "  no direct install: $wmDrv does not hold WO Mic's Microsoft-signed x64 driver 2.1.0.0" }
+      elseif (-not $dc) { Write-Host '  no direct install: no x64 devcon.exe found' }
+      else {
+        if ($dc -ne (Join-Path $wmDrv 'devcon.exe')) { Write-Host "  WO Mic's own devcon is not x64 - using $dc" }
+        # a WO Mic device that is there but not working gets the driver again (update); none at all = a new root device (install)
+        $verb = if (@(Get-MediaDevice '(?i)WOMic|WO Mic').Count) { 'update' } else { 'install' }
+        Write-Host "  device still missing - installing the Microsoft-signed driver directly: devcon $verb womic.inf Root\WOMic"
+        # 19 Nov 2026: built outside the "..." - the nested quotes inside $( ) split it, and 'Seconds' got the .inf path (FAIL on 8 PCs)
+        $dcArgs = $verb + ' "' + $wmInf + '" Root\WOMic'
+        $dcRes = Invoke-Setup $dc $dcArgs 90
+        Write-Host "  devcon: $(Format-DevconExit $dcRes)"
+        # the device restarts after the driver install: give it time like the setup's (was 3 s, too short at boot)
+        $ww = Wait-WoMic 60; $wmDev = $ww.Dev
+        Write-Host "  after devcon: $(if ($wmDev.Count) { "working after $($ww.Waited) s" } else { "still not working after $($ww.Waited) s" })"
+      }
     }
     if ($wmExe -and $wmDev.Count) { Write-Host "WO Mic: installed ($r) -> $wmExe; device: $($wmDev[0].FriendlyName)" }
-    else { Write-Host "WO Mic: NOT installed ($r; program: $(if ($wmExe) { $wmExe } else { 'missing' }), device: $(if ($wmDev.Count) { 'yes' } else { 'missing' }))"; $failed = $true }
+    else { Write-Host "WO Mic: NOT installed ($r; program: $(if ($wmExe) { $wmExe } else { 'missing' }), device: $(if ($wmDev.Count) { 'yes' } else { 'missing' }))"; Show-WoMicState; $failed = $true }
     Show-AudioDefaults 'after'
   }
 }

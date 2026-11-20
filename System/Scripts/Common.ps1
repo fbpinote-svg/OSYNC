@@ -100,7 +100,17 @@ function Get-LanIP {
     if (-not $ip) { $ip = $c | ForEach-Object { $_.IPAddress } | Where-Object { $_ -match '^(10|192\.168|172\.(1[6-9]|2\d|3[01]))\.' } | Select-Object -First 1 }
     "$ip"
 }
-function Test-Admin { ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) }
+# Sunshine 0JAYSHOP port plan (Tools\Sunshine0J; Client-Sunshine0J.ps1 and Tool-SunshineProfiles.ps1): client PC n has the IP
+# <net>.(offset + n) and the port 20000 + n x 100 (web page = port + 1), name <prefix><n, 2 digits>. Settings SunshineIpBase
+# (<net>.<offset>), SunshinePcPrefix, SunshinePcCount; empty = this shop's plan 192.168.51.100 / KORI / 72.
+function Get-SunshinePlan {
+    $b = Get-Setting 'SunshineIpBase' '192.168.51.100'
+    if (-not ($b -match '^(\d{1,3}\.\d{1,3}\.\d{1,3})\.(\d{1,3})$')) { [void]('192.168.51.100' -match '^(\d{1,3}\.\d{1,3}\.\d{1,3})\.(\d{1,3})$') }
+    $net = $Matches[1]; $off = [int]$Matches[2]
+    $c = 0; if (-not [int]::TryParse((Get-Setting 'SunshinePcCount' '72'), [ref]$c)) { $c = 72 }
+    $c = [Math]::Max(0, [Math]::Min([Math]::Min(99, 254 - $off), $c))
+    [pscustomobject]@{ Net = $net; Offset = $off; Prefix = (Get-Setting 'SunshinePcPrefix' 'KORI'); Count = $c }
+}function Test-Admin { ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) }
 # master or client: Settings Role=master|client wins; else a diskless SERVER program on this PC (LW / Kritidet / CCU,
 # CCBoot, iCafeCloud, NxD, ggRock ...) or the OSYNC watcher's autostart = master; anything else = client
 $DisklessServerFolders  = 'C:\lwserver', 'C:\Program Files\CCBoot', 'C:\Program Files (x86)\CCBoot', 'C:\iCafeCloud\Server', 'C:\Program Files\iCafeCloud Server', 'C:\NxD\Server', 'C:\ggRock'

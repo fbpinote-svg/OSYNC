@@ -5,8 +5,17 @@
 # Actions that change this PC ask for admin (UAC) and run in a new window.
 param([string]$Action = '', [string]$Arg = '')
 . (Join-Path $PSScriptRoot 'Common.ps1')
+# a DOWNLOAD of the project (no Launchers\ and no System\Data\ - the setup makes both) is not an installed OSYNC: its
+# settings.txt names the master PC of the shop it came from, so this PC would count as a client and a double-click
+# would install client things here. Point to the Easy Install instead (an old layout before step B is not a download).
+if (-not (Test-Path -LiteralPath $Launchers) -and -not (Test-Path -LiteralPath $DataDir) -and -not (Test-PreMigration)) {
+    Write-Host 'This folder is a download of OSYNC, not an installed OSYNC - nothing was done.' -ForegroundColor Yellow
+    Write-Host "Install it first: double-click $Root\EASY-INSTALL.bat   (guide: System\Docs\00-EASY-INSTALL.md)" -ForegroundColor Yellow
+    if (-not $env:OSYNC_NOPAUSE) { [void](Read-Host 'Press Enter to close') }
+    exit 1
+}
 $isMaster = Test-IsMaster
-$adminActions = 'setup', 'client', 'move', 'steam-library', 'organize', 'steam-firstrun', 'ea-install', 'ea-uninstall', 'ea-anticheat', 'eac', 'newthings',
+$adminActions = 'setup', 'client', 'move', 'bluestacks', 'steam-library', 'organize', 'steam-firstrun', 'ea-install', 'ea-uninstall', 'ea-anticheat', 'eac', 'newthings',
                 'riot-startup-on', 'riot-startup-off', 'firewall', 'boot-off', 'migrate', 'branch', 'branch-off'
 # before step B the old layout still runs this folder: actions that write what clients use are blocked
 $preB = Test-PreMigration
@@ -85,6 +94,15 @@ function Invoke-Action([string]$a, [string]$x) {
         'link-scan' { [void](Run-Ps 'Tool-LinkScan.ps1') }
         'migrate'  { [void](Run-Ps 'Tool-Migrate.ps1') }
         'pack'     { [void](Run-Ps 'Tool-Pack.ps1') }
+        'plan'     { [void](Run-Ps 'Setup-Plan.ps1' @('-OutFile', (Join-Path $DataDir 'setup-plan.txt'))) }
+        'bluestacks' {
+            $rc = Run-Ps 'Master-Move-BlueStacks.ps1' @('-DryRun')
+            if ($rc -eq 0 -and (Ask 'Move BlueStacks now (it is closed first) and put it in the game menu?')) { [void](Run-Ps 'Master-Move-BlueStacks.ps1') }
+        }
+        'sunshine-profiles' {
+            $rc = Run-Ps 'Tool-SunshineProfiles.ps1' @('-DryRun')
+            if ($rc -eq 0 -and (Ask 'Write these PC profiles into the Sunshine 0JAYSHOP config?')) { [void](Run-Ps 'Tool-SunshineProfiles.ps1') }
+        }
         'branch'   { [void](Run-Ps 'Branch-Runner.ps1' $(if ($x) { @('-Install', '-Command', $x) } else { @('-Install') })) }
         'branch-status' { [void](Run-Ps 'Branch-Runner.ps1' @('-Status')) }
         'branch-off' { if (Ask 'Remove the branch runner from this PC (the web can no longer wake this branch''s PCs)?') { [void](Run-Ps 'Branch-Runner.ps1' @('-Uninstall')) } }
@@ -102,6 +120,9 @@ function Show-Tools {
         '3' = @('build-menu', 'Build the menu program (after a change in Menu\source or the logo)')
         '18' = @('organize', 'Tidy the game drive: Games\, Tools\ (shop closed)')
         '19' = @('pack', 'Make OSYNC-Setup.exe: one file that installs / updates OSYNC on any master')
+        '23' = @('plan', 'Check this master: where each part should go (read only)')
+        '25' = @('bluestacks', 'BlueStacks 5: move it off the system drive onto a game drive + game menu card + clients')
+        '24' = @('sunshine-profiles', 'Sunshine 0JAYSHOP: PC profiles from Settings SunshineIpBase / SunshinePcPrefix / SunshinePcCount')
         '4' = @('steam-firstrun', 'Steam first-run setup only'); '5' = @('ea-install', 'EA app + EA AntiCheat only'); '6' = @('ea-uninstall', 'EA app: remove')
         '7' = @('eac', 'EasyAntiCheat only'); '8' = @('newthings', 'NEWTHINGS-GAMES (GTA SA) + Thai text fix')
         '9' = @('riot-startup-on', 'Riot silent start at logon: ON'); '10' = @('riot-startup-off', 'Riot silent start at logon: OFF')
@@ -115,7 +136,7 @@ function Show-Tools {
     Write-Host ''
     Write-Host ' Tools' -ForegroundColor Cyan
     Write-Host '  Master' -ForegroundColor DarkGray
-    foreach ($k in '1', '2', '18', '3', '19') { Write-Host ('  {0,3}  {1}' -f $k, $items[$k][1]) }
+    foreach ($k in '23', '1', '2', '18', '3', '19', '24', '25') { Write-Host ('  {0,3}  {1}' -f $k, $items[$k][1]) }
     Write-Host '  Branch (this master <-> the shop web, folder C:\AT9-Branch)' -ForegroundColor DarkGray
     foreach ($k in '20', '21', '22') { Write-Host ('  {0,3}  {1}' -f $k, $items[$k][1]) }
     Write-Host '  Client (super workstation mode, then save the image)' -ForegroundColor DarkGray

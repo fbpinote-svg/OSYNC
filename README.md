@@ -6,6 +6,10 @@ OSYNC ทำให้เกม ตัวเปิดเกม (launcher) แล�
 - **เครื่องลูก:** บูตแล้วพร้อมเล่น มีเมนูเกม, launcher ที่จำเกมได้, ไดรเวอร์ไมค์ และล็อกอินของลูกค้าคนก่อนถูกล้างแล้ว
 - **อยู่ที่เดียว:** ทุกอย่างอยู่ในโฟลเดอร์ `H:\OSYNC` บนไดรฟ์เกม และใช้ไฟล์ `OSYNC.bat` ไฟล์เดียว
 
+> **ร้านอื่นที่จะนำไปใช้:** อ่าน [00 · Easy Install](System/Docs/00-EASY-INSTALL.md) บทเดียว ตัวติดตั้งตรวจเครื่องแม่ของคุณ แนะนำที่วางไฟล์ให้เหมาะกับเครื่อง แล้วติดตั้งให้
+> (โหลด zip จากปุ่ม **Code → Download ZIP** แตกแล้วดับเบิลคลิก `EASY-INSTALL.bat` หรือใช้ `OSYNC-Setup.exe` ที่ร้านที่ใช้อยู่ทำให้)
+> ใช้ AI (เช่น Claude Code) ช่วยติดตั้ง: ข้อความแรกที่พิมพ์ให้ AI อยู่ใน [00 ข้อ 11](System/Docs/00-EASY-INSTALL.md#เริ่มยังไง-ข้อความแรกที่พิมพ์ให้-ai)
+
 ![เมนูเกม 0JAYSHOP บนเครื่องลูก](System/Docs/images/menu-01-all.png)
 
 *เมนูเกมของร้าน (107 การ์ดจริง) — รายละเอียดใน [06-MENU.md](System/Docs/06-MENU.md)*
@@ -27,7 +31,7 @@ OSYNC ทำให้เกม ตัวเปิดเกม (launcher) แล�
 
 ## เริ่มใช้
 
-**เครื่องแม่:** ดับเบิลคลิก `H:\OSYNC\OSYNC.bat` จะเห็นเมนูนี้ (ข้อความจริงจาก [`System/Scripts/OSYNC.ps1`](System/Scripts/OSYNC.ps1#L137)):
+**เครื่องแม่:** ดับเบิลคลิก `H:\OSYNC\OSYNC.bat` จะเห็นเมนูนี้ (ข้อความจริงจาก [`System/Scripts/OSYNC.ps1`](System/Scripts/OSYNC.ps1#L158)):
 
 ```
  OSYNC   DESKTOP-3ORJAGC = MASTER   H:\OSYNC
@@ -67,6 +71,7 @@ OSYNC ทำให้เกม ตัวเปิดเกม (launcher) แล�
 
 | บท | เรื่อง |
 |---|---|
+| [00 Easy Install](System/Docs/00-EASY-INSTALL.md) | **ร้านอื่น:** สิ่งที่ต้องมี, วางไฟล์ตรงไหนให้เหมาะกับเครื่องแม่, ติดตั้งจาก zip ของ GitHub หรือ exe, ค่าที่ต้องตรวจ |
 | [01 ภาพรวม](System/Docs/01-OVERVIEW.md) | diskless ทำงานยังไง, ภาพใหญ่ของระบบ, โฟลเดอร์, บริการบนเครื่องแม่ |
 | [02 ติดตั้ง / อัปเดต / ทำ Image](System/Docs/02-INSTALL-UPDATE.md) | ทีละขั้น + ปุ่มทุกข้อของ OSYNC.bat |
 | [03 เครื่องแม่](System/Docs/03-MASTER.md) | สคริปต์ Master-* ทีละฟังก์ชัน |

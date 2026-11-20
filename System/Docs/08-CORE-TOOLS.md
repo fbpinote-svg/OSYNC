@@ -89,10 +89,10 @@ flowchart LR
 **Log:** ไม่มี (สคริปต์ที่เรียกมี log ของตัวเอง)
 
 **ขั้นตอนการทำงาน**
-1. dot-source `Common.ps1` → `$isMaster = Test-IsMaster`
-2. ตั้งรายการงานที่ต้อง admin ([บรรทัด 9](../Scripts/OSYNC.ps1#L9)): `setup client move steam-library organize steam-firstrun ea-install ea-uninstall ea-anticheat eac newthings riot-startup-on riot-startup-off firewall boot-off migrate branch branch-off`
+1. dot-source `Common.ps1` → ถ้าโฟลเดอร์นี้ไม่มีทั้ง `Launchers\` และ `System\Data\` (= โฟลเดอร์ที่แตกจาก zip ของโปรเจกต์ ยังไม่ได้ติดตั้ง) และไม่ใช่โครงเดิมก่อนขั้น B: ขึ้น `This folder is a download of OSYNC, not an installed OSYNC - nothing was done.` บอกให้ใช้ `EASY-INSTALL.bat` แล้ว exit 1 ([บรรทัด 8-16](../Scripts/OSYNC.ps1#L8), เพิ่ม 20 พ.ย. 2026: `settings.txt` ในโฟลเดอร์นั้นยังเป็นชื่อเครื่องแม่ของร้านต้นทาง ถ้าไม่กัน เครื่องแม่ของร้านใหม่จะถูกนับเป็นเครื่องลูกและดับเบิลคลิกเดียวจะติดตั้งของเครื่องลูกลงไป) → `$isMaster = Test-IsMaster`
+2. ตั้งรายการงานที่ต้อง admin ([บรรทัด 18](../Scripts/OSYNC.ps1#L18)): `setup client move steam-library organize steam-firstrun ea-install ea-uninstall ea-anticheat eac newthings riot-startup-on riot-startup-off firewall boot-off migrate branch branch-off`
 3. `$preB = Test-PreMigration` และรายการงานที่กันก่อนขั้น B: `master update watch-on setup client move steam-library`
-4. ไม่มีชื่องาน และไม่ใช่เครื่องแม่ → งาน = `client` ([บรรทัด 134](../Scripts/OSYNC.ps1#L134))
+4. ไม่มีชื่องาน และไม่ใช่เครื่องแม่ → งาน = `client` ([บรรทัด 155](../Scripts/OSYNC.ps1#L155))
 5. มีชื่องาน → `Invoke-Action` → `Pause-End` → ออก
 6. ไม่มี → วนแสดงเมนูหลัก (1-7, 0) จนกด 0
 
@@ -100,11 +100,11 @@ flowchart LR
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Pause-End`](../Scripts/OSYNC.ps1#L15) | 15 | รอ "Press Enter to close" เว้นแต่ตั้ง env `OSYNC_NOPAUSE` (Setup-Install ตั้งให้) |
-| [`Ask`](../Scripts/OSYNC.ps1#L16) | 16 | ถาม `[Y/N]` คืน `$true` เมื่อตอบขึ้นต้นด้วย Y |
-| [`Choose-Launcher`](../Scripts/OSYNC.ps1#L17) | 17 | แสดง `Title` ของ `$LauncherTable` เป็นเลข คืน `Key` ที่เลือก หรือ '' |
-| [`Invoke-Action`](../Scripts/OSYNC.ps1#L25) | 25 | ตัวแจกงาน: กันงานก่อนขั้น B → ถ้าต้อง admin แต่ยังไม่ใช่ เปิด `powershell.exe -Verb RunAs` ด้วยงานเดิมแล้วจบ → `switch` รันสคริปต์ของงาน (งานที่ย้ายของ = DryRun ก่อนแล้วถาม) |
-| [`Show-Tools`](../Scripts/OSYNC.ps1#L99) | 99 | เมนู 7 Tools: ตาราง `[ordered]` เลข → `งาน[:ค่า]` แสดงเป็นกลุ่ม · เลข 17 ใส่เฉพาะเมื่อมี `GAMELUNCHER` · แยก `งาน:ค่า` แล้วส่ง `Invoke-Action` |
+| [`Pause-End`](../Scripts/OSYNC.ps1#L24) | 24 | รอ "Press Enter to close" เว้นแต่ตั้ง env `OSYNC_NOPAUSE` (Setup-Install ตั้งให้) |
+| [`Ask`](../Scripts/OSYNC.ps1#L25) | 25 | ถาม `[Y/N]` คืน `$true` เมื่อตอบขึ้นต้นด้วย Y |
+| [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26 | แสดง `Title` ของ `$LauncherTable` เป็นเลข คืน `Key` ที่เลือก หรือ '' |
+| [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34 | ตัวแจกงาน: กันงานก่อนขั้น B → ถ้าต้อง admin แต่ยังไม่ใช่ เปิด `powershell.exe -Verb RunAs` ด้วยงานเดิมแล้วจบ → `switch` รันสคริปต์ของงาน (งานที่ย้ายของ = DryRun ก่อนแล้วถาม) |
+| [`Show-Tools`](../Scripts/OSYNC.ps1#L117) | 117 | เมนู 7 Tools: ตาราง `[ordered]` เลข → `งาน[:ค่า]` แสดงเป็นกลุ่ม · เลข 17 ใส่เฉพาะเมื่อมี `GAMELUNCHER` · แยก `งาน:ค่า` แล้วส่ง `Invoke-Action` |
 
 ### `Invoke-Action` — จุดที่ควรรู้
 
@@ -136,7 +136,7 @@ flowchart LR
 1. คำนวณ path ทั้งหมดจากที่อยู่ของไฟล์ ([บรรทัด 14-26](../Scripts/Common.ps1#L14)) แล้วให้ env ทดสอบทับได้
 2. ตั้ง path ของโครงเดิม `GAMELUNCHER`, `GCafe` ([บรรทัด 28](../Scripts/Common.ps1#L28))
 3. ตั้ง `$SettingsFile`, `$ExtraGamesFile` แล้วอ่าน `GamesFolder` → `$GamesRoot` ([บรรทัด 61](../Scripts/Common.ps1#L61))
-4. ประกาศรายชื่อโปรแกรม diskless ฝั่งเซิร์ฟเวอร์ ([บรรทัด 106](../Scripts/Common.ps1#L106)), `$LauncherTable` ([บรรทัด 123](../Scripts/Common.ps1#L123)), `$CfxGames` ([บรรทัด 225](../Scripts/Common.ps1#L225)) และฟังก์ชันทั้งหมด
+4. ประกาศรายชื่อโปรแกรม diskless ฝั่งเซิร์ฟเวอร์ ([บรรทัด 116](../Scripts/Common.ps1#L116)), `$LauncherTable` ([บรรทัด 133](../Scripts/Common.ps1#L133)), `$CfxGames` ([บรรทัด 235](../Scripts/Common.ps1#L235)) และฟังก์ชันทั้งหมด
 
 ### ตัวแปรกลาง
 
@@ -175,7 +175,7 @@ flowchart LR
 
 Roblox ไม่อยู่ในตาราง (ไม่มีอะไรต้องเปิดค้าง) ใช้ `Get-RobloxExe` แทน · ร้านนี้มี `H:\OSYNC\Launchers\Roblox`
 
-### ฟังก์ชัน (34 ตัว)
+### ฟังก์ชัน (35 ตัว)
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน | ใช้ที่ (สคริปต์อื่น) |
 |---|---|---|---|
@@ -187,32 +187,33 @@ Roblox ไม่อยู่ในตาราง (ไม่มีอะไร�
 | [`Get-OnlineSecret`](../Scripts/Common.ps1#L80) | 80 | กุญแจคลังออนไลน์จาก `System\Data\Online\online.key` (ไม่เก็บใน Settings เพราะ Settings ขึ้น git) | `Hub-Server`, `Online-Library` |
 | [`Read-ExtraGames`](../Scripts/Common.ps1#L85) | 85 | อ่าน `extra-games.json` เป็นออบเจ็กต์ · ไม่มีไฟล์ = `$null` · JSON เสีย = throw | `Master-GameList`, `Online-Library`, `Tool-Check` |
 | [`Run-Ps`](../Scripts/Common.ps1#L91) | 91 | รันสคริปต์อื่นใน `System\Scripts` ในหน้าต่างเดียวกัน คืน exit code (ดูข้างล่าง) | `OSYNC.ps1`, `Master-Setup`, `Tool-Migrate`, `Tool-Organize-Drive` |
+| [`Get-SunshinePlan`](../Scripts/Common.ps1#L106) | 106 | แผนพอร์ต Sunshine 0JAYSHOP จาก `SunshineIpBase` (`<net>.<offset>`), `SunshinePcPrefix`, `SunshinePcCount` (ค่าผิดรูป / ว่าง = `192.168.51.100`, `KORI`, `72`; จำนวนสูงสุด 99 และไม่เกิน .254) คืน `Net`, `Offset`, `Prefix`, `Count` | `Client-Sunshine0J`, `Tool-SunshineProfiles` |
 | [`Get-LanIP`](../Scripts/Common.ps1#L97) | 97 | IPv4 ของการ์ดที่มี default gateway (ไม่ใช่ 169.254.x) ไม่มี = IP private ตัวแรก (10., 192.168., 172.16-31.) | `Master-Setup` (`MasterIP`), `Online-Upnp` |
 | [`Test-Admin`](../Scripts/Common.ps1#L103) | 103 | process นี้อยู่ในกลุ่ม Administrators (สิทธิ์ยกระดับแล้ว) | `OSYNC.ps1`, `Client-*` หลายตัว, `Master-*`, `Tool-Migrate`, `Tool-Organize-Drive` |
-| [`Test-IsMaster`](../Scripts/Common.ps1#L108) | 108 | ตัดสินว่าเครื่องนี้คือเครื่องแม่ (ดูข้างล่าง) | `OSYNC.ps1`, `Tool-Check`, `Client-Install` (24 ครั้ง: ข้ามขั้นบนเครื่องแม่), `Client-*`, `Console-Server`, `Master-ClientReports`, `Master-FiveMShare`, `Master-OslinkLogins` |
-| [`Find-UninstallPath`](../Scripts/Common.ps1#L140) | 140 | หารายการ Uninstall ที่ `DisplayName` ตรง regex คืน `InstallLocation` หรือโฟลเดอร์ของ exe ใน `DisplayIcon` / `UninstallString` (ต้องมีอยู่จริง) | `Get-LauncherInstallPath`, `Master-Move-Launcher` |
-| [`Get-Launcher`](../Scripts/Common.ps1#L151) | 151 | แถวของ `$LauncherTable` ตาม `Key` | ภายใน (`Get-LauncherDir`, `Get-LauncherExe`) |
-| [`Get-LauncherDir`](../Scripts/Common.ps1#L152) | 152 | `Launchers\<Dir>` · ไม่มี = ลองชื่อเก่า (`Old`) ที่มีอยู่ · ไม่เจอเลย = คืน path ใหม่ | `Client-EA`, `Client-Riot-Start`, `Master-GameList`, `Master-Setup`, `Master-Snapshot-EA`, `Master-Snapshot-Riot`, `Online-Library`, `Tool-Check`, `Tool-Folder-Icons`, `Tool-RiotDiag` |
-| [`Get-LauncherExe`](../Scripts/Common.ps1#L158) | 158 | `Get-LauncherDir` + `Exe` ของแถว | `Client-Epic-Start`, `Client-Install`, `Master-GameList`, `Master-Setup`, `Master-Watch`, `Tool-Check`, `Tool-Folder-Icons` |
-| [`Get-RobloxExe`](../Scripts/Common.ps1#L161) | 161 | `RobloxPlayerBeta.exe` ตัวใหม่สุดใน `Launchers\Roblox\Versions\version-*` ไม่มี = '' | `Client-DesktopClean`, `Client-Install` (1c), `Client-Roblox`, `Master-GameList`, `Tool-Check`, `Tool-Folder-Icons` |
-| [`Get-LauncherInstallPath`](../Scripts/Common.ps1#L168) | 168 | ที่ติดตั้งตาม registry / config ของ launcher เอง (ตารางข้างล่าง) แปลง `/` เป็น `\` ต้องมีอยู่จริง ไม่งั้น '' | `Master-Setup` (ขั้น 2), `Tool-Check` (`Launchers outside`), `Tool-Migrate` (ขั้น 3) |
-| [`RegVal`](../Scripts/Common.ps1#L169) | 169 | ฟังก์ชันซ้อนใน `Get-LauncherInstallPath`: อ่านค่า registry 1 ค่า error = `$null` | ภายในเท่านั้น (`Master-Move-Launcher` มีตัวของเอง) |
-| [`Get-SteamDir`](../Scripts/Common.ps1#L191) | 191 | `Launchers\Steam` ถ้ามี `steam.exe` ไม่งั้น `SteamPath` ใน `HKCU\Software\Valve\Steam` ไม่มี = '' | `Client-GameStart`, `Client-SteamVerify`, `Master-GameList`, `Master-Setup`, `Master-Steam-Library`, `Master-Watch`, `Tool-Check`, `Tool-Folder-Icons` |
-| [`Get-SteamLibraries`](../Scripts/Common.ps1#L199) | 199 | library Steam ทุกอันบนไดรฟ์ที่แชร์ (ดูข้างล่าง) | `Client-Steam-FirstRun`, `Client-EAC`, `Client-EA-AntiCheat`, `Client-GameStart`, `Client-SteamVerify`, `Master-GameList`, `Master-SteamQueue`, `Master-Watch`, `Master-Setup`, `Online-Library`, `Console-Server`, `Tool-Check`, `Tests\Sim-OnlineLibrary` |
-| [`Test-CfxGameDir`](../Scripts/Common.ps1#L230) | 230 | โฟลเดอร์ใช้กับ FiveM / RedM ได้: อยู่บนไดรฟ์ที่แชร์ + มี exe ของเกม + (FiveM) ไม่มี `GTA5_Enhanced.exe` | ภายใน (`Find-CfxGameDir`, `Get-CfxStatus`) |
-| [`Find-CfxGameDir`](../Scripts/Common.ps1#L236) | 236 | หาโฟลเดอร์เกม: appmanifest ใน library Steam → registry Rockstar (`InstallFolder`, `InstallFolderSteam`, `InstallFolderEpic` และโฟลเดอร์แม่) → `GAME\Rockstar...`, `GAME\Epic\...` · ตัวแรกที่ผ่าน `Test-CfxGameDir` คืนแบบตัวพิมพ์จริง | ภายใน (`Get-CfxStatus`) |
-| [`Get-RealCasePath`](../Scripts/Common.ps1#L251) | 251 | ไล่ทีละชั้นหาชื่อโฟลเดอร์ตามตัวพิมพ์จริง (libraryfolders.vdf เก็บ path ตัวเล็ก) | ภายใน (`Find-CfxGameDir`) |
-| [`Get-CfxApps`](../Scripts/Common.ps1#L262) | 262 | หา FiveM / RedM บนดิสก์เกม: จาก `cmd` ใน `Menu\data\games.json` + `FiveM.exe` / `RedM.exe` ลึก 2 ชั้นในโฟลเดอร์หมวดของทุก game folder (ยกเว้น `Steam`) · ต้องมี `<ชื่อ>.app\CoreRT.dll` · คืน Name, App, Ini | `Client-ClearLogins`, `Client-FiveMShare`, `Console-Server`, `Master-FiveMShare` |
-| [`Read-CfxIni`](../Scripts/Common.ps1#L281) | 281 | อ่าน `CitizenFX.ini` ตาม BOM (UTF-16 LE / UTF-8 / ANSI) คืนอาร์เรย์บรรทัด | ภายใน (`Get-CfxIVPath`, `Set-CfxIVPath`) |
-| [`Get-CfxIVPath`](../Scripts/Common.ps1#L287) | 287 | ค่า `IVPath=` ในหมวด `[Game]` (ตัด `"`) | `Master-CitizenFX` |
-| [`Set-CfxIVPath`](../Scripts/Common.ps1#L293) | 293 | ตั้ง `[Game] IVPath=` เก็บบรรทัดอื่นไว้ ไม่มีหมวด = เพิ่มท้ายไฟล์ เขียน CRLF แบบ ASCII หรือ UTF-16 ถ้ามีอักษรนอก ASCII | `Master-CitizenFX` (ขั้น 6 ของ Master-Update) |
-| [`Get-CfxStatus`](../Scripts/Common.ps1#L307) | 307 | ต่อ FiveM / RedM: `Name`, `Game`, `App`, `Ini`, `Have` (IVPath ตอนนี้), `HaveOk`, `Want` (โฟลเดอร์ที่ควรชี้) | `Master-CitizenFX`, `Tool-Check` |
-| [`Get-GameFolderStamp`](../Scripts/Common.ps1#L317) | 317 | รายการบรรทัดที่ใช้เทียบว่ามีเกมใหม่ / ถูกลบ (ดูข้างล่าง) | `Master-Watch` |
-| [`Get-MenuInfo`](../Scripts/Common.ps1#L339) | 339 | ชื่อและ exe ของโปรแกรมเมนู + `config.json` (ดูข้างล่าง) | `Client-Install`, `Client-Menu`, `Client-DesktopClean`, `Master-GameList`, `Master-Setup`, `Tool-Check`, `Tool-Migrate`, `Tool-Pack` |
-| [`Show-Live`](../Scripts/Common.ps1#L353) | 353 | บรรทัดสถานะที่วาดทับที่เดิม + ชื่อหน้าต่าง `OSYNC <ข้อความ>` · output ถูก pipe = พิมพ์ `~ข้อความ` ให้ตัวเรียกวาด · '' = ล้าง · ไม่ลง log | `Client-Install` (แปลงบรรทัด `~`), `Client-OslinkDrivers`, ภายใน `Invoke-Installer` |
-| [`Format-Sec`](../Scripts/Common.ps1#L364) | 364 | วินาที → `m:ss` | `Client-SteamVerify`, ภายใน `Invoke-Installer` |
-| [`Invoke-Installer`](../Scripts/Common.ps1#L368) | 368 | รันตัวติดตั้งแบบซ่อน รอไม่เกินเวลา แสดงบรรทัดสด เกินเวลา = ฆ่าทั้งต้นไม้ (ดูข้างล่าง) | `Client-Steam-FirstRun`, `Client-EAC`, `Client-EA-AntiCheat` |
-| [`Get-RiotBusy`](../Scripts/Common.ps1#L396) | 396 | ชื่อผลิตภัณฑ์ Riot ที่ยังโหลด / แพตช์อยู่บนเครื่องนี้ (ดูข้างล่าง) | `Master-Snapshot-Riot`, `Master-Watch`, `Tool-Check` |
+| [`Test-IsMaster`](../Scripts/Common.ps1#L118) | 118 | ตัดสินว่าเครื่องนี้คือเครื่องแม่ (ดูข้างล่าง) | `OSYNC.ps1`, `Tool-Check`, `Client-Install` (24 ครั้ง: ข้ามขั้นบนเครื่องแม่), `Client-*`, `Console-Server`, `Master-ClientReports`, `Master-FiveMShare`, `Master-OslinkLogins` |
+| [`Find-UninstallPath`](../Scripts/Common.ps1#L150) | 150 | หารายการ Uninstall ที่ `DisplayName` ตรง regex คืน `InstallLocation` หรือโฟลเดอร์ของ exe ใน `DisplayIcon` / `UninstallString` (ต้องมีอยู่จริง) | `Get-LauncherInstallPath`, `Master-Move-Launcher` |
+| [`Get-Launcher`](../Scripts/Common.ps1#L161) | 161 | แถวของ `$LauncherTable` ตาม `Key` | ภายใน (`Get-LauncherDir`, `Get-LauncherExe`) |
+| [`Get-LauncherDir`](../Scripts/Common.ps1#L162) | 162 | `Launchers\<Dir>` · ไม่มี = ลองชื่อเก่า (`Old`) ที่มีอยู่ · ไม่เจอเลย = คืน path ใหม่ | `Client-EA`, `Client-Riot-Start`, `Master-GameList`, `Master-Setup`, `Master-Snapshot-EA`, `Master-Snapshot-Riot`, `Online-Library`, `Tool-Check`, `Tool-Folder-Icons`, `Tool-RiotDiag` |
+| [`Get-LauncherExe`](../Scripts/Common.ps1#L168) | 168 | `Get-LauncherDir` + `Exe` ของแถว | `Client-Epic-Start`, `Client-Install`, `Master-GameList`, `Master-Setup`, `Master-Watch`, `Tool-Check`, `Tool-Folder-Icons` |
+| [`Get-RobloxExe`](../Scripts/Common.ps1#L171) | 171 | `RobloxPlayerBeta.exe` ตัวใหม่สุดใน `Launchers\Roblox\Versions\version-*` ไม่มี = '' | `Client-DesktopClean`, `Client-Install` (1c), `Client-Roblox`, `Master-GameList`, `Tool-Check`, `Tool-Folder-Icons` |
+| [`Get-LauncherInstallPath`](../Scripts/Common.ps1#L178) | 178 | ที่ติดตั้งตาม registry / config ของ launcher เอง (ตารางข้างล่าง) แปลง `/` เป็น `\` ต้องมีอยู่จริง ไม่งั้น '' | `Master-Setup` (ขั้น 2), `Tool-Check` (`Launchers outside`), `Tool-Migrate` (ขั้น 3) |
+| [`RegVal`](../Scripts/Common.ps1#L179) | 179 | ฟังก์ชันซ้อนใน `Get-LauncherInstallPath`: อ่านค่า registry 1 ค่า error = `$null` | ภายในเท่านั้น (`Master-Move-Launcher` มีตัวของเอง) |
+| [`Get-SteamDir`](../Scripts/Common.ps1#L201) | 201 | `Launchers\Steam` ถ้ามี `steam.exe` ไม่งั้น `SteamPath` ใน `HKCU\Software\Valve\Steam` ไม่มี = '' | `Client-GameStart`, `Client-SteamVerify`, `Master-GameList`, `Master-Setup`, `Master-Steam-Library`, `Master-Watch`, `Tool-Check`, `Tool-Folder-Icons` |
+| [`Get-SteamLibraries`](../Scripts/Common.ps1#L209) | 209 | library Steam ทุกอันบนไดรฟ์ที่แชร์ (ดูข้างล่าง) | `Client-Steam-FirstRun`, `Client-EAC`, `Client-EA-AntiCheat`, `Client-GameStart`, `Client-SteamVerify`, `Master-GameList`, `Master-SteamQueue`, `Master-Watch`, `Master-Setup`, `Online-Library`, `Console-Server`, `Tool-Check`, `Tests\Sim-OnlineLibrary` |
+| [`Test-CfxGameDir`](../Scripts/Common.ps1#L240) | 240 | โฟลเดอร์ใช้กับ FiveM / RedM ได้: อยู่บนไดรฟ์ที่แชร์ + มี exe ของเกม + (FiveM) ไม่มี `GTA5_Enhanced.exe` | ภายใน (`Find-CfxGameDir`, `Get-CfxStatus`) |
+| [`Find-CfxGameDir`](../Scripts/Common.ps1#L246) | 246 | หาโฟลเดอร์เกม: appmanifest ใน library Steam → registry Rockstar (`InstallFolder`, `InstallFolderSteam`, `InstallFolderEpic` และโฟลเดอร์แม่) → `GAME\Rockstar...`, `GAME\Epic\...` · ตัวแรกที่ผ่าน `Test-CfxGameDir` คืนแบบตัวพิมพ์จริง | ภายใน (`Get-CfxStatus`) |
+| [`Get-RealCasePath`](../Scripts/Common.ps1#L261) | 261 | ไล่ทีละชั้นหาชื่อโฟลเดอร์ตามตัวพิมพ์จริง (libraryfolders.vdf เก็บ path ตัวเล็ก) | ภายใน (`Find-CfxGameDir`) |
+| [`Get-CfxApps`](../Scripts/Common.ps1#L272) | 272 | หา FiveM / RedM บนดิสก์เกม: จาก `cmd` ใน `Menu\data\games.json` + `FiveM.exe` / `RedM.exe` ลึก 2 ชั้นในโฟลเดอร์หมวดของทุก game folder (ยกเว้น `Steam`) · ต้องมี `<ชื่อ>.app\CoreRT.dll` · คืน Name, App, Ini | `Client-ClearLogins`, `Client-FiveMShare`, `Console-Server`, `Master-FiveMShare` |
+| [`Read-CfxIni`](../Scripts/Common.ps1#L291) | 291 | อ่าน `CitizenFX.ini` ตาม BOM (UTF-16 LE / UTF-8 / ANSI) คืนอาร์เรย์บรรทัด | ภายใน (`Get-CfxIVPath`, `Set-CfxIVPath`) |
+| [`Get-CfxIVPath`](../Scripts/Common.ps1#L297) | 297 | ค่า `IVPath=` ในหมวด `[Game]` (ตัด `"`) | `Master-CitizenFX` |
+| [`Set-CfxIVPath`](../Scripts/Common.ps1#L303) | 303 | ตั้ง `[Game] IVPath=` เก็บบรรทัดอื่นไว้ ไม่มีหมวด = เพิ่มท้ายไฟล์ เขียน CRLF แบบ ASCII หรือ UTF-16 ถ้ามีอักษรนอก ASCII | `Master-CitizenFX` (ขั้น 6 ของ Master-Update) |
+| [`Get-CfxStatus`](../Scripts/Common.ps1#L317) | 317 | ต่อ FiveM / RedM: `Name`, `Game`, `App`, `Ini`, `Have` (IVPath ตอนนี้), `HaveOk`, `Want` (โฟลเดอร์ที่ควรชี้) | `Master-CitizenFX`, `Tool-Check` |
+| [`Get-GameFolderStamp`](../Scripts/Common.ps1#L327) | 327 | รายการบรรทัดที่ใช้เทียบว่ามีเกมใหม่ / ถูกลบ (ดูข้างล่าง) | `Master-Watch` |
+| [`Get-MenuInfo`](../Scripts/Common.ps1#L349) | 349 | ชื่อและ exe ของโปรแกรมเมนู + `config.json` (ดูข้างล่าง) | `Client-Install`, `Client-Menu`, `Client-DesktopClean`, `Master-GameList`, `Master-Setup`, `Tool-Check`, `Tool-Migrate`, `Tool-Pack` |
+| [`Show-Live`](../Scripts/Common.ps1#L363) | 363 | บรรทัดสถานะที่วาดทับที่เดิม + ชื่อหน้าต่าง `OSYNC <ข้อความ>` · output ถูก pipe = พิมพ์ `~ข้อความ` ให้ตัวเรียกวาด · '' = ล้าง · ไม่ลง log | `Client-Install` (แปลงบรรทัด `~`), `Client-OslinkDrivers`, ภายใน `Invoke-Installer` |
+| [`Format-Sec`](../Scripts/Common.ps1#L374) | 374 | วินาที → `m:ss` | `Client-SteamVerify`, ภายใน `Invoke-Installer` |
+| [`Invoke-Installer`](../Scripts/Common.ps1#L378) | 378 | รันตัวติดตั้งแบบซ่อน รอไม่เกินเวลา แสดงบรรทัดสด เกินเวลา = ฆ่าทั้งต้นไม้ (ดูข้างล่าง) | `Client-Steam-FirstRun`, `Client-EAC`, `Client-EA-AntiCheat` |
+| [`Get-RiotBusy`](../Scripts/Common.ps1#L406) | 406 | ชื่อผลิตภัณฑ์ Riot ที่ยังโหลด / แพตช์อยู่บนเครื่องนี้ (ดูข้างล่าง) | `Master-Snapshot-Riot`, `Master-Watch`, `Tool-Check` |
 
 ### `Get-Setting` — อ่านค่าร้าน
 
@@ -395,7 +396,7 @@ sequenceDiagram
 
 **ขั้นตอนการทำงาน**
 1. ตัดสินโหมด แล้วเก็บผลใน `$rows`
-2. เช็กทั้งสองฝั่ง: ไฟล์ OSYNC, ไดรฟ์ที่แชร์, ไดรฟ์ของ OSYNC, `extra-games.json`
+2. เช็กทั้งสองฝั่ง: ไฟล์ OSYNC, ไดรฟ์ที่แชร์, ไดรฟ์ของ OSYNC, `extra-games.json`, `Tools` ([บรรทัด 24](../Scripts/Tool-Check.ps1#L24), เพิ่ม 20 พ.ย. 2026: มี `Tools\TOOLS-MANIFEST.txt` = เทียบขนาดทุกไฟล์ ไม่ตรง = WARN "run the newest OSYNC-Setup.exe again" · ร้านนี้ไม่มีไฟล์นี้ (เป็นต้นทาง) จึงไม่มีแถวนี้)
 3. เครื่องแม่: launcher, Steam, ตัวเฝ้า (autostart + กำลังทำงาน + อัปเดตล่าสุด), branch runner, ข้อมูล Riot / Roblox / FiveM / RedM / EA, เมนู, รายการเกม, โครงเดิม, ไฟล์หลุดในโฟลเดอร์ launcher
 4. เครื่องลูก: งานบูต, Riot ตอนล็อกอิน, Vanguard, เมนูตอนล็อกอิน, บริการ EA, ภาษาไทย, บูตครั้งล่าสุด
 5. พิมพ์ทีละบรรทัดตามสี บรรทัด `->` วิธีแก้ (ไม่แสดงกับ OK) สรุป `OK n WARN n FAIL n` เขียน log
@@ -417,17 +418,19 @@ sequenceDiagram
 
 **หน้าที่:** ทำ `OSYNC-Setup-<yyyyMMdd-HHmm>.exe` ไฟล์เดียวที่ติดตั้ง OSYNC บนเครื่องแม่ร้านไหนก็ได้ หรืออัปเดต OSYNC ที่มีอยู่ ไม่ต้องดาวน์โหลดอะไร
 **เรียกจาก / ทำงานเมื่อไหร่:** `OSYNC.bat` 7 → 19 (`pack`, ไม่ต้อง admin)
-**พารามิเตอร์:** `-Out <โฟลเดอร์>` (ค่าเริ่ม `System\Dist`) · `-NoExe` หยุดหลังทำ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ใน `%TEMP%\osync-pack-<เวลา>`
+**พารามิเตอร์:** `-Out <โฟลเดอร์>` (ค่าเริ่ม `System\Dist`) · `-NoExe` หยุดหลังทำ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ใน `%TEMP%\osync-pack-<เวลา>` · `-NoTools` ไม่ใส่ `Tools\` (20 พ.ย. 2026)
 **อ่านค่า:** `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `Settings\settings.txt`, `Settings\extra-games.json`, `Get-MenuInfo` (exe เมนู), `Menu\tools`, `Menu\README-TH.txt`, `Menu\config.json` · `csc.exe` ของ .NET Framework 4 (`Framework64` ก่อน)
-**เขียน / เปลี่ยน:** โฟลเดอร์ชั่วคราว `%TEMP%\osync-pack-<เวลา>` (ลบตอนจบ) และไฟล์ exe ใน `-Out` · ไม่แตะไฟล์ของร้าน
+**เขียน / เปลี่ยน:** โฟลเดอร์ชั่วคราว `%TEMP%\osync-pack-<เวลา>` (ลบตอนจบ; ใช้ชื่อเต็มของ `%TEMP%` จาก `Get-Item` เพราะ `%TEMP%` แบบ 8.3 เช่น `C:\Users\CCU_MA~1` เคยทำให้ชื่อไฟล์ใน zip ขึ้นต้นด้วย `d/` แก้ 20 พ.ย. 2026) และไฟล์ exe ใน `-Out` · ไม่แตะไฟล์ของร้าน
 **Log:** ไม่มี (ขึ้นจอ)
 
 **ขั้นตอนการทำงาน**
 1. คัดลอก `OSYNC.bat`, `README.md`, `System\Scripts`, `Client`, `Docs` และเขียน `System\VERSION.txt` = `OSYNC <เวลา> (packed on <ชื่อเครื่อง>)`
-2. Settings ของร้านใหม่: ล้าง `SharedDrives`, `MasterIP`, `MasterPC` · `Role=auto` · `extra-games.json` ให้ `"games": []` แล้วเช็กว่ายังเป็น JSON
+2. Settings ของร้านใหม่: ล้างค่าเฉพาะร้านนี้ (`SharedDrives`, `MasterIP`, `MasterPC`, `GameFolders`, `ClientBlockCpuz`, `ClientApexClean`, `ClientApexMinimal`, `ClientSteamVerify`, `ClientSteamVerifyApps`, `OnlineBranch`, `OnlineBranchName`, `OnlineBind`, `OnlineExternalIP`; รายการเดียวกับ `$ShopKeys` ของ `Setup-Install`) · `Role=auto` · `extra-games.json` ให้ `"games": []` แล้วเช็กว่ายังเป็น JSON · คัดลอก `.json` / `.xml` อื่นใน `Settings\` (`game-start.json`, `gta5_settings*.xml`)
+3b. **Tools** ([บรรทัด 73](../Scripts/Tool-Pack.ps1#L73), ไม่ใส่เมื่อ `-NoTools`): คัดลอก `Tools\` ทั้งหมด (ข้าม `*.log`) แล้วเขียน `Tools\TOOLS-MANIFEST.txt` = บรรทัดหัว `# OSYNC Tools <เวลา> from <ชื่อเครื่อง>` + `SHA256<TAB>ขนาด<TAB>ที่อยู่` ทุกไฟล์ ยกเว้น `Sunshine0J\config\*` (คอนฟิกของแต่ละร้าน) · ร้านนี้ 20 พ.ย. 2026: 14 โฟลเดอร์ 6,969 ไฟล์ 1,000 MB → `payload.zip` 754 MB ทั้งหมด 118 วินาที
 3. เมนู: `Menu\app` (ข้าม exe ใหญ่ตัวอื่นที่ไม่ใช่ตัวหลัก เช่นสำเนา `0JAYSHOP.exe` เก่า), `Menu\tools`, `README-TH.txt`, `config.json` แบบกลาง (`brandName=GAME CENTER`, ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText`, `featured=[]`), `Menu\data` ว่าง
 4. บีบ `payload.zip` ทีละไฟล์ด้วย `/` + คัดลอก `Setup-Install.ps1` + เขียน `Setup.cmd` (ล้าง `PSModulePath` แล้วรัน `Setup-Install.ps1 %*`) · `-NoExe` = จบตรงนี้
 5. คอมไพล์ตัวเปิด C# `OsyncSetup` ด้วย `csc.exe` แล้วต่อไฟล์: **stub exe + payload.zip + ท้าย 16 ไบต์** (8 ไบต์ = ตำแหน่งเริ่มของ zip, 8 ไบต์ = `OSYNCPK1`)
+6. คัดลอก `SETUP-AI.md` และ `00-EASY-INSTALL.md` ไปไว้ข้างไฟล์ exe ใน `-Out` (คู่มือชุดที่ตรงกับรุ่นของ exe ให้สาขา)
 
 ```mermaid
 flowchart LR
@@ -436,36 +439,37 @@ flowchart LR
   foot -.->|"ตอนรัน"| run["อ่านท้ายไฟล์ → คัด zip ลง TEMP<br/>แตก Setup-Install.ps1<br/>powershell -File ... -Payload zip"]
 ```
 
-**ตัวเปิด C# (`OsyncSetup.Main`, ฝังใน here-string บรรทัด 86-120):** อ่าน 16 ไบต์ท้ายไฟล์ตัวเอง ไม่ใช่ `OSYNCPK1` = "This file has no OSYNC inside." (exit 2) · คัด zip ลง `%TEMP%\osync-setup-<8 ตัว>` · แตกเฉพาะ `System/Scripts/Setup-Install.ps1` · รัน `powershell.exe -NoProfile -ExecutionPolicy Bypass -File <ps1> -Payload <zip>` + อาร์กิวเมนต์ทุกตัว (ตัด `"` ออกแล้วครอบใหม่) โดยลบ `PSModulePath` · รอจบ ลบโฟลเดอร์ชั่วคราว คืน exit code
+**ตัวเปิด C# (`OsyncSetup.Main`, ฝังใน here-string บรรทัด 115-149):** อ่าน 16 ไบต์ท้ายไฟล์ตัวเอง ไม่ใช่ `OSYNCPK1` = "This file has no OSYNC inside." (exit 2) · คัด zip ลง `%TEMP%\osync-setup-<8 ตัว>` · แตกเฉพาะ `System/Scripts/Setup-Install.ps1` · รัน `powershell.exe -NoProfile -ExecutionPolicy Bypass -File <ps1> -Payload <zip>` + อาร์กิวเมนต์ทุกตัว (ตัด `"` ออกแล้วครอบใหม่) โดยลบ `PSModulePath` · รอจบ ลบโฟลเดอร์ชั่วคราว คืน exit code
 
 **ฟังก์ชัน**
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L20) | 20 | `robocopy <จาก> <ไป> /E /R:1 /W:1` แบบเงียบ (`/NP /NFL /NDL /NJH /NJS`) ข้ามไฟล์ด้วย `/XF` · exit ≥ 8 = throw "copy failed" |
+| [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L27) | 27 | `robocopy <จาก> <ไป> /E /R:1 /W:1` แบบเงียบ (`/NP /NFL /NDL /NJH /NJS`) ข้ามไฟล์ด้วย `/XF` · exit ≥ 8 = throw "copy failed" |
 
-**ค่าในร้านนี้ตอนนี้:** ยังไม่มีโฟลเดอร์ `H:\OSYNC\System\Dist` · ไม่มี `System\VERSION.txt` (เขียนเฉพาะในไฟล์แพ็ก)
+**ค่าในร้านนี้ตอนนี้:** ยังไม่มีโฟลเดอร์ `H:\OSYNC\System\Dist` · ไม่มี `System\VERSION.txt` (เขียนเฉพาะในไฟล์แพ็ก) · 20 พ.ย. 2026 ทำ exe ลงโฟลเดอร์ทดสอบ (188 MB) แล้วติดตั้งลงโฟลเดอร์ทดสอบผ่าน
 
 ---
 
 ## 7. `Setup-Install.ps1` — ตัวติดตั้งและอัปเดตเครื่องแม่
 
-**หน้าที่:** สิ่งที่ `OSYNC-Setup.exe` รัน: ติดตั้ง OSYNC ใหม่บนไดรฟ์เกมที่เครื่องลูกเห็น เขียน Settings ของร้านนี้ ตั้งชื่อเมนู แล้วเปิดตั้งค่าครั้งแรก หรืออัปเดต OSYNC ที่มีอยู่ในที่เดิม
-**เรียกจาก / ทำงานเมื่อไหร่:** ตัวเปิด C# ใน `OSYNC-Setup.exe` หรือ `Setup.cmd` (ทั้งคู่ทำโดย `Tool-Pack`) · ไม่ dot-source `Common.ps1` (ทำงานก่อนมี OSYNC ในเครื่อง)
+**หน้าที่:** Easy Install: สิ่งที่ `OSYNC-Setup.exe` และ `EASY-INSTALL.bat` รัน: ตรวจเครื่องแม่ (`Setup-Plan.ps1`) แล้วติดตั้ง OSYNC ใหม่บนไดรฟ์เกมที่เครื่องลูกเห็น ล้างค่าของร้านต้นทาง เขียน Settings ของร้านนี้ ตั้งชื่อเมนู แล้วเปิดตั้งค่าครั้งแรก หรืออัปเดต OSYNC ที่มีอยู่ในที่เดิม (คู่มือผู้ใช้: [00-EASY-INSTALL.md](00-EASY-INSTALL.md))
+**เรียกจาก / ทำงานเมื่อไหร่:** ตัวเปิด C# ใน `OSYNC-Setup.exe` หรือ `Setup.cmd` (ทั้งคู่ทำโดย `Tool-Pack`) · [`EASY-INSTALL.bat`](../../EASY-INSTALL.bat) ในโฟลเดอร์ที่แตกจาก zip ของโปรเจกต์ (`-Source <โฟลเดอร์นั้น>`) · ไม่ dot-source `Common.ps1` (ทำงานก่อนมี OSYNC ในเครื่อง) แต่เรียก `Setup-Plan.ps1` จากไฟล์ที่แตกแล้ว
 **พารามิเตอร์:**
 - `-Target <โฟลเดอร์>` ที่ติดตั้งใหม่ · `-ShopName "<ชื่อ>"` ชื่อร้าน (ค่าเริ่ม `GAME CENTER`) · `-Upgrade <โฟลเดอร์>` อัปเดต OSYNC นั้น
-- `-Payload <zip>` (ค่าเริ่ม `payload.zip` ข้างไฟล์) · `-Yes` ไม่ถาม · `-NoWizard` ไม่เปิดขั้นต่อไป · `-BranchCommand <บรรทัด>` ติดตั้ง branch runner
+- `-PlanOnly` แค่ตรวจเครื่องแล้วจบ (ดึง `System/Scripts/*` จาก payload ลงโฟลเดอร์ชั่วคราวแล้วรัน `Setup-Plan.ps1`, ไม่ถามเรื่องอัปเดต)
+- `-Payload <zip>` (ค่าเริ่ม `payload.zip` ข้างไฟล์) · `-Source <โฟลเดอร์>` ไฟล์จากโฟลเดอร์แทน zip (ไม่มีโปรแกรมเมนูที่ build แล้ว) · `-Yes` ไม่ถาม · `-NoWizard` ไม่เปิดขั้นต่อไป · `-BranchCommand <บรรทัด>` ติดตั้ง branch runner
 
 **อ่านค่า:** `System/VERSION.txt` ใน zip, ไดรฟ์ fixed (`Win32_LogicalDisk`), `C:\lwserver\config\lwservice.db` ตาราง `tServerDiskMng` (ผ่าน Node.js `node:sqlite` แบบ readOnly), IP ของการ์ดที่มี gateway, `Menu\config.json` เดิม, process ที่รันจาก `Menu\app` และ `Master-Watch.ps1`, `C:\AT9-Branch\state.json`
-**เขียน / เปลี่ยน:** โฟลเดอร์ OSYNC ทั้งหมด (ติดตั้งใหม่) หรือรายการที่แทนที่ (อัปเดต) · `Settings\settings.txt` (`SharedDrives`, `MasterPC`, `MasterIP` / คีย์ใหม่) · `Menu\config.json` `brandName` · ชื่อ exe เมนู · `System\Backup\upgrade-<เวลา>` · `Unblock-File` · หยุด/เปิดตัวเฝ้า
+**เขียน / เปลี่ยน:** โฟลเดอร์ OSYNC ทั้งหมด (ติดตั้งใหม่) หรือรายการที่แทนที่ (อัปเดต) · `Settings\settings.txt` (ล้าง `$ShopKeys`, เขียน `SharedDrives`, `MasterPC`, `MasterIP` / คีย์ใหม่) · `Menu\config.json` (`brandName` + ล้างค่าร้านต้นทาง) · `System\Data\setup-plan.txt` · ชื่อ exe เมนู · `System\Backup\upgrade-<เวลา>` · `Unblock-File` · หยุด/เปิดตัวเฝ้า
 **Log:** ไม่มี (ขึ้นจอ)
 
 **ขั้นตอนการทำงาน** (ทีละขั้นแบบผู้ใช้อยู่ใน [02 ข้อ 2](02-INSTALL-UPDATE.md#2-ตั้งเครื่องแม่สาขาใหม่ด้วย-osync-setupexe) และ [ข้อ 3](02-INSTALL-UPDATE.md#3-อัปเดตเครื่องแม่ที่มี-osync-อยู่แล้ว))
-1. หา payload, อ่านรุ่น, หาไดรฟ์ และ OSYNC ที่มีอยู่ (`OSYNC.bat` + `System\Scripts\Common.ps1`)
+1. หา payload (หรือ `-Source`: ต้องมี `System\Scripts\Common.ps1` และต้องไม่ใช่ OSYNC ที่ติดตั้งแล้ว), อ่านรุ่น, หาไดรฟ์ และ OSYNC ที่ติดตั้งแล้ว (`Test-Installed`: `OSYNC.bat` + `System\Scripts\Common.ps1` + `Launchers\` หรือ `System\Data\`; ไม่นับโฟลเดอร์ `-Source`)
 2. เจอ OSYNC และไม่ได้ใส่ `-Upgrade` / `-Target`: `-Yes` = หยุด exit 1 · ไม่งั้นถามว่าจะอัปเดตไหม
-3. หาไดรฟ์ที่เครื่องลูกเห็น (LW db หรือไดรฟ์ fixed)
-4. **อัปเดต:** แตก zip → หยุดตัวเฝ้า → แทนที่ `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` → เพิ่มคีย์ใหม่ใน `settings.txt` พร้อมคำอธิบาย → `MasterPC` ถ้าว่าง → แทนที่ `Menu\app` ถ้าเมนูปิด → เปิดตัวเฝ้าใหม่
-   **ติดตั้งใหม่:** เลือกโฟลเดอร์ → แตก zip และย้าย → สร้างโฟลเดอร์ว่าง → เขียน Settings → ชื่อร้าน → ชื่อ exe
+3. หาไดรฟ์ที่เครื่องลูกเห็น (LW db หรือไดรฟ์ fixed) เรียงตามตัวอักษร
+4. **อัปเดต:** แตกไฟล์ (`Expand-Files`) → หยุดตัวเฝ้า → แทนที่ `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` → `Sync-Tools` + `Test-ToolsSame` (ถ้าไฟล์ติดตั้งมี `Tools\`) → เพิ่มคีย์ใหม่ใน `settings.txt` พร้อมคำอธิบาย → `MasterPC` ถ้าว่าง → แทนที่ `Menu\app` ถ้าเมนูปิด → เปิดตัวเฝ้าใหม่
+   **ติดตั้งใหม่:** แตกไฟล์ → ตรวจเครื่อง (`Setup-Plan.ps1 -SharedDrives <ที่หาได้> -PassThru`) → เลือกโฟลเดอร์ (ค่าแนะนำ = `OsyncRoot` ของผลตรวจ; ตอบไม่ = `Quit` ลบโฟลเดอร์ชั่วคราว) → ย้าย → สร้างโฟลเดอร์ว่าง → `Clear-ShopValues` + `Clear-MenuShop` + ล้างรายการ `games` ใน `extra-games.json` + บันทึก `setup-plan.txt` → เขียน Settings → ชื่อร้าน → ชื่อ exe (ไม่มีโปรแกรมเมนู = บอกให้ build ที่ตั้งค่าครั้งแรกข้อ 4)
 5. `Unblock-File` ใน `System`, `Menu\app`, `Menu\tools` · ลบโฟลเดอร์ชั่วคราว
 6. branch runner: ใช้ `-BranchCommand` หรือถาม (ไม่ถามเมื่อ `-Yes` หรือมี `C:\AT9-Branch\state.json`) · บรรทัดต้องตรง `https?://<host>/api/branch/setup/<รหัส 20-64 ตัว>` แล้วรัน `Branch-Runner.ps1 -Install -Yes -Command <url> -OsyncRoot <root>` แบบ RunAs
 7. `-NoWizard` = บอกขั้นต่อไปแล้วจบ · อัปเดต = `Tool-Check.ps1 -Mode master` · ใหม่ = ตั้ง `OSYNC_NOPAUSE=1` แล้ว `cmd /c OSYNC.bat setup`
@@ -474,15 +478,46 @@ flowchart LR
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Ask`](../Scripts/Setup-Install.ps1#L16) | 16 | ถามพร้อมค่าแนะนำ `[ค่า]` Enter = ค่าแนะนำ · `-Yes` = คืนค่าแนะนำทันที |
-| [`YesNo`](../Scripts/Setup-Install.ps1#L17) | 17 | ถาม `[Y/N]` · `-Yes` = `$true` ทันที |
-| [`Head`](../Scripts/Setup-Install.ps1#L18) | 18 | พิมพ์หัวขั้น `== <ข้อความ>` สีเหลือง |
-| [`Set-Line`](../Scripts/Setup-Install.ps1#L19) | 19 | ตั้ง `คีย์=ค่า` ในไฟล์ (แทนบรรทัดแรกที่ตรง ไม่มี = ต่อท้าย) · `-OnlyIfEmpty` = ไม่ทับค่าที่มีอยู่ · เขียน UTF-8 ไม่มี BOM |
-| [`Set-BrandName`](../Scripts/Setup-Install.ps1#L26) | 26 | แทนค่า `"brandName": "..."` ตัวแรกด้วย regex โดยไม่จัดรูปไฟล์ใหม่ · UTF-8 ไม่มี BOM |
-| [`Get-Watchers`](../Scripts/Setup-Install.ps1#L32) | 32 | process `powershell.exe` ที่ command line มี `<root>\System\Scripts\Master-Watch.ps1` |
+| [`Test-Installed`](../Scripts/Setup-Install.ps1#L19) | 19 | โฟลเดอร์เป็น OSYNC ที่ติดตั้งแล้วไหม: `OSYNC.bat` + `System\Scripts\Common.ps1` + (`Launchers\` หรือ `System\Data\`) · โฟลเดอร์ที่แตกจาก zip ไม่มีสองโฟลเดอร์หลัง จึงไม่นับ |
+| [`Ask`](../Scripts/Setup-Install.ps1#L31) | 31 | ถามพร้อมค่าแนะนำ `[ค่า]` Enter = ค่าแนะนำ · `-Yes` = คืนค่าแนะนำทันที |
+| [`YesNo`](../Scripts/Setup-Install.ps1#L32) | 32 | ถาม `[Y/N]` · `-Yes` = `$true` ทันที |
+| [`Head`](../Scripts/Setup-Install.ps1#L33) | 33 | พิมพ์หัวขั้น `== <ข้อความ>` สีเหลือง |
+| [`Set-Line`](../Scripts/Setup-Install.ps1#L34) | 34 | ตั้ง `คีย์=ค่า` ในไฟล์ (แทนบรรทัดแรกที่ตรง ไม่มี = ต่อท้าย) · `-OnlyIfEmpty` = ไม่ทับค่าที่มีอยู่ · เขียน UTF-8 ไม่มี BOM |
+| [`Set-BrandName`](../Scripts/Setup-Install.ps1#L41) | 41 | แทนค่า `"brandName": "..."` ตัวแรกด้วย regex โดยไม่จัดรูปไฟล์ใหม่ · UTF-8 ไม่มี BOM |
+| [`Get-Watchers`](../Scripts/Setup-Install.ps1#L47) | 47 | process `powershell.exe` ที่ command line มี `<root>\System\Scripts\Master-Watch.ps1` |
+| [`Expand-Files`](../Scripts/Setup-Install.ps1#L51) | 51 | วางไฟล์ลงโฟลเดอร์ชั่วคราว: แตก `payload.zip` หรือ `robocopy` โฟลเดอร์ `-Source` โดยข้าม `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules` · exit ≥ 8 = throw |
+| [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L59) | 59 | ล้างค่าใน `$ShopKeys` เป็นว่างและ `Role=auto` (regex ต่อบรรทัด ไม่แตะท้ายบรรทัด CRLF) · UTF-8 ไม่มี BOM |
+| [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L66) | 66 | ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText` และ `featured=[]` ใน `Menu\config.json` แล้วเช็กว่ายังเป็น JSON |
+| [`Sync-Tools`](../Scripts/Setup-Install.ps1#L78) | 78 | ใส่ `Tools\` จากไฟล์ติดตั้งทีละโฟลเดอร์: โฟลเดอร์เดิมย้ายไป `<backup>\Tools\<ชื่อ>` (ย้ายไม่ได้เพราะเปิดอยู่ = ขึ้น `is in use - not updated` แล้วข้าม) · คืน `$KeepInTools` (`Sunshine0J\config`) จากของเดิม · คัดลอก `TOOLS-MANIFEST.txt` · โฟลเดอร์ที่ไฟล์ติดตั้งไม่มีไม่แตะ |
+| [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L98) | 98 | อ่าน `Tools\TOOLS-MANIFEST.txt` ทุกบรรทัด: ไฟล์ต้องมี ขนาดเท่า และ SHA256 ตรง → `tools: all <n> files are the same as the pack (SHA256)` (เขียว) หรือรายชื่อไฟล์ที่ไม่ตรง 5 ตัวแรก (แดง) |
+| [`Quit`](../Scripts/Setup-Install.ps1#L139) | 139 | ลบโฟลเดอร์ชั่วคราวแล้ว `exit <รหัส>` (ใช้ตอนผู้ใช้ตอบไม่ที่คำถามเรื่องโฟลเดอร์) |
 
-**ค่าในร้านนี้ตอนนี้:** ร้านนี้ไม่ได้ติดตั้งด้วยไฟล์นี้ (โฟลเดอร์ `H:\OSYNC` เป็นต้นทาง) · ถ้ารันบนเครื่องนี้จะเจอ OSYNC เดิมที่ `H:\OSYNC` · มี `C:\lwserver\config\lwservice.db` และ Node.js จึงอ่านไดรฟ์จาก LW ได้
+### `Setup-Plan.ps1` — ตรวจเครื่องแม่และแนะนำที่วางไฟล์ (อ่านอย่างเดียว)
 
+**หน้าที่:** ดูเครื่องแม่แล้วบอกว่าแต่ละส่วนของ OSYNC ควรอยู่ที่ไหน ไม่เปลี่ยนอะไรเลย (ผลจริงและวิธีอ่าน: [00 ข้อ 3](00-EASY-INSTALL.md#3-วางไฟล์ตรงไหนให้เหมาะกับเครื่องแม่ของคุณ))
+**เรียกจาก / ทำงานเมื่อไหร่:** `Setup-Install` ตอนติดตั้งใหม่ (`-PassThru`) · `OSYNC.bat` 7 → 23 (`-OutFile System\Data\setup-plan.txt`)
+**พารามิเตอร์:** `-SharedDrives <อักษร>` · `-OutFile <ไฟล์>` (UTF-8 มี BOM) · `-PassThru` คืนออบเจกต์ (`OsyncRoot`, `Why`, `SharedDrives`, `SharedHow`, `MoreGameFolders`, `Existing`, `Server`, `IP`, `Dhcp`, `Drives`, `Launchers`, `SteamLibraries`, `Text`) · `-Quiet` ไม่พิมพ์
+**อ่านค่า:** โฟลเดอร์ / เซอร์วิสของ diskless server (`$DisklessServerFolders`, `$DisklessServerServices` ของ `Common.ps1`), `lwservice.db` (Node.js), `SharedDrives` (เฉพาะ OSYNC ที่ติดตั้งแล้ว), `Win32_LogicalDisk`, `Get-PhysicalDisk` + `Get-Partition` (SSD / HDD / NVMe), `$LauncherTable` + `Get-LauncherInstallPath`, `libraryfolders.vdf` + `appmanifest_*.acf` (`SizeOnDisk`), `Win32_NetworkAdapterConfiguration` (IP, gateway, DHCP), `Win32_OperatingSystem`, `node --version`, `csc.exe`
+**เขียน / เปลี่ยน:** ไฟล์ `-OutFile` เท่านั้น
+
+**กติกาเลือกที่วาง OSYNC** (บรรทัด 99-114, เฉพาะไดรฟ์ที่เครื่องลูกเห็นและไม่ใช่ไดรฟ์ระบบ): 1) ไดรฟ์ของ OSYNC ที่ติดตั้งแล้ว 2) ไดรฟ์ที่มีเกม Steam มากที่สุด (library ≥ 50 GB, ว่าง ≥ 50 GB) 3) SSD ที่ว่าง ≥ 200 GB มากที่สุด 4) ไดรฟ์ที่ว่างมากที่สุด · ไดรฟ์ที่แชร์อื่นที่ว่าง ≥ 100 GB เสนอเป็น `X:\GAME` (ไม่เขียนลงค่า)
+
+| ฟังก์ชัน | บรรทัด | หลักการทำงาน |
+|---|---|---|
+| [`Out`](../Scripts/Setup-Plan.ps1#L15) | 15 | เก็บบรรทัดไว้ทำไฟล์ / ข้อความ และพิมพ์ขึ้นจอ (สีได้) เว้นแต่ `-Quiet` |
+| [`GB`](../Scripts/Setup-Plan.ps1#L16) | 16 | ไบต์ → GB ปัดเต็ม |
+| [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L57) | 57 | กติกาเดียวกับ `Test-Installed` ของ `Setup-Install` |
+
+**ค่าในร้านนี้ตอนนี้:** ร้านนี้ไม่ได้ติดตั้งด้วยไฟล์นี้ (โฟลเดอร์ `H:\OSYNC` เป็นต้นทาง) · ถ้ารันบนเครื่องนี้จะเจอ OSYNC เดิมที่ `H:\OSYNC` · มี `C:\lwserver\config\lwservice.db` และ Node.js จึงอ่านไดรฟ์จาก LW ได้ (`DEFGHIJ`) · 20 พ.ย. 2026 ทดสอบลงโฟลเดอร์ทดสอบ 4 แบบผ่าน: exe ใหม่, `EASY-INSTALL.bat` ใหม่, `-Upgrade` จาก zip (ค่าเดิมคงอยู่), เปิด `EASY-INSTALL.bat` ในโฟลเดอร์ที่ติดตั้งแล้ว (หยุดตามที่ตั้งใจ)
+
+### `Tool-SunshineProfiles.ps1` — โปรไฟล์เครื่องของ Sunshine 0JAYSHOP สำหรับสาขา
+
+**หน้าที่:** เขียน `shop_ip_profiles` (ทุกเครื่อง: IP, ชื่อ, พอร์ต) และ `shop_gateway_list` ลง `Tools\Sunshine0J\config\sunshine.conf` จากแผนใน Settings ([`Get-SunshinePlan`](../Scripts/Common.ps1#L106)) ค่าอื่นในไฟล์ไม่แตะ (คู่มือผู้ใช้: [00 ข้อ 7.2](00-EASY-INSTALL.md#72-sunshine-ของสาขา-วง-ip-และชื่อเครื่อง))
+**เรียกจาก / ทำงานเมื่อไหร่:** `OSYNC.bat` 7 → 24 (`-DryRun` ก่อน แล้วถาม) · สาขาที่วง IP / ชื่อเครื่องไม่ใช่แบบร้านนี้ รันครั้งเดียวหลังติดตั้ง
+**พารามิเตอร์:** `-DryRun` แค่แสดง · `-Gateway <ip>` เราเตอร์ (ค่าเริ่ม = default gateway ของการ์ดเครื่องนี้ที่อยู่วงเดียวกัน ไม่มี = `<net>.1`)
+**เขียน / เปลี่ยน:** `sunshine.conf` (คง BOM และท้ายบรรทัดเดิม) · ไฟล์เดิมสำรองที่ `System\Backup\sunshine-conf-<เวลา>.conf`
+**ขั้นตอน:** ไม่มี `sunshine.conf` = จบ · `SunshinePcCount` = 0 = exit 1 · สร้างรายการ `{"ip":"<net>.<offset+n>","name":"<prefix><nn>","port":20000+n*100}` n = 1..จำนวน · เทียบกับค่าปัจจุบัน เหมือน = `already has these profiles - nothing to change`
+**ค่าในร้านนี้ตอนนี้ (20 พ.ย. 2026):** `-DryRun` ขึ้น `72 PCs, KORI01 = 192.168.51.101 port 20100 ... KORI72 = 192.168.51.172 port 27200, router 192.168.51.1` และ `already has these profiles` (ตรงกับคอนฟิกที่ใช้อยู่ทุกตัว) · ทดสอบกับสำเนา: `10.0.0.20` / `PC` / 5 เครื่อง → เขียน `PC01 = 10.0.0.21 port 20100 ... PC05`, เราเตอร์ `10.0.0.1` จำนวนบรรทัดไฟล์เท่าเดิม
 ---
 
 ## 8. `Tool-Migrate.ps1` — ย้ายโครงเดิม (ขั้น B)
