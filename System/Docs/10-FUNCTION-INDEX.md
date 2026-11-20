@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 87 ไฟล์ · ฟังก์ชัน 644 ตัว · สร้างเมื่อ 20 Nov 2026 22:47 จากโค้ดใน repo นี้
+ไฟล์โค้ด 87 ไฟล์ · ฟังก์ชัน 646 ตัว · สร้างเมื่อ 20 Nov 2026 23:05 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -33,7 +33,7 @@
   - [System/Scripts/Client-Firewall.ps1](#system-scripts-client-firewall-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Client-Install.ps1](#system-scripts-client-install-ps1) — 3 ฟังก์ชัน
   - [System/Scripts/Client-Menu.ps1](#system-scripts-client-menu-ps1) — 0 ฟังก์ชัน
-  - [System/Scripts/Client-Mic.ps1](#system-scripts-client-mic-ps1) — 18 ฟังก์ชัน
+  - [System/Scripts/Client-Mic.ps1](#system-scripts-client-mic-ps1) — 20 ฟังก์ชัน
   - [System/Scripts/Client-Parsec.ps1](#system-scripts-client-parsec-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-PopupGuard.ps1](#system-scripts-client-popupguard-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Client-Runtimes.ps1](#system-scripts-client-runtimes-ps1) — 4 ฟังก์ชัน
@@ -342,28 +342,30 @@
 <a id="system-scripts-client-mic-ps1"></a>
 ### System/Scripts/Client-Mic.ps1
 
-417 บรรทัด · 18 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `WatchDefaults`, `WatchMinutes` · [เปิดไฟล์](../Scripts/Client-Mic.ps1)
+441 บรรทัด · 20 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `WatchDefaults`, `WatchMinutes` · [เปิดไฟล์](../Scripts/Client-Mic.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L33) | 33-33 | `p` | x64 program? (PE machine 0x8664) |
 | 2 | [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L40) | 40-44 | `Pattern` |  |
 | 3 | [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L47) | 47-49 | `Pattern` | 20 Nov 2026: only a device that WORKS counts - Windows can keep a root device with no driver (empty class and name, only the HardwareID; the master has one f... |
-| 4 | [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L50) | 50-62 | - |  |
-| 5 | [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L65) | 65-73 | `Exe`, `Arguments`, `Seconds` | runs a setup hidden; stops it (and what it started) when it is still busy after $Seconds - a setup waiting on a window nobody can see (SYSTEM at boot) must n... |
-| 6 | [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L138) | 138-142 | `Id` |  |
-| 7 | [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L143) | 143-148 | - |  |
-| 8 | [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L149) | 149-152 | `When` |  |
-| 9 | [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L156) | 156-160 | `Flow` | the PC's own active speaker (flow 0) / mic (flow 1): not ours, not another program's virtual device |
-| 10 | [`WLog`](../Scripts/Client-Mic.ps1#L164) | 164-164 | `s` |  |
-| 11 | [`Get-Devcon`](../Scripts/Client-Mic.ps1#L193) | 193-200 | - | x64 client) - then OSLink's x64 devcon is used (game disk, signed by its maker, the same one Client-OslinkDrivers uses) 19 Nov 2026: "UnknownError" = its roo... |
-| 12 | [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L204) | 204-216 | - | WO Mic's x64 driver for the direct install (Tools\WOMic\driver): 2.1.0.0 out of WOMicClientSetup6.4.exe, signed by Microsoft (Windows Hardware Compatibility ... |
-| 13 | [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L218) | 218-218 | `r` | devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed |
-| 14 | [`Show-Sound`](../Scripts/Client-Mic.ps1#L223) | 223-226 | `When` | Owner, 20 Nov 2026: only the sound / mic drivers of OUR menu system (WO Mic, VB-CABLE) are handled here - never the PC's own sound card, Windows' sound servi... |
-| 15 | [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L302) | 302-302 | - | root device(s) with VB-CABLE's HardwareID but no working driver (the setup / an old install left them) |
-| 16 | [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L304) | 304-318 | `before` | Windows may switch the default to the new CABLE device a moment after it appears: watch ~20 s, put the old one back |
-| 17 | [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L382) | 382-393 | - | on "CABLE Output". A VB-CABLE speaker / mic that was disabled (in the image; several PCs show one renamed "NOT USE") is not seen at all - so they are enabled... |
-| 18 | [`Format-EpState`](../Scripts/Client-Mic.ps1#L394) | 394-394 | `s` |  |
+| 4 | [`Wait-WoMic`](../Scripts/Client-Mic.ps1#L52) | 52-56 | `Seconds` | 20 Nov 2026 evening: at boot the image's own WO Mic device can need well over a minute to start. Wait for it: returns the working device(s) and the seconds w... |
+| 5 | [`Show-WoMicState`](../Scripts/Client-Mic.ps1#L57) | 57-62 | - |  |
+| 6 | [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L63) | 63-75 | - |  |
+| 7 | [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L78) | 78-86 | `Exe`, `Arguments`, `Seconds` | runs a setup hidden; stops it (and what it started) when it is still busy after $Seconds - a setup waiting on a window nobody can see (SYSTEM at boot) must n... |
+| 8 | [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L151) | 151-155 | `Id` |  |
+| 9 | [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L156) | 156-161 | - |  |
+| 10 | [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L162) | 162-165 | `When` |  |
+| 11 | [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L169) | 169-173 | `Flow` | the PC's own active speaker (flow 0) / mic (flow 1): not ours, not another program's virtual device |
+| 12 | [`WLog`](../Scripts/Client-Mic.ps1#L177) | 177-177 | `s` |  |
+| 13 | [`Get-Devcon`](../Scripts/Client-Mic.ps1#L206) | 206-213 | - | x64 client) - then OSLink's x64 devcon is used (game disk, signed by its maker, the same one Client-OslinkDrivers uses) 19 Nov 2026: "UnknownError" = its roo... |
+| 14 | [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L217) | 217-229 | - | WO Mic's x64 driver for the direct install (Tools\WOMic\driver): 2.1.0.0 out of WOMicClientSetup6.4.exe, signed by Microsoft (Windows Hardware Compatibility ... |
+| 15 | [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L231) | 231-231 | `r` | devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed |
+| 16 | [`Show-Sound`](../Scripts/Client-Mic.ps1#L236) | 236-239 | `When` | Owner, 20 Nov 2026: only the sound / mic drivers of OUR menu system (WO Mic, VB-CABLE) are handled here - never the PC's own sound card, Windows' sound servi... |
+| 17 | [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L326) | 326-326 | - | root device(s) with VB-CABLE's HardwareID but no working driver (the setup / an old install left them) |
+| 18 | [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L328) | 328-342 | `before` | Windows may switch the default to the new CABLE device a moment after it appears: watch ~20 s, put the old one back |
+| 19 | [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L406) | 406-417 | - | on "CABLE Output". A VB-CABLE speaker / mic that was disabled (in the image; several PCs show one renamed "NOT USE") is not seen at all - so they are enabled... |
+| 20 | [`Format-EpState`](../Scripts/Client-Mic.ps1#L418) | 418-418 | `s` |  |
 
 <a id="system-scripts-client-parsec-ps1"></a>
 ### System/Scripts/Client-Parsec.ps1

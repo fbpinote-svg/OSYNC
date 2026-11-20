@@ -687,24 +687,26 @@ flowchart TD
 | [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L33) | 33 | อ่าน PE header ของไฟล์ ตรวจว่า machine = `0x8664` (x64) |
 | [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L40) | 40 | อุปกรณ์ที่มีอยู่ (PresentOnly) ทุก class ที่ชื่อหรือ HardwareID ตรง pattern (เพราะ Windows อาจแสดง VB-CABLE แบบ class และชื่อว่าง) |
 | [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L47) | 47 | กรองจาก `Get-MediaDevice` เฉพาะ Status `OK` และ class `MEDIA` หรือ `AudioEndpoint` = ทำงานจริง |
-| [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L50) | 50 | หา `WOMicClient.exe` จาก registry Wolicheng, รายการ Uninstall `WO Mic*`, `Program Files (x86)` / `Program Files` `\WOMic` หรือ `\WO Mic`; คืนตัวแรกที่มีจริง |
-| [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L65) | 65 | รันตัวติดตั้งซ่อนหน้าต่าง รอ `$Seconds` (ค่าเริ่มต้น 180) เกินเวลา `taskkill /T /F`; คืน `exit n` หรือ `still running ... - stopped` |
-| [`OsyncAudio.Defaults.Get`](../Scripts/Client-Mic.ps1#L113) (C#) | 113 | id ของลำโพง (flow 0) / ไมค์ (flow 1) หลัก ตาม role 0-2 ผ่าน `IMMDeviceEnumerator.GetDefaultAudioEndpoint` |
-| [`OsyncAudio.Defaults.Set`](../Scripts/Client-Mic.ps1#L121) (C#) | 121 | ตั้ง id เป็นค่าหลักทั้ง 3 role ผ่าน `IPolicyConfig.SetDefaultEndpoint` (สิ่งที่หน้าต่าง Sound ใช้) |
-| [`OsyncAudio.Defaults.Enable`](../Scripts/Client-Mic.ps1#L128) (C#) | 128 | "Enable" ใน Sound panel = `SetEndpointVisibility(id, 1)` |
-| [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L138) | 138 | แปลง endpoint id เป็นชื่อ (อุปกรณ์ `SWD\MMDEVAPI\<id>`); ว่าง = `(none)` |
-| [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L143) | 143 | เก็บค่าหลักทั้ง 6 ช่อง (flow 0/1 x role 0/1/2) เป็น hashtable |
-| [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L149) | 149 | พิมพ์ชื่อลำโพงและไมค์หลักตอนนี้ |
-| [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L156) | 156 | ลำโพง/ไมค์จริงของเครื่อง: class `AudioEndpoint`, Status OK, flow ตรง, ชื่อไม่ตรง `$notReal` (CABLE, VB-Audio, WO Mic, Parsec, Steam Streaming, Virtual, Sunshine, Zako, Remote Audio, Voicemeeter, Broadcast) |
-| [`WLog`](../Scripts/Client-Mic.ps1#L164) | 164 | ต่อท้าย `C:\Users\Public\OSYNC-AudioDefaults.log` (เฉพาะโหมด `-WatchDefaults`) |
-| [`Get-Devcon`](../Scripts/Client-Mic.ps1#L193) | 193 | devcon สำหรับลงไดรเวอร์ตรง — ดูหัวข้อย่อย |
-| [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L204) | 204 | ไฟล์ `womic.inf` / `womic.sys` / `womic.cat` ใน `Tools\WOMic\driver` ต้องมีครบและ SHA256 ตรงกับไดรเวอร์ 2.1.0.0 ที่ Microsoft เซ็น (ค่าที่ปักไว้) ไม่ตรง = ไม่ลงตรง |
-| [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L218) | 218 | แปล exit ของ devcon: 0 เสร็จ, 1 เสร็จแต่ Windows ขอรีสตาร์ต, 2 ล้มเหลว |
-| [`Show-Sound`](../Scripts/Client-Mic.ps1#L223) | 223 | **อ่านอย่างเดียว:** พิมพ์ลำโพง/ไมค์ทั้งหมดที่ Windows เห็น พร้อม build |
-| [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L302) | 302 | อุปกรณ์ `ROOT\*` ที่มี HardwareID `VBAudioVACWDM` แต่ไม่ทำงาน (ไม่ใช่ OK + MEDIA) |
-| [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L304) | 304 | หลังลง VB-CABLE: เฝ้า ~20 วินาที (10 x 2) ถ้าค่าหลักเดิมไม่ใช่ CABLE แต่ตอนนี้กลายเป็น CABLE → ตั้งกลับเป็นตัวเดิม |
-| [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L382) | 382 | อ่าน MMDevices Render/Capture เฉพาะ adapter ที่มี `VB-Audio`: flow, ชื่อ, adapter, state, id |
-| [`Format-EpState`](../Scripts/Client-Mic.ps1#L394) | 394 | แปล `DeviceState` เป็นคำ (active / DISABLED / not present / unplugged) |
+| [`Wait-WoMic`](../Scripts/Client-Mic.ps1#L52) | 52 | รอให้อุปกรณ์ WO Mic ทำงาน (ตรวจทุก 3 วินาที สูงสุดตามที่ส่งมา) คืนอุปกรณ์ที่ทำงาน + จำนวนวินาทีที่รอ |
+| [`Show-WoMicState`](../Scripts/Client-Mic.ps1#L57) | 57 | พิมพ์อุปกรณ์ WO Mic ทุกตัว: InstanceId, ชื่อ, สถานะ, class, problem code (ไว้ดูในรายงานเมื่อไม่ทำงาน) |
+| [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L63) | 63 | หา `WOMicClient.exe` จาก registry Wolicheng, รายการ Uninstall `WO Mic*`, `Program Files (x86)` / `Program Files` `\WOMic` หรือ `\WO Mic`; คืนตัวแรกที่มีจริง |
+| [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L78) | 78 | รันตัวติดตั้งซ่อนหน้าต่าง รอ `$Seconds` (ค่าเริ่มต้น 180) เกินเวลา `taskkill /T /F`; คืน `exit n` หรือ `still running ... - stopped` |
+| [`OsyncAudio.Defaults.Get`](../Scripts/Client-Mic.ps1#L126) (C#) | 113 | id ของลำโพง (flow 0) / ไมค์ (flow 1) หลัก ตาม role 0-2 ผ่าน `IMMDeviceEnumerator.GetDefaultAudioEndpoint` |
+| [`OsyncAudio.Defaults.Set`](../Scripts/Client-Mic.ps1#L134) (C#) | 121 | ตั้ง id เป็นค่าหลักทั้ง 3 role ผ่าน `IPolicyConfig.SetDefaultEndpoint` (สิ่งที่หน้าต่าง Sound ใช้) |
+| [`OsyncAudio.Defaults.Enable`](../Scripts/Client-Mic.ps1#L141) (C#) | 128 | "Enable" ใน Sound panel = `SetEndpointVisibility(id, 1)` |
+| [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L151) | 151 | แปลง endpoint id เป็นชื่อ (อุปกรณ์ `SWD\MMDEVAPI\<id>`); ว่าง = `(none)` |
+| [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L156) | 156 | เก็บค่าหลักทั้ง 6 ช่อง (flow 0/1 x role 0/1/2) เป็น hashtable |
+| [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L162) | 162 | พิมพ์ชื่อลำโพงและไมค์หลักตอนนี้ |
+| [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L169) | 169 | ลำโพง/ไมค์จริงของเครื่อง: class `AudioEndpoint`, Status OK, flow ตรง, ชื่อไม่ตรง `$notReal` (CABLE, VB-Audio, WO Mic, Parsec, Steam Streaming, Virtual, Sunshine, Zako, Remote Audio, Voicemeeter, Broadcast) |
+| [`WLog`](../Scripts/Client-Mic.ps1#L177) | 177 | ต่อท้าย `C:\Users\Public\OSYNC-AudioDefaults.log` (เฉพาะโหมด `-WatchDefaults`) |
+| [`Get-Devcon`](../Scripts/Client-Mic.ps1#L206) | 206 | devcon สำหรับลงไดรเวอร์ตรง — ดูหัวข้อย่อย |
+| [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L217) | 217 | ไฟล์ `womic.inf` / `womic.sys` / `womic.cat` ใน `Tools\WOMic\driver` ต้องมีครบและ SHA256 ตรงกับไดรเวอร์ 2.1.0.0 ที่ Microsoft เซ็น (ค่าที่ปักไว้) ไม่ตรง = ไม่ลงตรง |
+| [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L231) | 231 | แปล exit ของ devcon: 0 เสร็จ, 1 เสร็จแต่ Windows ขอรีสตาร์ต, 2 ล้มเหลว |
+| [`Show-Sound`](../Scripts/Client-Mic.ps1#L236) | 236 | **อ่านอย่างเดียว:** พิมพ์ลำโพง/ไมค์ทั้งหมดที่ Windows เห็น พร้อม build |
+| [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L326) | 326 | อุปกรณ์ `ROOT\*` ที่มี HardwareID `VBAudioVACWDM` แต่ไม่ทำงาน (ไม่ใช่ OK + MEDIA) |
+| [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L328) | 328 | หลังลง VB-CABLE: เฝ้า ~20 วินาที (10 x 2) ถ้าค่าหลักเดิมไม่ใช่ CABLE แต่ตอนนี้กลายเป็น CABLE → ตั้งกลับเป็นตัวเดิม |
+| [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L406) | 406 | อ่าน MMDevices Render/Capture เฉพาะ adapter ที่มี `VB-Audio`: flow, ชื่อ, adapter, state, id |
+| [`Format-EpState`](../Scripts/Client-Mic.ps1#L418) | 418 | แปล `DeviceState` เป็นคำ (active / DISABLED / not present / unplugged) |
 
 ### `Get-Devcon` (บรรทัด 193)
 - **คืนค่า:** path ของ `devcon.exe` ที่ใช้ได้ หรือว่าง
@@ -717,6 +719,10 @@ flowchart TD
 - ผลบนเครื่องลูก ~15 เครื่อง: `womic.sys` ถูกทับเป็นไฟล์เก่า (35,696 ไบต์ เวอร์ชัน 6.3.9600.17246) · มีอุปกรณ์ WO Mic ตัวที่สองค้างแบบเสีย (problem 14) · Windows 10 จำนวน 10 เครื่องขึ้น 1f FAIL ทั้งที่ WO Mic ตัวแรกทำงานได้ในอีกไม่กี่นาที
 - **ตอนนี้:** รออุปกรณ์ของตัวติดตั้งก่อน (สูงสุด 45 วิ) · `Tools\WOMic\driver` เปลี่ยนเป็นไดรเวอร์ x64 2.1.0.0 ที่ Microsoft เซ็น (ดึงจากตัวติดตั้งตัวเดียวกัน ไม่ได้แก้ไฟล์) และโค้ดลงตรงเฉพาะเมื่อ SHA256 ทั้ง 3 ไฟล์ตรงค่าที่ปักไว้ · HardwareID `Root\WOMic` ตรงกับที่ตัวติดตั้งใช้ · ไฟล์เก่าย้ายไป `H:\_ลบได้\womic-2017-driver-20261120`
 - การเชื่อถือผู้เซ็น Wolicheng ยังทำเหมือนเดิม (อ่านใบรับรองจาก `wolicheng-publisher.cer`) เพราะเคยเห็นตัวติดตั้งค้างรอคำถามเมื่อไม่มี (17 พ.ย. KORI12)
+### รออุปกรณ์ WO Mic ของ Image ก่อน (20 พ.ย. 2026 ดึก)
+- คอนโซลขึ้น "ไมค์มือถือ (WO Mic + VB-CABLE)" 9 เครื่อง (KORI02/04/06/07/11/14/15/18/19, Windows 10) รายงานของ KORI04 / 07 / 19 ที่บูตหลังแก้รอบก่อน: Image มีโปรแกรม WO Mic และอุปกรณ์ `ROOT\MEDIA\0001 WO Mic Device` อยู่แล้ว แต่ตอนขั้น 1f อุปกรณ์ยังเริ่มไม่เสร็จ → ลงตัวติดตั้งซ้ำ → รอ 45 วิ → `devcon update` → เช็กหลัง 3 วิ ยังไม่พร้อม → FAIL · รายงานไม่กี่นาทีต่อมาอุปกรณ์เดียวกันสถานะ OK และ `womic.sys` เป็นตัวที่ Microsoft เซ็น (51,192 ไบต์)
+- **ตอนนี้:** มีโปรแกรมและมีอุปกรณ์ WO Mic อยู่ (สถานะใดก็ได้) = รออุปกรณ์นั้นก่อนสูงสุด 120 วิ ไม่ลงอะไร · หลัง `devcon` รอสูงสุด 60 วิ (เดิม 3 วิ) · ไม่ผ่านจริง = พิมพ์สถานะ / problem code ของทุกอุปกรณ์ WO Mic ลงรายงาน
+- ทดสอบ: `-CheckOnly` บนเครื่องแม่ผ่าน · ผลจริงดูจากรายงานบูตครั้งถัดไปของ 9 เครื่องนี้
 ### ทางสำรอง devcon สำหรับ Windows 11 (บรรทัด 352-365)
 - คอมเมนต์ 20 พ.ย. 2026: เครื่องลูกบูตได้ 2 อิมเมจ (Windows 10 IoT LTSC 2021 build 19045 หรือ Windows 11 Pro 26300 — เห็นบน KORI06/11/23/25) · บน Windows 11 ตัวติดตั้ง VB-CABLE บอก exit 0 แต่ไม่สร้างอุปกรณ์
 - ตอนนี้ "มีอยู่แล้ว" นับเฉพาะอุปกรณ์ที่มีไดรเวอร์ทำงาน และถ้าตัวติดตั้งไม่สร้างอุปกรณ์ จะลงไดรเวอร์ตรงแบบที่ Windows ทำ (devcon = SetupAPI) ด้วยแพ็กเกจ Windows 10+ ของ VB-Audio ที่ Microsoft เซ็น: build ≥ 16299 ใช้ `vbMmeCable64_win10.inf` (ทั้งสองอิมเมจของร้านเข้าเงื่อนไขนี้) ต่ำกว่านั้นใช้ `vbMmeCable64_win7.inf`

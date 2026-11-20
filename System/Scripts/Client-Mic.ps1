@@ -47,6 +47,19 @@ function Get-MediaDevice([string]$Pattern) {
 function Get-WorkingDevice([string]$Pattern) {
   @(Get-MediaDevice $Pattern | Where-Object { "$($_.Status)" -eq 'OK' -and @('MEDIA', 'AudioEndpoint') -contains "$($_.Class)" })
 }
+# 20 Nov 2026 evening: at boot the image's own WO Mic device can need well over a minute to start. Wait for it: returns the
+# working device(s) and the seconds waited. Show-WoMicState prints every WO Mic device with its status and problem code.
+function Wait-WoMic([int]$Seconds) {
+  $w = 0; $d = Get-WorkingDevice '(?i)WOMic|WO Mic'
+  while (-not $d.Count -and $w -lt $Seconds) { Start-Sleep -Seconds 3; $w += 3; $d = Get-WorkingDevice '(?i)WOMic|WO Mic' }
+  [pscustomobject]@{ Dev = $d; Waited = $w }
+}
+function Show-WoMicState {
+  foreach ($x in @(Get-MediaDevice '(?i)WOMic|WO Mic')) {
+    $pc = (Get-PnpDeviceProperty -InstanceId $x.InstanceId -KeyName 'DEVPKEY_Device_ProblemCode' -ErrorAction SilentlyContinue).Data
+    Write-Host "  $($x.InstanceId) | $($x.FriendlyName) | status $($x.Status) | class $($x.Class) | problem $pc"
+  }
+}
 function Find-WoMicClient {
   $c = @()
   foreach ($k in 'HKLM:\SOFTWARE\WOW6432Node\Wolicheng\WOMic', 'HKLM:\SOFTWARE\Wolicheng\WOMic') {
@@ -229,6 +242,16 @@ Show-Sound 'before'
 # ---------- WO Mic ----------
 $wmExe = Find-WoMicClient
 $wmDev = Get-WorkingDevice '(?i)WOMic|WO Mic'
+# 20 Nov 2026 evening (9 Windows 10 PCs "mic problem" in the console): the image has WO Mic (program + device ROOT\MEDIA\0001
+# with the Microsoft-signed womic.sys), but at step 1f the device had not started yet. The setup ran again, 45 s, devcon update,
+# 3 s, still not started -> FAIL; the report a few minutes later showed the same device OK. So: program here and its device
+# present = wait for that device first (up to 120 s); nothing is installed when it starts.
+if ($wmExe -and -not $wmDev.Count -and @(Get-MediaDevice '(?i)WOMic|WO Mic').Count -and -not $CheckOnly) {
+  Write-Host 'WO Mic: program here and its device present, not started yet - waiting for it (up to 120 s)'
+  Show-WoMicState
+  $ww = Wait-WoMic 120; $wmDev = $ww.Dev
+  Write-Host "  after $($ww.Waited) s: $(if ($wmDev.Count) { 'working' } else { 'still not working' })"
+}
 if ($wmExe -and $wmDev.Count) {
   Write-Host "WO Mic: already on this PC ($wmExe; device: $($wmDev[0].FriendlyName))"
 } else {
@@ -283,12 +306,13 @@ if ($wmExe -and $wmDev.Count) {
         $dcArgs = $verb + ' "' + $wmInf + '" Root\WOMic'
         $dcRes = Invoke-Setup $dc $dcArgs 90
         Write-Host "  devcon: $(Format-DevconExit $dcRes)"
-        Start-Sleep -Seconds 3
-        $wmDev = Get-WorkingDevice '(?i)WOMic|WO Mic'
+        # the device restarts after the driver install: give it time like the setup's (was 3 s, too short at boot)
+        $ww = Wait-WoMic 60; $wmDev = $ww.Dev
+        Write-Host "  after devcon: $(if ($wmDev.Count) { "working after $($ww.Waited) s" } else { "still not working after $($ww.Waited) s" })"
       }
     }
     if ($wmExe -and $wmDev.Count) { Write-Host "WO Mic: installed ($r) -> $wmExe; device: $($wmDev[0].FriendlyName)" }
-    else { Write-Host "WO Mic: NOT installed ($r; program: $(if ($wmExe) { $wmExe } else { 'missing' }), device: $(if ($wmDev.Count) { 'yes' } else { 'missing' }))"; $failed = $true }
+    else { Write-Host "WO Mic: NOT installed ($r; program: $(if ($wmExe) { $wmExe } else { 'missing' }), device: $(if ($wmDev.Count) { 'yes' } else { 'missing' }))"; Show-WoMicState; $failed = $true }
     Show-AudioDefaults 'after'
   }
 }
