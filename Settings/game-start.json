@@ -1,0 +1,13 @@
+{
+  "_help": "เปิดเกมแบบ iPlay (20 พ.ย. 2026): การ์ดเกมที่อยู่ในนี้ เมนูจะเปิดผ่าน System\\Client\\GameStart.vbs ซึ่งปิดตัวเกม/ตัวกันโกงที่ค้างก่อน เช็กเครื่องตามที่ตัวกันโกงต้องการ แล้วให้ launcher ของค่ายเปิดเกมเหมือนเดิม (คำสั่งเดิมของการ์ดอยู่ในช่อง direct ของ games.json) · ชื่อเกม = id การ์ดใน Menu\\data\\games.json · ลบเกมออกจากไฟล์นี้ = กลับไปเปิดตรงแบบเดิม (มีผลหลังเครื่องแม่สร้างรายชื่อเกมใหม่ และเครื่องลูกรีบูต)",
+  "_fields": "kill = ชื่อโปรแกรมที่ปิดถ้าค้าง (เปิดมาเกิน 45 วินาทีแล้วไม่มีหน้าต่างหรือค้าง) · stopServices = บริการที่หยุดถ้ายังรันอยู่ตอนไม่มีเกมเปิด · checks = เช็กก่อนเปิด: ea_anticheat (บริการ EA AntiCheat ลงแล้วและไม่เก่ากว่าตัวติดตั้งในโฟลเดอร์เกม), javelin_drivers (ไม่มีไดรเวอร์ที่ EA Javelin ห้ามโหลดอยู่ เช่น CPU-Z, WO Mic), no_test_signing (Windows ไม่ได้เปิด test signing / debug) · ถ้าเช็กไม่ผ่าน ลูกค้าจะเห็นข้อความบอกเหตุผล เลือกเปิดต่อหรือไม่เปิดได้",
+  "games": {
+    "steam-1172470": {
+      "name": "Apex Legends",
+      "steamApp": "1172470",
+      "kill": ["r5apex.exe", "r5apex_dx12.exe", "EAAntiCheat.GameServiceLauncher.exe"],
+      "stopServices": ["EAAntiCheatService"],
+      "checks": ["ea_anticheat", "javelin_drivers", "no_test_signing"]
+    }
+  }
+}

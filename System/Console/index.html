@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>จัดการร้าน - OSYNC</title>
+<style>
+  :root { --bg:#0f1218; --panel:#171b23; --line:#262c38; --text:#e6e9ef; --muted:#8b93a5; --accent:#4f8cff; --ok:#2fbf71; --warn:#e3a33b; --bad:#e5534b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 "Segoe UI","Leelawadee UI",Tahoma,sans-serif; }
+  header { display:flex; align-items:center; gap:16px; padding:12px 20px; border-bottom:1px solid var(--line); background:var(--panel); position:sticky; top:0; z-index:5; }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  header .pc { color:var(--muted); font-size:12px; }
+  nav { display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
+  nav button { background:none; border:1px solid transparent; color:var(--muted); padding:6px 12px; border-radius:6px; cursor:pointer; font:inherit; }
+  nav button.on { color:var(--text); border-color:var(--line); background:#1f2430; }
+  main { padding:20px; max-width:1300px; margin:0 auto; }
+  section { display:none; } section.on { display:block; }
+  .bar { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  input[type=text], select { background:#0c0f14; border:1px solid var(--line); color:var(--text); padding:7px 10px; border-radius:6px; font:inherit; }
+  button.b { background:#222837; border:1px solid var(--line); color:var(--text); padding:7px 12px; border-radius:6px; cursor:pointer; font:inherit; }
+  button.b:hover { border-color:var(--accent); } button.p { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.b:disabled { opacity:.45; cursor:default; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; display:flex; flex-direction:column; }
+  .card.hidden { opacity:.55; }
+  .card .img { aspect-ratio: 460/215; background:#0b0d12 center/cover no-repeat; }
+  .card .body { padding:10px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .card .t { font-weight:600; }
+  .tags { display:flex; gap:4px; flex-wrap:wrap; }
+  .tag { font-size:11px; padding:1px 7px; border-radius:20px; border:1px solid var(--line); color:var(--muted); }
+  .tag.c { color:#9cc0ff; border-color:#2b3e63; } .tag.w { color:var(--warn); border-color:#5a4523; }
+  .card .acts { display:flex; gap:6px; flex-wrap:wrap; margin-top:auto; }
+  .card .acts button { padding:4px 8px; font-size:12px; }
+  .edit { display:none; flex-direction:column; gap:6px; } .card.editing .edit { display:flex; }
+  table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  th { color:var(--muted); font-weight:500; font-size:12px; }
+  .muted { color:var(--muted); } .ok { color:var(--ok); } .bad { color:var(--bad); } .warn { color:var(--warn); }
+  .box { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+  .prog { height:8px; background:#0b0d12; border-radius:6px; overflow:hidden; min-width:140px; } .prog i { display:block; height:100%; background:var(--accent); }
+  pre { background:#0b0d12; border:1px solid var(--line); border-radius:8px; padding:10px; max-height:320px; overflow:auto; font-size:12px; white-space:pre-wrap; }
+  #toast { position:fixed; right:20px; bottom:20px; background:#222837; border:1px solid var(--line); padding:10px 14px; border-radius:8px; max-width:420px; display:none; z-index:10; white-space:pre-wrap; }
+  h2 { font-size:15px; margin:0 0 10px; font-weight:600; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-bottom:14px; }
+  .kpi { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  .kpi .n { font-size:26px; font-weight:600; } .kpi .l { color:var(--muted); font-size:12px; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  .dot.ok { background:var(--ok); } .dot.bad { background:var(--bad); } .dot.warn { background:var(--warn); }
+  .sw { position:relative; display:inline-block; width:42px; height:22px; flex:none; } .sw input { display:none; }
+  .sw i { position:absolute; inset:0; background:#3a4152; border-radius:22px; cursor:pointer; transition:.15s; }
+  .sw i:before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.15s; }
+  .sw input:checked + i { background:var(--ok); } .sw input:checked + i:before { transform:translateX(20px); }
+  .set { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line); }
+  .set .k { font-weight:600; min-width:220px; } .set .h { color:var(--muted); font-size:12px; white-space:pre-wrap; flex:1; }
+  .set input[type=text] { min-width:260px; }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:20; }
+  .modal.on { display:flex; } .modal .in { background:var(--panel); border:1px solid var(--line); border-radius:10px; width:min(1000px,94vw); max-height:88vh; display:flex; flex-direction:column; }
+  .modal .in header { position:static; } .modal pre { max-height:none; flex:1; margin:0; border:0; border-radius:0; }
+  .doc { white-space:pre-wrap; font-size:13px; max-height:none; }
+  @media (max-width:640px) { header { flex-wrap:wrap; } nav { margin-left:0; } main { padding:12px; } }
+
+  header h1 small { font-weight:400; color:var(--muted); font-size:12px; margin-left:6px; }
+  .sub { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+  .sub button { background:#1a1f2a; border:1px solid var(--line); color:var(--muted); padding:6px 12px; border-radius:20px; cursor:pointer; font:inherit; }
+  .sub button.on { color:#fff; border-color:var(--accent); background:#1d2a44; }
+  .todo { display:flex; flex-direction:column; gap:8px; }
+  .todo .it { display:flex; gap:12px; align-items:flex-start; background:#1b1f29; border:1px solid var(--line); border-left:4px solid var(--warn); border-radius:8px; padding:10px 14px; }
+  .todo .it.bad { border-left-color:var(--bad); } .todo .it.ok { border-left-color:var(--ok); } .todo .it.info { border-left-color:var(--accent); }
+  .todo .it b { display:block; } .todo .it .d { color:var(--muted); font-size:13px; } .todo .it .act { margin-left:auto; flex:none; }
+  .todo code { background:#0b0d12; padding:1px 6px; border-radius:4px; }
+  .chip { display:inline-block; padding:2px 10px; border-radius:20px; font-size:12px; border:1px solid var(--line); margin:0 6px 6px 0; cursor:pointer; }
+  .chip.bad { color:var(--bad); border-color:#5a2a2a; } .chip.wait { color:var(--muted); }
+  .grp { margin-bottom:16px; } .grp h3 { font-size:14px; margin:0 0 4px; color:#cfd6e4; }
+  .opt { display:flex; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+  .opt .tx { flex:1; } .opt .tx b { display:block; font-weight:600; } .opt .tx span { color:var(--muted); font-size:13px; }
+  .opt .tx code { font-size:11px; color:#6d7891; }
+  .opt select { min-width:150px; } .opt .names { min-width:200px; margin-left:8px; }
+  .loading { color:var(--muted); padding:8px 0; }
+  .loading:before { content:''; display:inline-block; width:12px; height:12px; border:2px solid var(--muted); border-top-color:transparent; border-radius:50%; margin-right:8px; vertical-align:-2px; animation:sp .8s linear infinite; }
+  @keyframes sp { to { transform:rotate(360deg); } }
+  .big { font-size:15px; }</style>
+</head>
+<body>
+<header>
+  <h1>จัดการร้าน<small>OSYNC</small></h1><span class="pc" id="pc"></span>
+  <nav>
+    <button data-page="home" class="on">หน้าหลัก</button>
+    <button data-page="clients">เครื่องลูก</button>
+    <button data-page="games">เกมในเมนู</button>
+    <button data-page="settings">ตั้งค่า</button>
+    <button data-page="advanced">ขั้นสูง</button>
+  </nav>
+</header>
+<main>
+  <section id="home" class="on">
+    <h2 class="big">สิ่งที่ควรดูตอนนี้</h2>
+    <div class="todo" id="todo"><div class="loading">กำลังตรวจทั้งร้าน...</div></div>
+    <div class="cards" id="ov-kpi" style="margin-top:16px"></div>
+    <div class="box"><h2>ระบบบนเครื่องแม่</h2><table><tbody id="ov-svc"><tr><td class="loading">กำลังโหลด...</td></tr></tbody></table></div>
+    <div class="box"><h2>พื้นที่ว่างของไดรฟ์เกม</h2><div id="ov-drv"></div><p class="muted" style="margin:8px 0 0">แถบ = ที่ใช้ไปแล้ว · สีส้ม = เหลือน้อยกว่า 80 GB · สีแดง = เหลือน้อยกว่า 30 GB</p></div>
+    <div class="bar"><button class="b" onclick="loadHome()">ตรวจใหม่</button></div>
+  </section>
+
+  <section id="clients">
+    <div id="cl-sum" style="margin-bottom:10px"></div>
+    <div class="bar"><input type="text" id="cq" placeholder="ค้นหาเครื่อง เช่น KORI12" style="min-width:200px"><label class="muted"><input type="checkbox" id="cfail"> เฉพาะเครื่องที่มีปัญหา</label><span class="muted" id="ccount"></span><button class="b" style="margin-left:auto" onclick="loadClients()">ตรวจใหม่</button></div>
+    <table><thead><tr><th>เครื่อง</th><th>เปิดเครื่องล่าสุด</th><th>สถานะ</th><th>Sunshine</th><th>FiveM</th><th></th></tr></thead><tbody id="cl"><tr><td colspan="6" class="loading">กำลังโหลด...</td></tr></tbody></table>
+    <p class="muted">ข้อมูลมาจากรายงานที่เครื่องลูกส่งมาเองหลังเปิดเครื่อง (และหลังเปิด Steam / FiveM / VALORANT) · เครื่องที่ปิดอยู่จะแสดงข้อมูลรอบล่าสุดที่เปิด</p>
+  </section>
+
+  <section id="settings">
+    <div class="sub"><button data-sub="set-client" class="on">การทำงานของเครื่องลูก</button><button data-sub="set-shop">ระบบเวลา / ร้านค้า</button></div>
+    <div id="set-client" class="subp">
+      <p class="muted">เปลี่ยนแล้วบันทึกทันที · เครื่องลูกเปลี่ยนตามตอนเปิดเครื่องครั้งถัดไป</p>
+      <div id="setlist"><div class="loading">กำลังโหลด...</div></div>
+    </div>
+    <div id="set-shop" class="subp" style="display:none">
+      <div class="box">
+        <h2>เชื่อมเกมเมนูกับระบบเวลา / ร้านค้าของร้าน</h2>
+        <p class="muted">เกมเมนูมีหน้านับเวลา ร้านขายไอดีเกม เติมเงิน และแชทอยู่แล้ว แต่ต้องมี "เซิร์ฟเวอร์ของร้าน" ก่อนถึงจะใช้ได้ ตอนนี้ร้านยังไม่มีเซิร์ฟเวอร์ จึงเปิดแบบเมนูเกมอย่างเดียว · ถ้าจะให้คนมาทำระบบ ส่งเอกสารด้านล่างให้เขา</p>
+        <div class="opt"><div class="tx"><b>ที่อยู่เซิร์ฟเวอร์ของร้าน</b><span>ว่าง = ยังไม่ต่อ (คนทำระบบจะบอกค่านี้ เช่น http://192.168.51.202:8000/api)</span></div><input type="text" id="sh-api" style="min-width:320px"></div>
+        <div class="opt"><div class="tx"><b>เปิดหน้านับเวลา + แท็บร้านค้าให้ลูกค้า</b><span>เปิดเมื่อเซิร์ฟเวอร์พร้อมแล้วเท่านั้น ไม่งั้นลูกค้าจะเห็นหน้าว่าง</span></div><label class="sw"><input type="checkbox" id="sh-timer"><i></i></label></div>
+        <div class="opt"><div class="tx"><b>แถบขวาในเมนูเกม (โฆษณา / แนะนำจากร้าน)</b><span></span></div><label class="sw"><input type="checkbox" id="sh-side"><i></i></label></div>
+        <div class="opt"><div class="tx"><b>ชื่อร้าน</b><span>โชว์บนเกมเมนู</span></div><input type="text" id="sh-brand"></div>
+        <div class="opt"><div class="tx"><b>รหัสเครื่อง</b><span>เว้นว่างไว้ = แต่ละเครื่องใช้ชื่อตัวเอง (KORI01, KORI02 ...) แนะนำแบบนี้</span></div><input type="text" id="sh-mid"></div>
+        <div class="bar" style="margin-top:12px"><button class="b p" onclick="saveShop()">บันทึก</button><button class="b" onclick="testShop()">ลองต่อเซิร์ฟเวอร์</button><button class="b" onclick="showDoc()">อ่านเอกสารสำหรับคนทำระบบ</button><span class="muted">เครื่องลูกเห็นหลังรีบูต</span></div>
+        <pre id="sh-test" style="display:none"></pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="advanced">
+    <div class="sub"><button data-sub="adv-drives" class="on">ไดรฟ์ที่เก็บเกม</button><button data-sub="adv-online">คลังเกมระหว่างสาขา</button><button data-sub="adv-log">บันทึกระบบ</button><button data-sub="adv-raw">ค่าตั้งทั้งหมด (ไฟล์)</button></div>
+    <div id="adv-drives" class="subp">
+  <div id="drives">
+    <div class="box">
+      <h2>ระบบหาเกมจากที่ไหน</h2>
+      <div id="folders"></div>
+      <p class="muted" id="drvhelp"></p>
+    </div>
+    <table><thead><tr><th>ไดร์ฟ</th><th>ชื่อ</th><th>ว่าง / ทั้งหมด</th><th>แชร์ให้เครื่องลูก</th><th>เกมในเมนู</th><th>ที่ระบบสแกนบนไดร์ฟนี้</th><th></th></tr></thead><tbody id="drv"></tbody></table>
+  </div>
+
+
+    </div>
+    <div id="adv-online" class="subp" style="display:none">
+  <div id="online">
+    <div class="box" id="onl-state"></div>
+    <div class="bar"><button class="b" onclick="publish()">ส่งรายการเกมของสาขานี้ขึ้นฮับ</button><button class="b" onclick="loadOnline()">รีเฟรช</button></div>
+    <h2>เกมที่สาขาอื่นมี แต่สาขานี้ยังไม่มี</h2>
+    <table><thead><tr><th>เกม</th><th>หมวด</th><th>ขนาด</th><th>มีที่สาขา</th><th></th></tr></thead><tbody id="miss"></tbody></table>
+    <h2 style="margin-top:18px">กำลังติดตั้ง / ประวัติ</h2>
+    <table><thead><tr><th>เกม</th><th>จากสาขา</th><th>ปลายทาง</th><th>สถานะ</th><th>ความคืบหน้า</th></tr></thead><tbody id="jobs"></tbody></table>
+    <h2 style="margin-top:18px">สาขาที่ต่อฮับ</h2>
+    <table><thead><tr><th>สาขา</th><th>จำนวนเกม</th><th>ส่งรายการล่าสุด</th></tr></thead><tbody id="brs"></tbody></table>
+  </div>
+
+
+    </div>
+    <div id="adv-log" class="subp" style="display:none">
+  <div id="status">
+    <div class="box" id="st"></div>
+    <div class="bar"><button class="b p" onclick="runUpdate()">อัปเดตรายการเกมตอนนี้</button></div>
+    <h2>บันทึกตัวเฝ้า (Master-Watch)</h2>
+    <pre id="wlog"></pre>
+    <h2>ผลอัปเดตรายการเกมล่าสุด</h2>
+    <pre id="ulog">-</pre>
+  </div>
+
+    </div>
+    <div id="adv-raw" class="subp" style="display:none">
+      <div class="bar"><input type="text" id="sq" placeholder="ค้นหา..." style="min-width:220px"><span class="muted">ค่าทุกตัวใน Settings\settings.txt ตามชื่อจริง (สำหรับผู้ดูแล)</span></div>
+      <div class="box" id="rawlist"></div>
+    </div>
+  </section>
+
+  <section id="games">
+    <div class="bar">
+      <input type="text" id="q" placeholder="ค้นหาเกม..." style="min-width:220px">
+      <select id="catf"><option value="">ทุกหมวด</option></select>
+      <label class="muted"><input type="checkbox" id="showHidden"> แสดงเกมที่ซ่อน</label>
+      <span class="muted" id="gcount"></span>
+      <button class="b" style="margin-left:auto" onclick="runUpdate()">อัปเดตรายการเกม</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="muted">เปลี่ยนชื่อ / หมวด / ซ่อน / รูป แล้วเครื่องลูกเห็นหลังรีบูตครั้งถัดไป · รูปการ์ดใช้ PNG, JPG หรือ WEBP (แนะนำ 460×215) · <span class="warn">ทุกการแก้เขียนรายการเกมของเมนูใหม่: เครื่องลูกที่เปิดอยู่ถ้าเปิดเมนูใหม่อาจเห็นเมนูว่างจนกว่าจะรีบูต - แก้ตอนร้านปิดดีที่สุด</span></p>
+  </section>
+
+
+</main>
+<div id="toast"></div>
+<div class="modal" id="rep"><div class="in"><header><h1 id="rep-t">รายงาน</h1><nav><button class="b" onclick="document.querySelector('#rep').classList.remove('on')">ปิด</button></nav></header><pre id="rep-x"></pre></div></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let GAMES = [], CATS = [], onlineTimer = null;
+function toast(msg, bad) { const t = $('#toast'); t.textContent = msg; t.style.borderColor = bad ? 'var(--bad)' : 'var(--line)'; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', bad ? 8000 : 4000); }
+async function api(path, body) {
+  const opt = body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-OSYNC': '1' }, body: JSON.stringify(body) };
+  const r = await fetch(path, opt); let j = {};
+  try { j = await r.json(); } catch (e) { }
+  if (!r.ok || j.ok === false) throw new Error(j.error || ('HTTP ' + r.status));
+  return j;
+}
+function showList(l) { if (l && l.log && $('#ulog')) $('#ulog').textContent = l.log.join('\n'); }
+function modal(title, text) { $('#rep-t').textContent = title; $('#rep-x').textContent = text; $('#rep').classList.add('on'); }
+
+// ---------- pages ----------
+const PAGES = { home: () => loadHome(), clients: () => loadClients(), games: () => loadGames(), settings: () => { loadSettings(); loadShop(); }, advanced: () => openSub('adv-drives') };
+function openPage(p) {
+  document.querySelectorAll('nav button[data-page]').forEach(x => x.classList.toggle('on', x.dataset.page === p));
+  document.querySelectorAll('main > section').forEach(s => s.classList.toggle('on', s.id === p));
+  PAGES[p]();
+}
+document.querySelectorAll('nav button[data-page]').forEach(b => b.onclick = () => openPage(b.dataset.page));
+const SUBLOAD = { 'set-client': loadSettings, 'set-shop': loadShop, 'adv-drives': () => loadDrives(), 'adv-online': () => loadOnline(), 'adv-log': () => loadStatus(), 'adv-raw': loadRaw };
+function openSub(id) {
+  const grp = document.getElementById(id).parentElement;
+  grp.querySelectorAll('.sub button').forEach(x => x.classList.toggle('on', x.dataset.sub === id));
+  grp.querySelectorAll('.subp').forEach(x => x.style.display = x.id === id ? '' : 'none');
+  SUBLOAD[id]();
+}
+document.querySelectorAll('.sub button').forEach(b => b.onclick = () => openSub(b.dataset.sub));
+
+// ---------- plain names for the boot steps of a client PC ----------
+const STEP = { '0': 'Sunshine 0JAYSHOP', '0b': 'แชร์ไฟล์เซิร์ฟ FiveM', '1': 'Riot (VALORANT / LoL)', '1b': 'ไอคอนเกมเมนู', '1c': 'Roblox', '1d': 'ตั้งค่า Windows', '1e': 'ล็อกปุ่มปิดเครื่อง', '1f': 'ไมค์มือถือ (WO Mic + VB-CABLE)', '1g': 'Parsec', '1h': 'กราฟิก GTA V / FiveM', '1i': 'ล้างรหัสเกมที่ค้าง', '1j': 'OSLink (ตัวตนเครื่อง)', '1k': 'OSLink (ล็อกอิน)', '1l': 'OSLink (ไดรเวอร์เมาส์/คีย์บอร์ด)', '1m': 'OSLink (เปิดตอนเข้า Windows)', '1o': 'WebView2 / Node.js / Python', '1p': 'จอเสมือน VDD', '1q': 'Steam เปิดเร็ว', '1r': 'ล้างบัญชี Steam ของเครื่องแม่', '1s': 'WinRAR', '1t': 'Rockstar Launcher', '2': 'เกม Steam (ติดตั้งครั้งแรก)', '3': 'EA app', '4': 'EasyAntiCheat', '5': 'เกมเมนู', '6': 'GTA SA NewThings', '7': 'งานตอนเปิดเครื่อง', '8': 'หน้าเดสก์ท็อป' };
+// problems already fixed on the master: a report older than this = "fixed, the PC still has to restart once"
+const FIXED = { '1f': '2026-11-18 15:28' };
+function stepOf(fail) { const id = String(fail).split(' ')[0]; return { id, name: STEP[id] || String(fail).split(':')[0] }; }
+function isFixed(id, reportAt) { return FIXED[id] && reportAt && reportAt < FIXED[id]; }
+const MASTER_IPS = ['192.168.51.201'];
+function realClients(list) { return (list || []).filter(c => /^KORI/i.test(c.pc) && !MASTER_IPS.includes(c.ip)); }
+function ago(m) { return m < 60 ? m + ' นาทีก่อน' : m < 1440 ? Math.round(m / 60) + ' ชม.ก่อน' : Math.round(m / 1440) + ' วันก่อน'; }
+
+// ---------- home ----------
+const SVC_FIX = {
+  'รับรายงานสถานะเครื่องลูก': 'เปิดหน้าต่าง PowerShell แบบผู้ดูแล แล้วพิมพ์ <code>schtasks /run /tn OSYNC-ClientReports</code>',
+  'รับไฟล์เซิร์ฟ FiveM จากเครื่องลูก': 'เปิดหน้าต่าง PowerShell แบบผู้ดูแล แล้วพิมพ์ <code>schtasks /run /tn OSYNC-FiveMShare</code>',
+  'ล็อกอิน OSLink ของเครื่องลูก': 'เปิดหน้าต่าง PowerShell แบบผู้ดูแล แล้วพิมพ์ <code>schtasks /run /tn OSYNC-OslinkLogins</code>',
+  'ฮับคลังออนไลน์': 'รีสตาร์ตเครื่องแม่ หรือ ดับเบิลคลิก OSYNC.bat แล้วเลือกเมนูเปิดฮับ',
+  'ตัวเฝ้าเครื่องแม่ (อัปเดตรายการเกม / ข้อมูลให้เครื่องลูก)': 'ดับเบิลคลิก H:\\OSYNC\\OSYNC.bat แล้วเลือก 2'
+};
+async function loadHome() {
+  $('#todo').innerHTML = '<div class="loading">กำลังตรวจทั้งร้าน...</div>';
+  let o, c = [];
+  try { o = await api('/api/overview'); } catch (e) { $('#todo').innerHTML = '<div class="it bad"><div><b>ตรวจไม่ได้</b><div class="d">' + esc(e.message) + '</div></div></div>'; return; }
+  c = realClients(o.clientList);   // the overview carries the client list: one request
+  $('#pc').textContent = o.pc + ' · เครื่องแม่';
+  const items = [];
+  (o.services || []).filter(s => !s.ok).forEach(s => items.push({ cls: 'bad', t: 'ระบบ "' + s.name + '" ไม่ทำงาน', d: 'วิธีแก้: ' + (SVC_FIX[s.name] || esc(s.how)) }));
+  const probs = {};
+  c.forEach(x => (x.fails || []).forEach(f => { const s = stepOf(f); const k = s.id; probs[k] = probs[k] || { name: s.name, pcs: [], fixed: 0 }; probs[k].pcs.push(x.pc); if (isFixed(k, x.lastSeen)) probs[k].fixed++; }));
+  Object.entries(probs).forEach(([k, p]) => {
+    const open = p.pcs.length - p.fixed;
+    if (open > 0) items.push({ cls: 'bad', t: p.name + ' มีปัญหา ' + p.pcs.length + ' เครื่อง', d: p.pcs.slice(0, 12).join(', ') + (p.pcs.length > 12 ? ' ...' : ''), act: '<button class="b" onclick="openPage(\'clients\')">ดูเครื่อง</button>' });
+    else items.push({ cls: 'info', t: p.name + ': แก้แล้ว รอเครื่องลูกรีบูต (' + p.pcs.length + ' เครื่อง)', d: 'เครื่องที่ยังขึ้นปัญหานี้ เปิดก่อนที่จะแก้ - รีบูตแล้วจะหายเอง' });
+  });
+  (o.drives || []).filter(d => d.freeGB < 30).forEach(d => items.push({ cls: 'bad', t: 'ไดรฟ์ ' + d.letter + ': ใกล้เต็ม (เหลือ ' + d.freeGB + ' GB)', d: 'ลบเกมที่ไม่ใช้ หรือโฟลเดอร์ _ลบได้ ในไดรฟ์นั้น' }));
+  (o.drives || []).filter(d => d.freeGB >= 30 && d.freeGB < 80).forEach(d => items.push({ cls: '', t: 'ไดรฟ์ ' + d.letter + ': เหลือ ' + d.freeGB + ' GB', d: 'ยังพอใช้ แต่ถ้าจะลงเกมใหญ่ควรใช้ไดรฟ์อื่น' }));
+  if (!items.length) items.push({ cls: 'ok', t: 'ทุกอย่างปกติ', d: 'ไม่มีเรื่องที่ต้องทำตอนนี้' });
+  $('#todo').innerHTML = items.map(i => '<div class="it ' + i.cls + '"><div><b>' + esc(i.t) + '</b><div class="d">' + i.d + '</div></div>' + (i.act ? '<div class="act">' + i.act + '</div>' : '') + '</div>').join('');
+  const k = (n, l, cls) => '<div class="kpi"><div class="n ' + (cls || '') + '">' + n + '</div><div class="l">' + l + '</div></div>';
+  const today = c.filter(x => x.minutesAgo <= 720).length, bad = c.filter(x => x.minutesAgo <= 720 && (x.fails || []).some(f => !isFixed(stepOf(f).id, x.lastSeen))).length;
+  $('#ov-kpi').innerHTML = k(o.games, 'เกมในเมนู') + k(today, 'เครื่องลูกที่เปิดวันนี้ (มีข้อมูล ' + c.length + ' เครื่อง)') + k(bad, 'เครื่องที่มีปัญหาตอนเปิดเครื่อง', bad ? 'bad' : 'ok') + k(o.fivem.gb + ' GB', 'ไฟล์เซิร์ฟ FiveM ที่เก็บไว้ให้ทุกเครื่อง');
+  $('#ov-svc').innerHTML = (o.services || []).map(s => '<tr><td><span class="dot ' + (s.ok ? 'ok' : 'bad') + '"></span>' + esc(s.name) + '</td><td>' + (s.ok ? '<span class="ok">ทำงาน</span>' : '<span class="bad">ไม่ทำงาน</span>') + '</td></tr>').join('');
+  $('#ov-drv').innerHTML = (o.drives || []).map(d => { const pct = d.sizeGB ? Math.round(100 * (d.sizeGB - d.freeGB) / d.sizeGB) : 0; return '<div style="display:flex;gap:10px;align-items:center;margin:5px 0"><b style="width:24px">' + esc(d.letter) + ':</b><div class="prog" style="flex:1;max-width:420px"><i style="width:' + pct + '%;background:' + (d.freeGB < 30 ? 'var(--bad)' : d.freeGB < 80 ? 'var(--warn)' : 'var(--accent)') + '"></i></div><span class="' + (d.freeGB < 30 ? 'bad' : '') + '">ว่าง ' + d.freeGB + ' จาก ' + d.sizeGB + ' GB</span></div>'; }).join('');
+}
+
+// ---------- client PCs ----------
+let CLIENTS = [];
+async function loadClients() {
+  $('#cl').innerHTML = '<tr><td colspan="6" class="loading">กำลังโหลด...</td></tr>';
+  try { CLIENTS = realClients((await api('/api/clients')).clients); } catch (e) { toast('โหลดรายการเครื่องลูกไม่ได้: ' + e.message, true); return; }
+  const probs = {};
+  CLIENTS.forEach(x => (x.fails || []).forEach(f => { const s = stepOf(f); if (!isFixed(s.id, x.lastSeen)) { probs[s.name] = (probs[s.name] || 0) + 1; } }));
+  $('#cl-sum').innerHTML = Object.keys(probs).length ? 'ปัญหาที่เจอ: ' + Object.entries(probs).map(([n, c]) => '<span class="chip bad" onclick="$(\'#cfail\').checked=true;$(\'#cq\').value=\'\';drawClients()">' + esc(n) + ' · ' + c + ' เครื่อง</span>').join('') : '<span class="ok">ทุกเครื่องเปิดผ่านครบ</span>';
+  drawClients();
+}
+function drawClients() {
+  const q = $('#cq').value.trim().toLowerCase(), onlyFail = $('#cfail').checked;
+  const open = c => (c.fails || []).filter(f => !isFixed(stepOf(f).id, c.lastSeen));
+  const list = CLIENTS.filter(c => (!q || (c.pc + ' ' + c.ip).toLowerCase().includes(q)) && (!onlyFail || open(c).length));
+  $('#ccount').textContent = list.length + ' เครื่อง';
+  $('#cl').innerHTML = list.map(c => {
+    const o = open(c), fixedOnes = (c.fails || []).filter(f => isFixed(stepOf(f).id, c.lastSeen));
+    let st;
+    if (!c.steps) st = '<span class="muted">ยังไม่มีข้อมูลการเปิดเครื่อง</span>';
+    else if (o.length) st = '<span class="bad">มีปัญหา: ' + o.map(f => esc(stepOf(f).name)).join(', ') + '</span>';
+    else if (fixedOnes.length) st = '<span class="ok">ปกติ</span> <span class="muted">(' + fixedOnes.map(f => esc(stepOf(f).name)).join(', ') + ' แก้แล้ว รอรีบูต)</span>';
+    else st = '<span class="ok">ปกติ</span>';
+    const sun = /started|running/.test(c.sunshine) ? '<span class="ok">0JAYSHOP ทำงาน</span>' : /own Sunshine/.test(c.sunshine) ? '<span class="muted">ตัวเดิมของเครื่อง</span>' : '<span class="muted">-</span>';
+    const sh = /handed over/.test(c.fivemShare) ? '<span class="ok">ส่งไฟล์เซิร์ฟแล้ว</span>' : /stale/.test(c.fivemShare) ? '<span class="muted">เครื่องอื่นส่งไปก่อน</span>' : /start: cache|offer/.test(c.fivemShare) ? '<span class="muted">รอลูกค้าปิด FiveM</span>' : '<span class="muted">-</span>';
+    return '<tr><td><b>' + esc(c.pc) + '</b></td><td>' + esc(c.boot) + ' <span class="muted">(' + ago(c.minutesAgo) + ')</span></td><td>' + st + '</td><td>' + sun + '</td><td>' + sh + '</td><td><button class="b" onclick="showReport(\'' + esc(c.ip) + '\',\'' + esc(c.pc) + '\')">รายละเอียด</button></td></tr>';
+  }).join('') || '<tr><td colspan="6" class="muted">ไม่มี</td></tr>';
+}
+['#cq', '#cfail'].forEach(s => $(s).addEventListener('input', drawClients));
+async function showReport(ip, pc) { try { const r = await api('/api/client?ip=' + encodeURIComponent(ip)); modal(pc + ' · รายงานล่าสุด ' + r.at, r.text); } catch (e) { toast(e.message, true); } }
+
+// ---------- settings: plain names ----------
+// type: onoff | multi (on / off / some PC names) | ask (on / off / ask)
+const OPT = {
+  ClientPowerLock: ['ความปลอดภัย', 'ลูกค้าปิด / รีสตาร์ตเครื่องเองไม่ได้', 'ซ่อนปุ่ม Shut down / Restart / Sleep (ร้านยังสั่งปิดจากหลังบ้านได้)'],
+  ClientClearLogins: ['ความปลอดภัย', 'ล้างรหัสเกมที่ลูกค้าคนก่อนบันทึกไว้', 'ทุกครั้งที่เปิดเครื่อง: Steam, Riot, Epic, EA, Rockstar, FiveM, Discord ฯลฯ (ตัวเกมและเซฟไม่หาย)'],
+  ClientDesktopMenuOnly: ['หน้าจอ', 'หน้าเดสก์ท็อปมีแค่ไอคอนเกมเมนู', 'ไอคอนอื่นถูกย้ายไปเก็บ (ไม่ลบ)'],
+  ClientThaiFix: ['หน้าจอ', 'แก้ภาษาไทยเพี้ยนในเกม', 'ตั้งภาษาของระบบเป็นไทยให้เกมเก่าอ่านไทยได้', 'ask'],
+  ClientGtaSettings: ['เกม', 'กราฟิก GTA V / FiveM ตามที่ร้านตั้ง', 'ใช้ค่าภาพต่ำของร้านทุกครั้งที่เปิดเครื่อง (ลูกค้าเลือกระดับภาพตอนกดเล่นได้)'],
+  ClientSteamNoUpdate: ['เกม', 'Steam เปิดเร็ว (ไม่อัปเดตตัวเองบนเครื่องลูก)', 'Steam บนเครื่องแม่ยังอัปเดตตามปกติ', 'multi'],
+  ClientFiveMShare: ['เกม', 'แชร์ไฟล์เซิร์ฟ FiveM ระหว่างเครื่อง', 'เซิร์ฟที่เครื่องไหนโหลดแล้ว เครื่องอื่นเข้าเร็วขึ้นหลังรีบูต'],
+  ClientRockstar: ['เกม', 'Rockstar Launcher สำหรับ GTA V / FiveM', 'บอก Windows ว่า Rockstar Launcher อยู่ที่ไดรฟ์เกม'],
+  ClientMicDrivers: ['โปรแกรม', 'ไมค์มือถือ (WO Mic) + VB-CABLE', 'ลงให้เองถ้าเครื่องยังไม่มี'],
+  ClientParsec: ['โปรแกรม', 'Parsec', 'ลงให้เองถ้าเครื่องยังไม่มี (ลูกค้าล็อกอินบัญชีตัวเอง)'],
+  ClientWinRAR: ['โปรแกรม', 'WinRAR', 'ลงให้เองถ้าไม่มี และให้ไฟล์ .zip .rar .7z เปิดด้วย WinRAR'],
+  ClientWebView2: ['โปรแกรม', 'WebView2', 'โปรแกรมบางตัวต้องใช้ (เช่น แผงควบคุม Sunshine)'],
+  ClientNodeJs: ['โปรแกรม', 'Node.js', 'ใช้ได้ทุกเครื่อง (พิมพ์ node / npm)'],
+  ClientPython: ['โปรแกรม', 'Python', 'ใช้ได้ทุกเครื่อง (พิมพ์ python / pip)'],
+  ClientVdd: ['จอ / สตรีม', 'จอเสมือน 1920x1080', 'ลงให้เครื่องที่ยังไม่มีจอเสมือน (เครื่องที่มีแล้วไม่แตะ)'],
+  ClientSunshineAutoStart: ['จอ / สตรีม', 'Sunshine 0JAYSHOP เปิดเองตอนเปิดเครื่อง', 'เฉพาะเครื่องที่ยังไม่มี Sunshine ของตัวเอง', 'multi'],
+  ClientOslinkDrivers: ['OSLink (รีโมตเล่นเกม)', 'ลงไดรเวอร์เมาส์ / คีย์บอร์ดของ OSLink', 'แก้ "ไดรเวอร์ผิดปกติ คลิกเพื่อซ่อม"', 'multi'],
+  ClientOslinkReset: ['OSLink (รีโมตเล่นเกม)', 'ให้แต่ละเครื่องเป็นเครื่องของตัวเองใน OSLink', 'ไม่ใช้ตัวตนเดียวกับเครื่องแม่', 'multi'],
+  ClientOslinkLogin: ['OSLink (รีโมตเล่นเกม)', 'ล็อกอินบัญชีร้านใน OSLink ให้เอง', 'ใช้บัญชีที่ล็อกอินไว้บนเครื่องแม่ (บัญชีอื่นไม่ถูกเก็บ)', 'multi'],
+  ClientOslinkStart: ['OSLink (รีโมตเล่นเกม)', 'OSLink เปิดเองตอนเข้า Windows', 'อยู่ในถาดไอคอน ไม่มีหน้าต่าง', 'multi'],
+  ClientOslinkReport: ['ระบบ', 'เครื่องลูกส่งรายงานสถานะมาที่เครื่องแม่', 'ข้อมูลในหน้า "เครื่องลูก" มาจากตรงนี้ (แนะนำให้เปิด)']
+};
+let SETS = [];
+async function loadSettings() {
+  $('#setlist').innerHTML = '<div class="loading">กำลังโหลด...</div>';
+  try { SETS = (await api('/api/settings')).settings || []; } catch (e) { toast('โหลดการตั้งค่าไม่ได้: ' + e.message, true); return; }
+  drawSettings(); if ($('#rawlist')) drawRaw();
+}
+function ctl(s, type) {
+  const v = String(s.value).trim(), k = esc(s.key);
+  if (type === 'ask') return '<select onchange="saveSetting(\'' + k + '\', this.value)"><option value="on"' + (/^on$/i.test(v) ? ' selected' : '') + '>แก้ให้อัตโนมัติ</option><option value="ask"' + (/^ask$/i.test(v) ? ' selected' : '') + '>ถามก่อน</option><option value="off"' + (/^off$/i.test(v) ? ' selected' : '') + '>ไม่แก้</option></select>';
+  if (type === 'multi') {
+    const mode = /^(on|yes|1|true)$/i.test(v) ? 'on' : /^(off|no|0|false)$/i.test(v) || !v ? 'off' : 'some';
+    return '<select onchange="multiChange(\'' + k + '\', this)"><option value="on"' + (mode === 'on' ? ' selected' : '') + '>เปิดทุกเครื่อง</option><option value="some"' + (mode === 'some' ? ' selected' : '') + '>เฉพาะบางเครื่อง</option><option value="off"' + (mode === 'off' ? ' selected' : '') + '>ปิด</option></select>'
+      + '<input type="text" class="names" placeholder="เช่น KORI12, KORI15" value="' + (mode === 'some' ? esc(v) : '') + '" style="' + (mode === 'some' ? '' : 'display:none') + '" onchange="saveSetting(\'' + k + '\', this.value)">';
+  }
+  return '<label class="sw"><input type="checkbox" ' + (/^on$/i.test(v) ? 'checked' : '') + ' onchange="saveSetting(\'' + k + '\', this.checked ? \'on\' : \'off\')"><i></i></label>';
+}
+function multiChange(key, sel) {
+  const inp = sel.parentElement.querySelector('.names');
+  if (sel.value === 'some') { inp.style.display = ''; inp.focus(); return; }
+  inp.style.display = 'none'; saveSetting(key, sel.value);
+}
+function drawSettings() {
+  const groups = {};
+  SETS.filter(s => s.group === 'client').forEach(s => { const o = OPT[s.key] || ['อื่น ๆ', s.key, s.help, s.onoff ? 'onoff' : 'text']; (groups[o[0]] = groups[o[0]] || []).push([s, o]); });
+  const order = ['ความปลอดภัย', 'หน้าจอ', 'เกม', 'โปรแกรม', 'จอ / สตรีม', 'OSLink (รีโมตเล่นเกม)', 'ระบบ', 'อื่น ๆ'];
+  $('#setlist').innerHTML = order.filter(g => groups[g]).map(g => '<div class="box grp"><h3>' + esc(g) + '</h3>' + groups[g].map(([s, o]) => {
+    const type = o[3] || (s.onoff ? 'onoff' : 'text');
+    const control = type === 'text' ? '<input type="text" value="' + esc(s.value) + '" onchange="saveSetting(\'' + esc(s.key) + '\', this.value)">' : ctl(s, type);
+    return '<div class="opt"><div class="tx"><b>' + esc(o[1]) + '</b><span>' + esc(o[2] || '') + '</span> <code>' + esc(s.key) + '</code></div>' + control + '</div>';
+  }).join('') + '</div>').join('');
+}
+async function saveSetting(key, value) {
+  try { await api('/api/setting', { key, value }); toast('บันทึกแล้ว - เครื่องลูกเปลี่ยนตามตอนเปิดเครื่องครั้งถัดไป'); const s = SETS.find(x => x.key === key); if (s) s.value = value; }
+  catch (e) { toast('บันทึกไม่ได้: ' + e.message, true); loadSettings(); }
+}
+function loadRaw() { if (!SETS.length) loadSettings(); else drawRaw(); }
+function drawRaw() {
+  const q = ($('#sq') ? $('#sq').value : '').trim().toLowerCase();
+  $('#rawlist').innerHTML = SETS.filter(s => !q || (s.key + ' ' + s.help).toLowerCase().includes(q)).map(s => '<div class="set"><div class="k">' + esc(s.key) + '</div>' + (s.onoff
+    ? '<label class="sw"><input type="checkbox" ' + (/^on$/i.test(s.value) ? 'checked' : '') + ' onchange="saveSetting(\'' + esc(s.key) + '\', this.checked ? \'on\' : \'off\')"><i></i></label>'
+    : '<input type="text" value="' + esc(s.value) + '" onchange="saveSetting(\'' + esc(s.key) + '\', this.value)">') + '<div class="h">' + (esc(s.help) || '-') + '</div></div>').join('');
+}
+$('#sq').addEventListener('input', drawRaw);
+
+// ---------- shop systems ----------
+let SHOPDOC = '';
+async function loadShop() {
+  let s; try { s = await api('/api/shop'); } catch (e) { toast(e.message, true); return; }
+  $('#sh-api').value = s.apiUrl; $('#sh-mid').value = s.machineId; $('#sh-brand').value = s.brandName; $('#sh-timer').checked = !s.menuOnly; $('#sh-side').checked = s.sidePanel; SHOPDOC = s.doc || '';
+}
+function shopBody() { return { apiUrl: $('#sh-api').value.trim(), machineId: $('#sh-mid').value.trim(), brandName: $('#sh-brand').value.trim(), menuOnly: !$('#sh-timer').checked, sidePanel: $('#sh-side').checked }; }
+async function saveShop() {
+  const b = shopBody();
+  if (!b.menuOnly && !b.apiUrl && !confirm('เปิดหน้านับเวลา แต่ยังไม่ได้ใส่ที่อยู่เซิร์ฟเวอร์ - ลูกค้าจะเห็นหน้าว่าง บันทึกต่อไหม?')) return;
+  try { await api('/api/shop', b); toast('บันทึกแล้ว - เครื่องลูกเห็นหลังรีบูต'); } catch (e) { toast('บันทึกไม่ได้: ' + e.message, true); }
+}
+async function testShop() {
+  const p = $('#sh-test'); p.style.display = 'block'; p.textContent = 'กำลังลองต่อ...';
+  try { const r = await api('/api/shop/test', shopBody()); p.textContent = r.status ? 'ต่อได้ - เซิร์ฟเวอร์ตอบกลับ (HTTP ' + r.status + ')\n' + (r.body || '') : 'ต่อไม่ได้: ' + (r.error || '') + '\n(' + r.url + ')'; } catch (e) { p.textContent = 'ลองต่อไม่ได้: ' + e.message; }
+}
+function showDoc() { modal('เอกสารสำหรับคนทำระบบ (System\\Docs\\SHOP-API.md)', SHOPDOC || 'ยังไม่มีเอกสาร'); }
+
+// ---------- games ----------
+async function loadGames() {
+  try { const j = await api('/api/games'); GAMES = j.games || []; CATS = j.cats || []; }
+  catch (e) { toast('โหลดรายการเกมไม่ได้: ' + e.message, true); return; }
+  const cf = $('#catf'), cur = cf.value;
+  cf.innerHTML = '<option value="">ทุกหมวด</option>' + [...new Set(GAMES.map(g => g.cat).filter(Boolean))].sort().map(c => `<option${c === cur ? ' selected' : ''}>${esc(c)}</option>`).join('');
+  drawGames();
+}
+function drawGames() {
+  const q = $('#q').value.trim().toLowerCase(), cf = $('#catf').value, sh = $('#showHidden').checked;
+  const list = GAMES.filter(g => (sh || !g.hidden) && (!cf || g.cat === cf) && (!q || (g.title + ' ' + g.id).toLowerCase().includes(q)));
+  $('#gcount').textContent = list.length + ' / ' + GAMES.length + ' เกม';
+  $('#grid').innerHTML = list.map(g => `
+    <div class="card${g.hidden ? ' hidden' : ''}" data-id="${esc(g.id)}">
+      <div class="img" style="background-image:url('${g.img ? esc(g.img) + (g.customIcon ? '?v=' + Date.now() : '') : ''}')"></div>
+      <div class="body">
+        <div class="t">${esc(g.title)}</div>
+        <div class="tags"><span class="tag c">${esc(g.cat || '-')}</span>${g.hidden ? '<span class="tag w">ซ่อนอยู่</span>' : ''}${g.added ? '<span class="tag">เพิ่มเอง</span>' : ''}${g.renamed ? '<span class="tag">เปลี่ยนชื่อ</span>' : ''}${g.customIcon ? '<span class="tag">รูปของร้าน</span>' : ''}</div>
+        <div class="edit">
+          <input type="text" class="et" value="${esc(g.title)}" placeholder="${g.added ? 'ชื่อที่โชว์' : 'ชื่อที่โชว์ (เว้นว่าง = ชื่อเดิม)'}">
+          <select class="ec">${g.added ? '' : '<option value="">หมวดเดิม</option>'}${[...new Set([...CATS, g.cat].filter(Boolean))].map(c => `<option${(g.recat || g.added) && c === g.cat ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select>
+          <label class="muted"><input type="checkbox" class="eh"${g.hidden ? ' checked' : ''}> ซ่อนจากเมนู</label>
+          <div class="acts"><button class="b p" onclick="saveGame(this)">บันทึก</button><button class="b" onclick="this.closest('.card').classList.remove('editing')">ยกเลิก</button></div>
+        </div>
+        <div class="acts">
+          <button class="b" onclick="this.closest('.card').classList.add('editing')">แก้ไข</button>
+          <button class="b" onclick="pickIcon('${esc(g.id)}')">เปลี่ยนรูป</button>
+          ${g.customIcon ? `<button class="b" onclick="resetIcon('${esc(g.id)}')">คืนรูปเดิม</button>` : ''}
+        </div>
+        <div class="muted" style="font-size:11px">${esc(g.id)}</div>
+      </div>
+    </div>`).join('');
+}
+['#q', '#catf', '#showHidden'].forEach(s => $(s).addEventListener('input', drawGames));
+async function saveGame(btn) {
+  const c = btn.closest('.card'), id = c.dataset.id, g = GAMES.find(x => x.id === id);
+  const title = c.querySelector('.et').value.trim();
+  const body = { id, title: title === g.title && !g.renamed ? '' : title, cat: c.querySelector('.ec').value, hide: c.querySelector('.eh').checked };
+  try { const j = await api('/api/game', body); showList(j.list); toast('บันทึกแล้ว - เครื่องลูกเห็นหลังรีบูต'); loadGames(); } catch (e) { toast('บันทึกไม่ได้: ' + e.message, true); }
+}
+function pickIcon(id) {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/png,image/jpeg,image/webp';
+  inp.onchange = () => { const f = inp.files[0]; if (!f) return; if (f.size > 8 * 1024 * 1024) { toast('รูปใหญ่เกิน 8 MB', true); return; }
+    const rd = new FileReader(); rd.onload = async () => { try { const j = await api('/api/icon', { id, data: rd.result }); showList(j.list); toast('เปลี่ยนรูปแล้ว'); loadGames(); } catch (e) { toast('เปลี่ยนรูปไม่ได้: ' + e.message, true); } }; rd.readAsDataURL(f); };
+  inp.click();
+}
+async function resetIcon(id) { try { const j = await api('/api/icon/reset', { id }); showList(j.list); toast('ใช้รูปเดิมแล้ว'); loadGames(); } catch (e) { toast(e.message, true); } }
+async function runUpdate() { toast('กำลังอัปเดตรายการเกม...'); try { const j = await api('/api/update', {}); showList(j); toast(j.ok ? 'อัปเดตรายการเกมแล้ว' : 'อัปเดตไม่สำเร็จ', !j.ok); loadGames(); } catch (e) { toast(e.message, true); } }
+
+// ---------- drives ----------
+async function loadDrives() {
+  let d; try { d = await api('/api/drives'); } catch (e) { toast(e.message, true); return; }
+  DRV = d;
+  const extra = (d.setting || '').split(/[;,|]/).map(s => s.trim()).filter(Boolean);
+  const kinds = (d.kinds || []).join(', ');
+  const main = `<div style="display:flex;gap:8px;align-items:center;margin:4px 0"><code>${esc(d.main)}</code><span class="tag c">หลัก (GamesFolder)</span>${d.mainExists ? '' : '<span class="muted">ยังไม่มีโฟลเดอร์นี้</span>'}</div>`;
+  const more = (d.folders || []).filter(f => f.toLowerCase() !== String(d.main).replace(/\\$/, '').toLowerCase()).map(f => `<div style="display:flex;gap:8px;align-items:center;margin:4px 0"><code>${esc(f)}</code>${extra.some(x => x.toLowerCase().replace(/\\$/, '') === f.toLowerCase()) ? `<button class="b" onclick="removeDrive('${esc(f.replace(/\\/g, '\\\\'))}')">เลิกสแกน</button>` : ''}</div>`).join('');
+  $('#folders').innerHTML = main + more + `<div style="margin:6px 0">ทุกไดร์ฟ: <code>X:\\SteamLibrary</code> (ไลบรารี Steam) และโฟลเดอร์หมวด <code>X:\\&lt;หมวด&gt;\\&lt;เกม&gt;</code> / <code>X:\\Games\\&lt;หมวด&gt;\\&lt;เกม&gt;</code> <span class="muted">(${esc(kinds)})</span> + เกมที่เพิ่มเองใน Settings\\extra-games.json</div>`;
+  $('#drvhelp').innerHTML = (d.style === 'top'
+    ? 'ร้านนี้เก็บเกมไว้ที่ <b>X:\\Online, X:\\Mobile ...</b> บนแต่ละไดร์ฟ - วางเกมใหม่ในโฟลเดอร์หมวดของไดร์ฟไหนก็ได้ ระบบเจอเองภายในไม่กี่นาที ไม่ต้องเพิ่มไดร์ฟ'
+    : 'วางเกมใหม่ในโฟลเดอร์หมวดของโฟลเดอร์เกม (Online, Mobile, Single Player ...) ระบบเจอเองภายในไม่กี่นาที')
+    + ' · ปุ่ม "ใช้เก็บเกม" มีเฉพาะไดร์ฟเปล่าที่แชร์ให้เครื่องลูกแล้ว · <span class="warn">ไดร์ฟใหม่: ตั้งโปรแกรม diskless ให้แชร์ไดร์ฟนั้น + ใส่ตัวอักษรใน SharedDrives ก่อน</span>';
+  const whyTh = { system: 'ไดร์ฟ Windows', diskless: 'ดิสก์ของ diskless (ห้ามใช้)', hasGames: 'มีเกมอยู่แล้ว', notShared: 'ยังไม่แชร์ (ตั้งใน diskless + SharedDrives ก่อน)' };
+  $('#drv').innerHTML = (d.drives || []).map(x => {
+    const what = [...(x.steam || []).map(s => `<code>${esc(s.path)}</code> <span class="muted">Steam ${s.games} เกม</span>`), ...(x.kindDirs || []).map(k => `<code>${esc(k)}</code>`), ...(x.gameFolders || []).map(f => `<code>${esc(f)}</code> <span class="tag c">โฟลเดอร์เกม</span>`)];
+    return `<tr><td><b>${esc(x.letter)}:</b></td><td>${esc(x.label)}</td><td>${x.freeGB} / ${x.sizeGB} GB</td>
+    <td>${x.shared ? '<span class="ok">แชร์</span>' : '<span class="muted">ไม่แชร์</span>'}</td><td>${x.menuGames || '<span class="muted">-</span>'}</td>
+    <td style="font-size:12px">${what.join('<br>') || '<span class="muted">-</span>'}</td>
+    <td>${x.canAdd ? `<button class="b" onclick="addDrive('${esc(x.letter)}')">ใช้เก็บเกม</button>` : `<span class="muted">${esc(whyTh[x.why] || '')}</span>`}</td></tr>`; }).join('');
+}
+let DRV = null;
+async function addDrive(letter) {
+  const where = DRV && DRV.style === 'top' ? (DRV.newKinds || []).map(k => letter + ':\\' + k).join(', ') : letter + ':\\GAME\\(' + ((DRV && DRV.newKinds) || []).join(', ') + ')';
+  if (!confirm('ใช้ไดร์ฟ ' + letter + ': เก็บเกม?\nระบบจะสร้าง ' + where)) return;
+  if (!confirm('เครื่องลูกปิดหมดแล้ว (ร้านปิด) ใช่ไหม?\n\nการเขียนลงไดร์ฟที่เครื่องลูกเปิดใช้อยู่ ทำให้เครื่องลูกอ่านไดร์ฟนั้นเพี้ยนจนกว่าจะรีบูต')) return;
+  try { const j = await api('/api/drives/add', { letter, clientsOff: true }); showList(j.list); toast('เพิ่ม ' + j.path + ' แล้ว\n' + (j.notes || []).join('\n')); loadDrives(); } catch (e) { toast(e.message, true); }
+}
+async function removeDrive(path) {
+  if (!confirm('เลิกสแกน ' + path + ' ? (ไฟล์เกมไม่ถูกลบ)')) return;
+  try { const j = await api('/api/drives/remove', { path }); showList(j.list); toast('เลิกสแกนแล้ว'); loadDrives(); } catch (e) { toast(e.message, true); }
+}
+
+// ---------- online library ----------
+const stateTh = { requested: 'รอสาขาต้นทางแชร์', downloading: 'กำลังดาวน์โหลด', done: 'ติดตั้งแล้ว', failed: 'ไม่สำเร็จ' };
+async function loadOnline() {
+  clearTimeout(onlineTimer);
+  let v; try { v = await api('/api/online'); } catch (e) { v = { enabled: false, error: e.message }; }
+  const n = v.net || {}, maps = n.mappings || {}, mine = maps[(n.btPort || '') + '/TCP'];
+  const netTxt = `<br>รับการเชื่อมต่อจากสาขาอื่น: ${n.upnp ? (mine ? `<span class="ok">UPnP เปิดพอร์ต ${esc(mine.externalIP || '?')}:${esc(n.btPort)} → ${esc(mine.localIP)}</span>` : '<span class="warn">UPnP เปิดอยู่ แต่ยังไม่ได้พอร์ต (เปิดเองตอน aria2 ทำงาน)</span>') : '<span class="muted">UPnP ปิด (OnlineUpnp=off) - ส่งได้เมื่ออีกสาขารับการเชื่อมต่อได้</span>'}${n.externalIP ? ` · IP สาธารณะที่บอก tracker: <code>${esc(n.externalIP)}</code>` : ''}`;
+  $('#onl-state').innerHTML = v.enabled
+    ? `ฮับ: <code>${esc(v.hub)}</code> · สาขานี้: <b>${esc(v.name)}</b> (${esc(v.branch)}) · ตัวส่งไฟล์: <b>${esc(v.engine)}</b>${v.error ? ` · <span class="bad">${esc(v.error)}</span>` : ''}${netTxt}`
+    : `<span class="warn">ยังไม่ได้ตั้งคลังออนไลน์</span> - ใส่ <code>OnlineHub</code> ใน Settings\\settings.txt และกุญแจใน <code>System\\Data\\Online\\online.key</code>${v.error ? `<br><span class="muted">${esc(v.error)}</span>` : ''}`;
+  $('#miss').innerHTML = (v.missing || []).map(g => `<tr><td><b>${esc(g.title)}</b><div class="muted" style="font-size:11px">${esc(g.key)}</div></td><td>${esc(g.cat)}</td><td>${g.sizeGB} GB</td><td>${(g.branches || []).map(esc).join(', ')}</td>
+    <td>${g.pulling ? `<span class="muted">${esc(stateTh[g.pulling] || g.pulling)}</span>` : `<button class="b p" onclick="pull('${esc(g.key)}')">ติดตั้ง</button>`}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">ไม่มี - สาขานี้มีครบทุกเกมที่สาขาอื่นมี</td></tr>';
+  $('#jobs').innerHTML = (v.jobs || []).slice().reverse().map(j => `<tr><td>${esc(j.title)}</td><td>${esc(j.fromName || j.from)}</td><td><code style="font-size:11px">${esc(j.dest)}</code></td>
+    <td class="${j.state === 'failed' ? 'bad' : j.state === 'done' ? 'ok' : ''}">${esc(stateTh[j.state] || j.state)}<div class="muted" style="font-size:11px">${esc(j.message)}</div></td>
+    <td><div class="prog"><i style="width:${j.progress || 0}%"></i></div><span class="muted" style="font-size:11px">${j.progress || 0}%</span></td></tr>`).join('') || '<tr><td colspan="5" class="muted">-</td></tr>';
+  $('#brs').innerHTML = (v.branches || []).map(b => `<tr><td>${esc(b.name)} ${b.me ? '<span class="tag c">สาขานี้</span>' : ''}</td><td>${b.games}</td><td>${esc(b.lastSeen ? new Date(b.lastSeen).toLocaleString('th-TH') : '')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">-</td></tr>';
+  if ((v.jobs || []).some(j => j.state === 'requested' || j.state === 'downloading')) onlineTimer = setTimeout(loadOnline, 4000);
+}
+async function publish() { try { const j = await api('/api/online/publish', {}); toast('ส่งรายการแล้ว ' + j.games + ' เกม'); loadOnline(); } catch (e) { toast(e.message, true); } }
+async function pull(key) { try { const j = await api('/api/online/pull', { key }); toast('เริ่มติดตั้ง → ' + j.dest); loadOnline(); } catch (e) { toast('ติดตั้งไม่ได้: ' + e.message, true); } }
+
+// ---------- status ----------
+async function loadStatus() {
+  let s; try { s = await api('/api/status'); } catch (e) { toast(e.message, true); return; }
+  $('#pc').textContent = s.pc + (s.master ? ' · เครื่องแม่' : ' · ไม่ใช่เครื่องแม่');
+  $('#st').innerHTML = `เครื่อง: <b>${esc(s.pc)}</b> · OSYNC: <code>${esc(s.root)}</code><br>รายการเกม: <b>${s.games}</b> เกม (อัปเดต ${esc(s.gamesUpdated)})<br>
+    ตัวเฝ้า: ${s.watcher ? (s.watcherHere ? '<span class="ok">ทำงานอยู่</span>' : `<span class="warn">ทำงานอยู่${s.watcherFrom ? ' จากโฟลเดอร์ ' + esc(s.watcherFrom) : ' (ตัวเก่า?)'}</span> - เปิดตัวของโฟลเดอร์นี้: OSYNC.bat > 2`) : '<span class="bad">ไม่ทำงาน</span> (OSYNC.bat > 2)'} · คลังออนไลน์: ${s.online && s.online.enabled ? `<span class="ok">ตั้งแล้ว</span> (${esc(s.online.engine)}${s.online.upnp ? ', UPnP' : ''})` : '<span class="muted">ยังไม่ได้ตั้ง</span>'}`;
+  $('#wlog').textContent = (s.watcherLog || []).join('\n') || '-';
+}
+
+loadHome();
+</script>
+</body>
+</html>

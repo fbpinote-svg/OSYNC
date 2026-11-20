@@ -1,0 +1,169 @@
+# Setup-Install.ps1 - what OSYNC-Setup.exe runs on a master PC (made by Tool-Pack.ps1, next to payload.zip).
+# New master: puts OSYNC on the game drive the client PCs see, writes Settings for THIS shop (drives, master PC
+#             name + IP), names the game menu after the shop, then starts the first-time setup (Master-Setup.ps1).
+# Master that already has OSYNC: updates it in place - System\Scripts, System\Client, System\Docs, OSYNC.bat,
+#             README.md and the menu program are replaced (old ones -> System\Backup\upgrade-<date>); Settings,
+#             the menu's config / games / posters, Launchers, GAME, Tools and client data stay as they are.
+#   Setup-Install.ps1                              asks where / shop name (Enter = suggested answer)
+#   -Target X:\OSYNC -ShopName "MY SHOP" -Yes      no questions          -NoWizard   do not start the setup afterwards
+#   -Upgrade X:\OSYNC                              update that OSYNC folder       -Payload <zip>   default: next to this file
+param([string]$Target = '', [string]$ShopName = '', [string]$Upgrade = '', [string]$Payload = '', [switch]$Yes, [switch]$NoWizard, [string]$BranchCommand = '')
+$ErrorActionPreference = 'Stop'
+if (-not $Payload) { $Payload = Join-Path $PSScriptRoot 'payload.zip' }
+$Payload = (Resolve-Path -LiteralPath $Payload).Path
+# copying and naming need no admin rights; the first-time setup at the end asks for them itself (OSYNC.bat setup)
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Ask([string]$q, [string]$def) { if ($Yes) { return $def }; $r = Read-Host "$q [$def]"; if ($r.Trim()) { $r.Trim() } else { $def } }
+function YesNo([string]$q) { if ($Yes) { return $true }; (Read-Host "$q [Y/N]") -match '^[Yy]' }
+function Head([string]$t) { Write-Host "`n== $t" -ForegroundColor Yellow }
+function Set-Line([string]$file, [string]$key, [string]$value, [switch]$OnlyIfEmpty) {
+  $lines = @(Get-Content -LiteralPath $file -Encoding UTF8)
+  $i = -1; for ($n = 0; $n -lt $lines.Count; $n++) { if ($lines[$n] -match "^\s*$key\s*=") { $i = $n; break } }
+  if ($i -ge 0) { if ($OnlyIfEmpty -and (($lines[$i] -split '=', 2)[1].Trim())) { return }; $lines[$i] = "$key=$value" } else { $lines += "$key=$value" }
+  [IO.File]::WriteAllLines($file, [string[]]$lines, (New-Object Text.UTF8Encoding $false))
+}
+# set "brandName" in config.json without reformatting the file
+function Set-BrandName([string]$file, [string]$name) {
+  $t = [IO.File]::ReadAllText($file, [Text.Encoding]::UTF8)
+  $t = ([regex]'("brandName"\s*:\s*")[^"]*(")').Replace($t, [Text.RegularExpressions.MatchEvaluator] { param($m) $m.Groups[1].Value + $name + $m.Groups[2].Value }, 1)
+  [IO.File]::WriteAllText($file, $t, (New-Object Text.UTF8Encoding $false))
+}
+# the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced
+function Get-Watchers([string]$root) { @(Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -like "*$root\System\Scripts\Master-Watch.ps1*" }) }
+$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$ver = try { $z = [IO.Compression.ZipFile]::OpenRead($Payload); $e = $z.Entries | Where-Object { $_.FullName -replace '\\', '/' -eq 'System/VERSION.txt' } | Select-Object -First 1; $r = New-Object IO.StreamReader($e.Open()); $t = $r.ReadToEnd(); $r.Close(); $z.Dispose(); $t.Trim() } catch { '?' }
+Write-Host "OSYNC setup  ($ver)" -ForegroundColor Cyan
+
+# ---------- where: an OSYNC that is already on this PC, or a new folder on the game drive ----------
+$sys = $env:SystemDrive.Substring(0, 1).ToUpper()
+$drives = @(Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | Where-Object { $_.DeviceID.Substring(0, 1).ToUpper() -ne $sys } | Sort-Object FreeSpace -Descending)
+$existing = @(foreach ($d in $drives) {
+    foreach ($c in @("$($d.DeviceID)\") + @(Get-ChildItem "$($d.DeviceID)\" -Directory -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })) {
+      if ((Test-Path -LiteralPath (Join-Path $c 'OSYNC.bat')) -and (Test-Path -LiteralPath (Join-Path $c 'System\Scripts\Common.ps1'))) { $c.TrimEnd('\') }
+    } })
+if (-not $Upgrade -and -not $Target -and $existing) {
+  Write-Host "OSYNC found on this PC: $($existing -join ', ')"
+  # never updated without a person saying so (with -Yes an update needs -Upgrade <folder>)
+  if ($Yes) { Write-Host 'Use -Upgrade <folder> to update it, or -Target <folder> for a new one.' -ForegroundColor Red; exit 1 }
+  if (YesNo "Update $($existing[0]) (keeps Settings, games, launchers, menu config)?") { $Upgrade = $existing[0] }
+}
+
+# the drives the clients see: the LW / Kritidet / CCU server's own list when Node.js can read it, else fixed drives except C:
+$shared = ''
+$db = 'C:\lwserver\config\lwservice.db'
+if ((Test-Path -LiteralPath $db) -and (Get-Command node -ErrorAction SilentlyContinue)) {
+  $js = "try{const{DatabaseSync}=require('node:sqlite');const d=new DatabaseSync(process.argv[1],{readOnly:true});console.log(d.prepare('select drive,type,vdiskletter from tServerDiskMng').all().filter(r=>+r.type===1&&+r.vdiskletter).map(r=>String.fromCharCode(+r.vdiskletter)).join(''))}catch(e){}"
+  $shared = ((& node --no-warnings -e $js $db 2>$null | Select-Object -First 1) -replace '[^A-Za-z]', '').ToUpper()
+}
+if (-not $shared) { $shared = ($drives | ForEach-Object { $_.DeviceID.Substring(0, 1).ToUpper() }) -join '' }
+
+$tmp = Join-Path $env:TEMP "osync-setup-$stamp"
+if ($Upgrade) {
+  # ---------- update in place ----------
+  $root = $Upgrade.TrimEnd('\')
+  Head "Update $root"
+  [IO.Compression.ZipFile]::ExtractToDirectory($Payload, $tmp)
+  $bk = Join-Path $root "System\Backup\upgrade-$stamp"; New-Item -ItemType Directory -Force -Path $bk | Out-Null
+  $watch = Get-Watchers $root
+  if ($watch) { $watch | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }; Write-Host '  watcher stopped while its scripts are replaced' }
+  foreach ($rel in 'OSYNC.bat', 'README.md', 'System\Scripts', 'System\Client', 'System\Docs', 'System\VERSION.txt') {
+    $old = Join-Path $root $rel; $new = Join-Path $tmp $rel
+    if (-not (Test-Path -LiteralPath $new)) { continue }
+    if (Test-Path -LiteralPath $old) { $dst = Join-Path $bk $rel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst) | Out-Null; Move-Item -LiteralPath $old -Destination $dst }
+    Move-Item -LiteralPath $new -Destination $old
+    Write-Host "  updated: $rel"
+  }
+  # settings keys new in this version are added; values the shop set stay
+  $newSet = Join-Path $tmp 'Settings\settings.txt'; $curSet = Join-Path $root 'Settings\settings.txt'
+  if (Test-Path -LiteralPath $curSet) {
+    $have = @(Get-Content -LiteralPath $curSet -Encoding UTF8 | Where-Object { $_ -match '^\s*[A-Za-z]+\s*=' } | ForEach-Object { ($_ -split '=', 2)[0].Trim() })
+    # each new key comes with the comment lines written above it in the new settings.txt
+    $add = @(); $names = @(); $note = @()
+    foreach ($l in Get-Content -LiteralPath $newSet -Encoding UTF8) {
+      if ($l -match '^\s*#') { $note += $l; continue }
+      if ($l -match '^\s*([A-Za-z]+)\s*=' -and $have -notcontains $Matches[1]) { $add += @('') + $note + $l; $names += $Matches[1] }
+      $note = @()
+    }
+    if ($add) {
+      $all = @(Get-Content -LiteralPath $curSet -Encoding UTF8) + $add
+      [IO.File]::WriteAllLines($curSet, [string[]]$all, (New-Object Text.UTF8Encoding $false))
+      Write-Host "  settings added: $($names -join ', ')"
+    }
+  }
+  Set-Line $curSet 'MasterPC' $env:COMPUTERNAME -OnlyIfEmpty
+  # the menu program: replaced only when it is closed (the shop's exe name is kept)
+  $appOld = Join-Path $root 'Menu\app'; $appNew = Join-Path $tmp 'Menu\app'
+  $cfg = try { Get-Content -LiteralPath (Join-Path $root 'Menu\config.json') -Raw -Encoding UTF8 | ConvertFrom-Json } catch { $null }
+  $name = if ($cfg -and $cfg.brandName) { ($cfg.brandName -replace '[\\/:*?"<>|]', '').Trim() } else { '' }
+  $running = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.Path.StartsWith($appOld + '\', [StringComparison]::OrdinalIgnoreCase) })
+  if ((Test-Path -LiteralPath $appNew) -and $running -and -not (YesNo "The game menu is open on this PC ($(($running | ForEach-Object Name | Sort-Object -Unique) -join ', ')). Close it to update the menu program?")) { Write-Host '  menu program: not updated (it was open)' -ForegroundColor Yellow }
+  elseif (Test-Path -LiteralPath $appNew) {
+    $running | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2
+    if (Test-Path -LiteralPath $appOld) { Move-Item -LiteralPath $appOld -Destination (Join-Path $bk 'Menu-app') }
+    Move-Item -LiteralPath $appNew -Destination $appOld
+    $exe = Get-ChildItem -LiteralPath $appOld -Filter *.exe -File | Where-Object { $_.Length -gt 50MB } | Select-Object -First 1
+    if ($name -and $exe -and $exe.BaseName -ne $name) { Rename-Item -LiteralPath $exe.FullName -NewName "$name.exe" }
+    Write-Host "  updated: Menu\app$(if ($name) { " ($name.exe)" })"
+    if ($running) { Start-Process explorer.exe -ArgumentList ('"' + (Join-Path $root 'System\Client\Menu.vbs') + '"') }
+  }
+  if ($watch) { & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'System\Scripts\Master-Watch.ps1') -Register | Out-Null; Write-Host '  watcher started again (new scripts)' }
+  Write-Host "  old files: $bk"
+} else {
+  # ---------- new install ----------
+  $def = if ($Target) { $Target } else { "$($shared.Substring(0, 1)):\OSYNC" }
+  Head 'Where to put OSYNC'
+  Write-Host "  drives the client PCs see: $shared   (OSYNC must be on one of them)"
+  $root = (Ask '  Folder' $def).TrimEnd('\')
+  if (-not ($shared.ToUpper().Contains($root.Substring(0, 1).ToUpper()))) { Write-Host "  WARNING $($root.Substring(0, 2)) is not in the drives the clients see ($shared)" -ForegroundColor Yellow; if (-not (YesNo '  Use it anyway?')) { exit 1 } }
+  if ((Test-Path -LiteralPath $root) -and (Get-ChildItem -LiteralPath $root -Force | Select-Object -First 1)) {
+    if (Test-Path -LiteralPath (Join-Path $root 'OSYNC.bat')) { Write-Host "  $root already has OSYNC - run this again and choose update" -ForegroundColor Red; exit 1 }
+    if (-not (YesNo "  $root is not empty. Put OSYNC in it anyway (nothing there is deleted)?")) { exit 1 }
+  }
+  Head "Copy OSYNC to $root"
+  [IO.Compression.ZipFile]::ExtractToDirectory($Payload, $tmp)
+  New-Item -ItemType Directory -Force -Path $root | Out-Null
+  foreach ($i in Get-ChildItem -LiteralPath $tmp -Force) { $d = Join-Path $root $i.Name; if (-not (Test-Path -LiteralPath $d)) { Move-Item -LiteralPath $i.FullName -Destination $d } }
+  foreach ($d in 'Launchers', 'GAME', 'Tools', 'System\Data', 'System\Backup', 'Menu\data') { New-Item -ItemType Directory -Force -Path (Join-Path $root $d) | Out-Null }
+  Write-Host '  done'
+
+  Head 'This shop'
+  $set = Join-Path $root 'Settings\settings.txt'
+  $ip = (@(Get-CimInstance Win32_NetworkAdapterConfiguration -Filter 'IPEnabled=TRUE' | Where-Object { $_.DefaultIPGateway } | ForEach-Object { $_.IPAddress } | Where-Object { $_ -match '^\d+\.\d+\.\d+\.\d+$' -and $_ -notmatch '^169\.254\.' }) + @('')) | Select-Object -First 1
+  Set-Line $set 'SharedDrives' $shared; Set-Line $set 'MasterPC' $env:COMPUTERNAME; Set-Line $set 'MasterIP' $ip
+  Write-Host "  SharedDrives=$shared  MasterPC=$env:COMPUTERNAME  MasterIP=$ip   ($set)"
+  $name = ((Ask '  Shop name (shown on the game menu)' $(if ($ShopName) { $ShopName } else { 'GAME CENTER' })) -replace '[\\/:*?"<>|]', '').Trim()
+  Set-BrandName (Join-Path $root 'Menu\config.json') $name
+  $exe = Get-ChildItem -LiteralPath (Join-Path $root 'Menu\app') -Filter *.exe -File | Where-Object { $_.Length -gt 50MB } | Select-Object -First 1
+  if ($exe -and $exe.BaseName -ne $name) { Rename-Item -LiteralPath $exe.FullName -NewName "$name.exe" }
+  Write-Host "  game menu: $name  (logo: Menu\tools\_system\Make-Brand.ps1 -Image <picture>)"
+}
+foreach ($d in 'System', 'Menu\app', 'Menu\tools') { Get-ChildItem -LiteralPath (Join-Path $root $d) -Recurse -File -Force -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue }
+if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+
+# ---------- branch runner (folder 2, C:\AT9-Branch): only for a branch of a shop that has the shop web ----------
+$bLine = $BranchCommand
+if (-not $bLine -and -not $Yes -and -not (Test-Path -LiteralPath (Join-Path $env:SystemDrive 'AT9-Branch\state.json'))) {
+  Head 'Branch of a shop with the shop web? (Enter = skip)'
+  Write-Host '  The branch runner links this master to the shop web, so the web can wake this branch''s PCs.'
+  Write-Host '  Admin page > Branches > the branch > install command: copy the whole line and paste it here.'
+  $bLine = (Read-Host '  Install line').Trim()
+}
+if ($bLine) {
+  $bm = [regex]::Match($bLine, '(?i)https?://[^\s/''"`;|]+/api/branch/setup/[A-Za-z0-9_-]{20,64}')
+  if (-not $bm.Success) { Write-Host '  That is not the install line from admin page > Branches - skipped (later: OSYNC.bat > 7 Tools > 20)' -ForegroundColor Yellow }
+  else {
+    Write-Host '  installing the branch runner (press Yes on the Windows prompt) ...'
+    $br = Join-Path $root 'System\Scripts\Branch-Runner.ps1'
+    $p = Start-Process powershell.exe -Verb RunAs -Wait -PassThru -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$br`"", '-Install', '-Yes', '-Command', $bm.Value, '-OsyncRoot', "`"$root`"")
+    if ($p.ExitCode -eq 0) { Write-Host '  branch runner installed (state: C:\AT9-Branch\status.cmd)' -ForegroundColor Green }
+    else { Write-Host '  branch runner NOT installed - later: OSYNC.bat > 7 Tools > 20 with a new install line' -ForegroundColor Yellow }
+  }
+}
+
+# ---------- next: the first-time setup (new) or the check (update) ----------
+$s = Join-Path $root 'System\Scripts'
+if ($NoWizard) { Write-Host "`nOSYNC is in $root. Next: $root\OSYNC.bat > $(if ($Upgrade) { '6 (check)' } else { '4 (first-time setup)' })" -ForegroundColor Cyan; exit 0 }
+if ($Upgrade) { & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $s 'Tool-Check.ps1') -Mode master }
+else { $env:OSYNC_NOPAUSE = '1'; & cmd.exe /c "`"$(Join-Path $root 'OSYNC.bat')`" setup" }   # asks for admin rights (UAC), opens its own window
+Write-Host "`nOSYNC: $root\OSYNC.bat   Clients: on ONE client PC per image, super workstation mode: OSYNC.bat client, then save the image." -ForegroundColor Cyan
+if (-not $Yes) { [void](Read-Host 'Press Enter to close') }

@@ -1,39 +1,35 @@
-# Only our own scripts, source and settings go to git.
-# Never: game files, launcher programs (third-party), built app, per-PC snapshots, logs.
+# Only our own scripts, menu source, settings and docs go to git.
+# Never: game files, launcher programs (third-party), the built menu, data made on each master, logs.
 /*
 !/.gitignore
 !/.gitattributes
 !/README.md
-!/SETUP-AI.md
-!/KNOWLEDGE.md
-!/HOW-IT-WORKS.md
-!/OSYNC-All-In-One.bat
-!/CLIENT-Install-All.bat
-!/MASTER-Update-All.bat
+!/OSYNC.bat
+!/Clear-Logins.bat
+# forwarder for client images made before the new layout (old task runs _system\Install-All.ps1)
 !/_system/
-!/GCafe/
-!/GAMELUNCHER/
+/_system/*
+!/_system/Install-All.ps1
+!/Settings/
+!/System/
+!/Menu/
 
-# GAMELUNCHER: only the ClientSetup kit (launcher programs stay on each master)
-/GAMELUNCHER/*
-!/GAMELUNCHER/ClientSetup/
-/GAMELUNCHER/ClientSetup/_system/Metadata/
-/GAMELUNCHER/ClientSetup/_system/EA-InstallData/
-/GAMELUNCHER/ClientSetup/_system/Epic-InstallData/
-/GAMELUNCHER/ClientSetup/_system/ea-client.reg
-/GAMELUNCHER/ClientSetup/_system/ea-games.reg
-/GAMELUNCHER/ClientSetup/_system/riotclient-files.csv
-/GAMELUNCHER/ClientSetup/_system/eac-products.txt
+# made on each master
+/System/Data/
+/System/Backup/
+# OSYNC-Setup.exe files made by OSYNC.bat > 7 > 19 (big, rebuilt any time)
+/System/Dist/
 
-# GCafe: built app, build output and per-PC data are made on each master
-/GCafe/app/
-/GCafe/_build/
-/GCafe/source/node_modules/
-/GCafe/source/out/
-/GCafe/source/.next/
-/GCafe/data/games.json
-/GCafe/data/posters/
+# Menu (GCafe): built program, build output and data made on each master
+/Menu/app/
+/Menu/_build/
+/Menu/source/node_modules/
+/Menu/source/out/
+/Menu/source/.next/
+/Menu/data/games.json
+/Menu/data/posters/
 
 *.log
+*.new
 Thumbs.db
 desktop.ini

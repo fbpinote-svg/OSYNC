@@ -1,78 +1,91 @@
-# OSYNC — ระบบเกมสำหรับร้านเกม diskless (0JAYSHOP)
+﻿# OSYNC — ระบบเกมของร้านเกม diskless (ร้าน 0JAYSHOP)
 
-ใช้บน **เครื่องแม่ (master)** ของร้านที่ใช้ diskless (LW / Kritidet) วางโฟลเดอร์ไว้บนไดรฟ์เกมที่เครื่องลูกมองเห็น
-เครื่องลูกจึงใช้ path เดียวกับเครื่องแม่ได้ เช่น `H:\OSYNC\...`
+OSYNC ทำให้เกม ตัวเปิดเกม (launcher) และเมนูเกมที่ลงไว้บน **เครื่องแม่** ใช้ได้บน **เครื่องลูก diskless** ทุกเครื่อง
 
-อธิบายการทำงานทั้งระบบพร้อมแผนภาพ: [HOW-IT-WORKS.md](HOW-IT-WORKS.md)
+- **เครื่องแม่:** ลงหรืออัปเดตเกมครั้งเดียว แล้วระบบทำรายชื่อเกมกับข้อมูลที่ launcher ต้องใช้ให้เอง
+- **เครื่องลูก:** บูตแล้วพร้อมเล่น มีเมนูเกม, launcher ที่จำเกมได้, ไดรเวอร์ไมค์ และล็อกอินของลูกค้าคนก่อนถูกล้างแล้ว
+- **อยู่ที่เดียว:** ทุกอย่างอยู่ในโฟลเดอร์ `H:\OSYNC` บนไดรฟ์เกม และใช้ไฟล์ `OSYNC.bat` ไฟล์เดียว
 
-## ปุ่มเดียวจบ
-กด `OSYNC-All-In-One.bat` ได้ทั้งเครื่องแม่และเครื่องลูก มันจะดูเองว่าเป็นเครื่องไหน แล้วทำทุกอย่างให้
-- **เครื่องแม่:** อัปเดตข้อมูลให้เครื่องลูก แล้วเปิด launcher ทุกค่ายค้างไว้ + เปิดตัวเฝ้าที่อัปเดตข้อมูลให้เอง
-- **เครื่องลูก:** กดในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** ติดตั้งทุกอย่างและตั้งให้เครื่องลูกเซ็ตเกมใหม่เองตอนเปิดเครื่อง
+![เมนูเกม 0JAYSHOP บนเครื่องลูก](System/Docs/images/menu-01-all.png)
 
-เครื่องแม่ที่ไม่มี `C:\lwserver` จะถูกเข้าใจว่าเป็นเครื่องลูก ให้สั่ง `OSYNC-All-In-One.bat master`
+*เมนูเกมของร้าน (107 การ์ดจริง) — รายละเอียดใน [06-MENU.md](System/Docs/06-MENU.md)*
 
-## ปุ่มแยก
-| ปุ่ม | กดที่ | เมื่อไร |
-|---|---|---|
-| `GAMELUNCHER\ClientSetup\MASTER-Start-All.bat` | เครื่องแม่ กดครั้งเดียว | เปิด launcher ทุกค่ายตอนนี้และทุกครั้งที่ล็อกอิน ปิดไปจะเปิดกลับเอง เกมอัปเดตเองที่เครื่องแม่ — อัปเดตเสร็จแล้วทำ `MASTER-Update-All` ให้เองภายใน ~3 นาที และทุก 1 ชั่วโมงอีกรอบ เครื่องลูกเข้าเกมได้เลยไม่ขึ้นซ่อม (ปิด: `Update-Master\Master-Start-All-Off.bat`, log: `C:\Users\Public\OSYNC-Master-Watch.log`) |
-| `MASTER-Update-All.bat` | เครื่องแม่ | หลังติดตั้ง / อัปเดต / ลบเกม (ถ้าเปิด MASTER-Start-All ไว้ ทำให้เองแล้ว) — อัปเดตข้อมูล Riot, EA, Epic, EasyAntiCheat ให้เครื่องลูก และสแกนรายการเกมในเมนูใหม่ (ไม่ต้องปิด Riot Client) |
-| `CLIENT-Install-All.bat` | เครื่องลูก 1 เครื่อง ในโหมด super workstation (แก้ Image) แล้ว **บันทึก Image** | **ครั้งเดียว** — Riot แบบเงียบ, สิ่งที่ Steam ติดตั้งตอนเปิดเกมครั้งแรก (กันโกง BattlEye/ACE/Ricochet/EasyAntiCheat, Social Club, DirectX, VC++), EA app + เกม EA + EA AntiCheat, EasyAntiCheat ของ Epic, เมนูเกม 0JAYSHOP, NEWTHINGS-GAMES (GTA SA) และงาน `OSYNC-Client-Boot` ที่ทำให้เครื่องลูก **เซ็ตเกมใหม่เองทุกครั้งที่เปิดเครื่อง** (ลงเกมใหม่ไม่ต้องแก้ Image แค่รีบูตเครื่องลูก) — ถามครั้งเดียวตอนเริ่มว่าจะแก้ภาษาไทยเอเลี่ยนในเกมไหม (Y แล้วต้องรีสตาร์ท) |
+![คอนโซลแอดมินบนเครื่องแม่](System/Docs/images/console-1-home.png)
 
-ผลการติดตั้งที่เครื่องลูกเก็บไว้ที่ `C:\Users\Public\OSYNC-Install-All.log`, ผลตอนเปิดเครื่องที่ `C:\Users\Public\OSYNC-Boot-Setup.log` (ของที่ทำแล้วจะข้าม จึงบูตเร็ว)
-ของใหม่สะสมเยอะจนบูตช้า → กด `CLIENT-Install-All.bat` ใส่ Image อีกรอบ; ปิดการเซ็ตตอนเปิดเครื่อง: `GAMELUNCHER\ClientSetup\Install-Client\Boot-AutoSetup-Off.bat` (โหมดแก้ Image)
+*คอนโซลแอดมินบนเครื่องแม่: สิ่งที่ควรดู · บริการที่รันอยู่ · พื้นที่ไดรฟ์ — รายละเอียดใน [07-CONSOLE-ONLINE-FUNCTIONS.md](System/Docs/07-CONSOLE-ONLINE-FUNCTIONS.md)*
 
-## ลงเกมใหม่ในอนาคต
-เมื่อกด `OSYNC-All-In-One` ที่เครื่องแม่ และใส่ Image ของเครื่องลูกไว้แล้ว: ลงเกมที่เครื่องแม่ → รอ ~3 นาที → **รีบูตเครื่องลูก** จบ
+## ร้านนี้ใช้อยู่
 
-| เกมจาก | ติดตั้งที่เครื่องแม่ | แล้วกด |
-|---|---|---|
-| Steam | ลงใน `X:\SteamLibrary` ของไดรฟ์ที่เครื่องลูกเห็น | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) → รีบูตเครื่องลูก |
-| Riot (VALORANT/LoL/TFT) | อัปเดตใน Riot Client จนขึ้น Play (เปิด MASTER-Start-All ไว้ = อัปเดตเอง) | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) — เครื่องลูกกดเล่นได้เลย |
-| Epic | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EPIC\<เกม>` | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) → รีบูตเครื่องลูก |
-| EA app | ลงในไดรฟ์ที่เครื่องลูกเห็น เช่น `X:\EA\<เกม>` | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) → รีบูตเครื่องลูก (เมนูจะเปิด EA app ให้กด Play; ถ้ารู้ offer id ใส่ใน `GCafe\tools\_system\Build-GameList.ps1` แล้วเปิดเกมตรงได้) |
-| เกมออนไลน์ / มือถือ / Garena / โปรแกรม | วางโฟลเดอร์เกมใน `X:\Online\<เกม>`, `X:\Mobile\<เกม>`, `X:\PvP\<เกม>`, `X:\Single Player\<เกม>` หรือ `X:\Web\<โปรแกรม>` | ไม่ต้องกด (หรือ `MASTER-Update-All.bat`) — เมนูหา exe ให้เอง (ดูบรรทัด `AUTO added ...` ใน log ว่าเลือกถูกไหม ถ้าผิดเพิ่มใน `GCafe\data\games.custom.json`) |
-| Ubisoft / Rockstar / Battle.net (ไม่ผ่าน Steam) | ยังไม่รองรับอัตโนมัติ — ใช้เวอร์ชัน Steam ถ้ามี | ให้ AI ช่วยเพิ่ม |
+| | |
+|---|---|
+| diskless | LW (`C:\lwserver` บนเครื่องแม่) |
+| เครื่องแม่ | `DESKTOP-3ORJAGC` · `192.168.51.201` |
+| เครื่องลูก | `KORIxx` · `192.168.51.1xx` · Windows 2 Image: Win10 IoT LTSC 2021 (19045) / Win11 Pro (26300) |
+| OSYNC | `H:\OSYNC` · ไดรฟ์เกมที่แชร์ `D E F G H I J` |
+| Steam | `F:\steam` · VALORANT / LoL / TFT ที่ `H:\RIOT\Riot Games` |
+| เมนูเกม | 0JAYSHOP Client (Electron + Next.js) แบบเมนูเกมอย่างเดียว |
 
-รูปปก: Steam ใช้รูปจาก Steam, เกมอื่นใช้ `zPoster.jpg` ในโฟลเดอร์เกม หรือทำจากไอคอนให้เอง, ใส่รูปเองได้ที่ `GCafe\data\posters\<id>.jpg`
+## เริ่มใช้
 
-## โครงสร้างโฟลเดอร์
+**เครื่องแม่:** ดับเบิลคลิก `H:\OSYNC\OSYNC.bat` จะเห็นเมนูนี้ (ข้อความจริงจาก [`System/Scripts/OSYNC.ps1`](System/Scripts/OSYNC.ps1#L137)):
+
 ```
-OSYNC\
-  OSYNC-All-In-One.bat      ปุ่มเดียว ใช้ได้ทั้งเครื่องแม่และเครื่องลูก
-  MASTER-Update-All.bat     ปุ่มเครื่องแม่
-  CLIENT-Install-All.bat    ปุ่มเครื่องลูก
-  HOW-IT-WORKS.md           อธิบายการทำงานทั้งระบบ
-  _system\                  สคริปต์ของปุ่มด้านบน
-  GAMELUNCHER\              ตัวโปรแกรม launcher ทุกค่าย (ห้ามย้าย/เปลี่ยนชื่อ) + ClientSetup\
-    ClientSetup\
-      MASTER-Start-All.bat  เครื่องแม่: เปิด launcher ทุกค่ายค้างไว้ + อัปเดตข้อมูลเครื่องลูกให้เองหลังเกมอัปเดต
-      VALORANT.bat ... RiotSilent.vbs, EpicSilent.vbs   ตัวเปิดเกมที่เมนูเรียกใช้ (ห้ามย้าย)
-      Install-Client\       ปุ่มติดตั้งเครื่องลูกทีละอย่าง (ใช้ตอนแก้ปัญหา)
-      Update-Master\        ปุ่มอัปเดตเครื่องแม่ทีละอย่าง
-      Master-Move\          ย้าย launcher ที่ติดตั้งใน C: มาไว้ใน GAMELUNCHER
-      Diagnose\             ตรวจปัญหาที่เครื่องลูก (RiotDiag, LinkScan)
-      _system\              สคริปต์และข้อมูล
-      README-TH.txt         คู่มือ launcher
-  GCafe\                    โปรแกรมเมนูเกม 0JAYSHOP — คู่มือ GCafe\README-TH.txt
-  Riot Games\               ตัวเกม VALORANT (ไม่อยู่ใน git)
+ OSYNC   DESKTOP-3ORJAGC = MASTER   H:\OSYNC
+ ------------------------------------------------------------
+  Master
+    1  Update clients now (after installing / updating games)
+    2  Watcher ON  - keep launchers open, update clients by itself
+    3  Watcher OFF
+    4  First-time setup of a new master
+  Client (super workstation mode, then save the image)
+    5  Install everything on this client
+  Both
+    6  Check the system
+    7  Tools ...
+    0  Exit
 ```
 
-สิ่งที่ **ไม่อยู่ใน git** (แต่ละเครื่องแม่สร้างเอง): ตัวเกม, ตัวโปรแกรม launcher, `GCafe\app` (โปรแกรมที่ build แล้ว),
-`GCafe\data\games.json` และรูปปกอัตโนมัติ, ข้อมูล snapshot ของ Riot/EA/Epic/EasyAntiCheat — ดู `.gitignore`
+| อยากทำ | กด |
+|---|---|
+| ลง / อัปเดตเกมเสร็จ อยากให้เครื่องลูกเห็นเลย | `1` (หรือเปิดตัวเฝ้า `2` ไว้ ระบบทำเองทุกครั้งที่เกมเปลี่ยน) |
+| ตรวจว่าระบบครบไหม | `6` |
+| เปิดคอนโซลแอดมิน | `System\Console\OSYNC-Console.exe` (หรือทางลัด "OSYNC Console" บนเดสก์ท็อปเครื่องแม่) |
 
-## เริ่มที่สาขาใหม่
-1. ติดตั้ง Git แล้ว clone ลงไดรฟ์เกมที่เครื่องลูกเห็น เช่น `git clone https://github.com/fbpinote-svg/OSYNC.git F:\OSYNC`
-2. เปิด Claude Code ในโฟลเดอร์นั้น แล้วให้อ่าน `KNOWLEDGE.md` (ปัญหาที่เคยเจอ + วิธีแก้) และทำตาม `SETUP-AI.md`
+**เครื่องลูก:**
+- ไม่ต้องกดอะไร งานตั้งเวลา `OSYNC-Client-Boot` ทำทุกอย่างให้เองทุกครั้งที่บูต
+- ถ้าจะทำ Image ใหม่ ให้เปิดเครื่องลูก 1 เครื่องต่อ 1 Image ในโหมด super แล้วดับเบิลคลิก `OSYNC.bat` (บนเครื่องลูกจะติดตั้งเลยโดยไม่มีเมนู) จากนั้นบันทึก Image
+- ขั้นตอนเต็มอยู่ใน [02-INSTALL-UPDATE.md](System/Docs/02-INSTALL-UPDATE.md)
 
-## มีปัญหา
-ดู `KNOWLEDGE.md` — รวมอาการที่เคยเจอ (Riot ขึ้น REPAIR, Apex เด้งปิด, ภาษาเอเลี่ยน, เกมเปิดไม่ติดที่เครื่องลูก ฯลฯ) พร้อมสาเหตุและวิธีแก้
+**แก้ค่าของร้าน:**
+- แก้ที่ `Settings\settings.txt` หรือในคอนโซลหน้า "ตั้งค่า"
+- เครื่องลูกเห็นค่าใหม่หลังรีบูต
+- ค่าทุกตัวอยู่ใน [09-SETTINGS.md](System/Docs/09-SETTINGS.md)
 
-## อัปเดตจากเครื่องแม่หลัก
-```
-cd /d H:\OSYNC
-git add -A
-git commit -m "อธิบายสิ่งที่เปลี่ยน"
-git push
-```
-สาขาอื่นดึงของใหม่: `git pull` แล้วกด `GCafe\tools\Build-App.bat` (ถ้ามีแก้ source) และ `MASTER-Update-All.bat`
+## เอกสาร
+
+เริ่มที่ **[System/Docs/README.md](System/Docs/README.md)** (สารบัญ) แล้วอ่านตามลำดับ:
+
+| บท | เรื่อง |
+|---|---|
+| [01 ภาพรวม](System/Docs/01-OVERVIEW.md) | diskless ทำงานยังไง, ภาพใหญ่ของระบบ, โฟลเดอร์, บริการบนเครื่องแม่ |
+| [02 ติดตั้ง / อัปเดต / ทำ Image](System/Docs/02-INSTALL-UPDATE.md) | ทีละขั้น + ปุ่มทุกข้อของ OSYNC.bat |
+| [03 เครื่องแม่](System/Docs/03-MASTER.md) | สคริปต์ Master-* ทีละฟังก์ชัน |
+| [04 เครื่องลูก: บูตและไดรเวอร์](System/Docs/04-CLIENT-BOOT.md) | ทุกขั้นตอนตอนบูต, ไมค์ WO Mic / VB-CABLE, จอเสมือน, Sunshine |
+| [05 เครื่องลูก: เกมและบัญชี](System/Docs/05-CLIENT-GAMES.md) | launcher แต่ละค่าย, ล้างล็อกอิน, OSLink, GTA / FiveM, Apex |
+| [06 เมนูเกม](System/Docs/06-MENU.md) | โปรแกรม 0JAYSHOP Client ทีละฟังก์ชัน |
+| [07 คอนโซลและคลังออนไลน์](System/Docs/07-CONSOLE-ONLINE-FUNCTIONS.md) | หน้าเว็บแอดมิน, API, ฮับ, aria2 |
+| [08 แกนกลางและเครื่องมือ](System/Docs/08-CORE-TOOLS.md) | `Common.ps1`, `Http-Lib.ps1`, `OSYNC.ps1`, `Tool-*` |
+| [09 ค่าของร้าน](System/Docs/09-SETTINGS.md) | ทุกค่าใน settings.txt + สคริปต์ที่อ่าน |
+| [10 ดัชนีฟังก์ชัน](System/Docs/10-FUNCTION-INDEX.md) | ฟังก์ชันทั้งหมดในโค้ด พร้อมลิงก์ไปบรรทัดจริง |
+
+## ใน repo นี้มีอะไร / ไม่มีอะไร
+
+- **มี:** สคริปต์ของเรา (`System\`), ซอร์สเมนูเกม (`Menu\source`, `Menu\tools`), ค่าของร้าน (`Settings\`), เอกสาร
+- **ไม่มี** (ดู [.gitignore](.gitignore)):
+  - เกม และ launcher ของค่ายเกม
+  - ตัวติดตั้งของคนอื่น (`Tools\`)
+  - โปรแกรมเมนูที่ build แล้ว
+  - ข้อมูลที่เครื่องแม่สร้าง (`System\Data`) และ log
+- **ไม่ใส่ข้อมูลลับเด็ดขาด:**
+  - repo นี้เป็น public ห้ามใส่รหัสผ่าน, token, ข้อมูลลูกค้า หรืออีเมลส่วนตัว
+  - กุญแจคลังออนไลน์อยู่ที่ `System\Data\Online\online.key` ซึ่งไม่ขึ้น git
