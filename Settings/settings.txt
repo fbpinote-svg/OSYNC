@@ -49,6 +49,13 @@ ClientWinRAR=on
 # Sunshine 0JAYSHOP เปิดเองตอนเข้า Windows แบบพับไว้ในถาด เฉพาะเครื่องที่ยังไม่มี Sunshine ของตัวเอง (เครื่องที่มีอยู่แล้ว = ไม่เปิดทับ)
 # on = ทุกเครื่องที่ไม่มี Sunshine / off = ปิด / ใส่ชื่อเครื่อง = เฉพาะเครื่องนั้น
 ClientSunshineAutoStart=on
+# Sunshine 0JAYSHOP: แผนพอร์ตตาม IP ของเครื่องลูก (เครื่องที่ n มี IP = SunshineIpBase + n, พอร์ต 20000 + n x 100, หน้าเว็บ = พอร์ต + 1)
+# ร้านนี้: 192.168.51.100 -> KORI01 = 192.168.51.101 พอร์ต 20100 · สาขาอื่นที่ใช้วง IP / ชื่อเครื่องต่างไป แก้ 3 ค่านี้แล้วกด OSYNC.bat > 7 > 24
+# (เขียนโปรไฟล์เครื่องลงคอนฟิก Sunshine ใหม่) ว่าง = ค่าของร้านนี้
+SunshineIpBase=192.168.51.100
+# ชื่อเครื่องในโปรไฟล์ = SunshinePcPrefix + เลข 2 หลัก (KORI01) · SunshinePcCount = จำนวนเครื่องลูก (สูงสุด 99)
+SunshinePcPrefix=KORI
+SunshinePcCount=72
 # FiveM: ไฟล์เซิร์ฟที่เครื่องลูกโหลด (ตอนปิด FiveM) ส่งเข้าเครื่องแม่ เครื่องอื่นได้ใช้หลังรีบูต (ไม่ส่งล็อกอิน) · on = เปิดใช้ / off = ปิด
 ClientFiveMShare=on
 # พอร์ตที่เครื่องแม่รับไฟล์เซิร์ฟ FiveM (Master-FiveMShare.ps1 · เปิดเฉพาะวง LAN)

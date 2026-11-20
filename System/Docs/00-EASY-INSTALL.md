@@ -14,7 +14,7 @@
 - [4. ติดตั้งทีละขั้น](#4-ติดตั้งทีละขั้น)
 - [5. ตั้งค่าครั้งแรก (OSYNC.bat เลข 4)](#5-ตั้งค่าครั้งแรก-osyncbat-เลข-4)
 - [6. ค่าที่ร้านใหม่ควรตรวจใน settings.txt](#6-ค่าที่ร้านใหม่ควรตรวจใน-settingstxt)
-- [7. โปรแกรมเสริมใน Tools\ (ร้านใส่เอง)](#7-โปรแกรมเสริมใน-tools-ร้านใส่เอง)
+- [7. โปรแกรมเครื่องมือใน Tools\](#7-โปรแกรมเครื่องมือใน-tools)
 - [8. ทำ Image เครื่องลูก](#8-ทำ-image-เครื่องลูก)
 - [9. ตรวจว่าครบ และอัปเดตภายหลัง](#9-ตรวจว่าครบ-และอัปเดตภายหลัง)
 - [10. ปัญหาที่พบบ่อย](#10-ปัญหาที่พบบ่อย)
@@ -59,8 +59,9 @@ flowchart TD
 
 | | วิธี A: `OSYNC-Setup.exe` (แนะนำ) | วิธี B: `EASY-INSTALL.bat` จาก zip ของ GitHub |
 |---|---|---|
-| ได้ไฟล์จากไหน | ร้านที่ใช้ OSYNC อยู่ทำให้: `OSYNC.bat` → `7` Tools → `19` ได้ไฟล์ `System\Dist\OSYNC-Setup-<วันที่>.exe` ไฟล์เดียว (ประมาณ 190 MB) | https://github.com/fbpinote-svg/OSYNC → ปุ่ม **Code** → **Download ZIP** |
+| ได้ไฟล์จากไหน | ร้านที่ใช้ OSYNC อยู่ทำให้: `OSYNC.bat` → `7` Tools → `19` ได้ไฟล์ `System\Dist\OSYNC-Setup-<วันที่>.exe` ไฟล์เดียว (มีเครื่องมือครบ 754 MB, แบบ `-NoTools` ประมาณ 190 MB) **เหมาะกับสาขาของร้านเอง** | https://github.com/fbpinote-svg/OSYNC → ปุ่ม **Code** → **Download ZIP** |
 | โปรแกรมเมนูเกม | **build มาแล้ว** ใช้ได้ทันที | มีแต่ซอร์ส ต้อง build ตอนตั้งค่าครั้งแรก (ต้องมี Node.js LTS + อินเทอร์เน็ต ไม่กี่นาที) |
+| โปรแกรมเครื่องมือ (`Tools\`: Sunshine, WO Mic, VB-CABLE, Parsec ...) | **ครบทุกตัว เหมือนร้านต้นทางทุกไฟล์** ตรวจ SHA256 ให้ ([ข้อ 7.1](#71-สาขาที่ติดตั้งด้วย-osync-setupexe-ได้ครบเหมือนร้านต้นทาง-100)) | ไม่มี ร้านใส่เอง ([ข้อ 7.3](#73-ติดตั้งจาก-zip-ของ-github-ร้านใส่เครื่องมือเอง)) |
 | ค่าของร้านต้นทาง | ล้างแล้วตั้งแต่ตอนทำไฟล์ และล้างซ้ำตอนติดตั้ง | ล้างตอนติดตั้ง |
 | ขั้นตอนหลังจากนั้น | เหมือนกันทุกอย่าง (ตัวติดตั้งตัวเดียวกัน [`Setup-Install.ps1`](../Scripts/Setup-Install.ps1)) | เหมือนกัน |
 
@@ -74,7 +75,7 @@ flowchart TD
 
 1. **ทุกอย่างที่เครื่องลูกต้องเปิด อยู่บนไดรฟ์ที่เครื่องลูกเห็น** ห้ามอยู่ C: ของเครื่องแม่ (OSYNC, launcher, เกม, โปรแกรมใน `Tools\`)
 2. **OSYNC อยู่ในโฟลเดอร์เดียว** เช่น `E:\OSYNC` ทุกสคริปต์หาที่อยู่ของโฟลเดอร์อื่นจากตำแหน่งของตัวเอง ([`Common.ps1`](../Scripts/Common.ps1#L14)) จึงวางไดรฟ์ไหนชื่ออะไรก็ได้ แต่ห้ามแยกโฟลเดอร์ย่อยไปไว้คนละที่
-3. **เกมที่ลงไว้แล้วไม่ต้องย้าย** ถ้าอยู่บนไดรฟ์ที่แชร์ OSYNC หา library ของ Steam ทุกอันจาก `libraryfolders.vdf` ของ Steam เอง และหา `X:\SteamLibrary`, `X:\Steam`, `X:\Games\Steam` ทุกไดรฟ์ที่แชร์ ([`Get-SteamLibraries`](../Scripts/Common.ps1#L199))
+3. **เกมที่ลงไว้แล้วไม่ต้องย้าย** ถ้าอยู่บนไดรฟ์ที่แชร์ OSYNC หา library ของ Steam ทุกอันจาก `libraryfolders.vdf` ของ Steam เอง และหา `X:\SteamLibrary`, `X:\Steam`, `X:\Games\Steam` ทุกไดรฟ์ที่แชร์ ([`Get-SteamLibraries`](../Scripts/Common.ps1#L209))
 4. **launcher ย้ายเข้า `OSYNC\Launchers\`** (Steam, Riot Client, EA, Epic, Garena, Ubisoft, Rockstar, HoYoPlay, Modrinth, Battle.net, GOG, Nexon, Amazon) ขั้นตั้งค่าครั้งแรกข้อ 2 ย้ายให้ทีละตัวและถามก่อน · launcher ที่อยู่บน C: **ต้อง** ย้าย · ที่อยู่บนไดรฟ์ที่แชร์อยู่แล้วจะย้ายหรือไม่ก็ได้
 5. **เกมใหม่ลงใน `OSYNC\GAME\<launcher>`** เช่น Steam ให้เพิ่ม `X:\OSYNC\GAME\Steam` เป็น library และตั้งเป็นค่าเริ่มต้น (Steam → Settings → Storage) · ไดรฟ์อื่นที่มีที่ว่างเพิ่มเป็นโฟลเดอร์เกมได้ด้วยค่า `GameFolders` (เช่น `F:\GAME;G:\GAME`) หรือในคอนโซลแอดมิน
 6. **อย่าให้ไดรฟ์เกมเหลือที่ว่างต่ำกว่า 10%** เกมอัปเดตไม่ผ่านเมื่อไดรฟ์เต็ม (ตัวตรวจเครื่องเตือน `has less than 10% free`)
@@ -88,7 +89,7 @@ X:\OSYNC\                      ← ไดรฟ์ที่เครื่อง
 ├─ Launchers\                   Steam\ "Riot Client"\ EA\ Epic\ Garena\ Ubisoft\ Rockstar\ HoYoPlay\ ...
 ├─ GAME\                        เกมใหม่: GAME\Steam\ GAME\Online\ ...   (ชื่อโฟลเดอร์ = ค่า GamesFolder)
 ├─ Menu\                        โปรแกรมเมนูเกม: app\ (โปรแกรม) data\ (รายชื่อเกม, รูป) config.json (ชื่อร้าน, หน้าตา)
-├─ Tools\                       โปรแกรมเสริมที่ร้านใส่เอง (ข้อ 7): WOMic\ VBCABLE\ Parsec\ WinRAR\ ...
+├─ Tools\                       โปรแกรมเครื่องมือ (ข้อ 7): Sunshine0J\ WOMic\ VBCABLE\ Parsec\ WinRAR\ ... + TOOLS-MANIFEST.txt
 └─ System\
    ├─ Scripts\                  สคริปต์ทั้งหมด
    ├─ Client\                   ไฟล์ที่ Image เครื่องลูกเรียก (ห้ามย้าย)
@@ -215,7 +216,7 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
    - ถ้าโฟลเดอร์ไม่ว่าง ถามก่อน (ไม่ลบอะไร) · ถ้ามี OSYNC อยู่แล้ว หยุดและบอกให้เลือกอัปเดต
 5. **คัดลอก** `== Copy OSYNC to X:\OSYNC` → `done` สร้าง `Launchers`, `GAME`, `Tools`, `System\Data`, `System\Backup`, `Menu\data`
 6. **ค่าของร้านคุณ** `== This shop`
-   - ล้างค่าของร้านต้นทาง ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L56), [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L63))
+   - ล้างค่าของร้านต้นทาง ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58), [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L65))
    - บันทึกผลตรวจเครื่องไว้ที่ `System\Data\setup-plan.txt`
    - เขียน `SharedDrives`, `MasterPC` (ชื่อเครื่องนี้), `MasterIP` (IP ของการ์ดที่มี gateway) ลง `Settings\settings.txt`
    - ถาม `Shop name (shown on the game menu) [GAME CENTER]` → พิมพ์ชื่อร้าน ชื่อนี้ขึ้นบนเมนู และเป็นชื่อไฟล์โปรแกรมเมนู (`Menu\app\<ชื่อร้าน>.exe`)
@@ -289,6 +290,7 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 | `ClientNodeJs`, `ClientPython` | ใส่ Node.js / Python ลง PATH | `Tools\NodeJS`, `Tools\Python` |
 | `ClientWinRAR` | ลง WinRAR ถ้ายังไม่มี | `Tools\WinRAR` |
 | `ClientSunshineAutoStart` | เปิด Sunshine ของร้านเป็นเซอร์วิส | `Tools\Sunshine0J` |
+| `SunshineIpBase`, `SunshinePcPrefix`, `SunshinePcCount` | แผนพอร์ต Sunshine ตาม IP และชื่อเครื่องของสาขา ([ข้อ 7.2](#72-sunshine-ของสาขา-วง-ip-และชื่อเครื่อง)) | — |
 | `ClientOslinkReset`, `ClientOslinkLogin`, `ClientOslinkDrivers`, `ClientOslinkStart`, `ClientOslinkReport` | OSLink (เล่นทางไกลของ LDPlayer) | `<ไดรฟ์ที่แชร์>:\LDPlayer\OSLink` ร้านที่ไม่ใช้ OSLink จะถูกข้ามเอง |
 | `ClientGtaSettings` | ตั้งกราฟิก GTA V / FiveM ตามไฟล์ร้าน (ขนาดจอใช้ของเครื่องนั้น) | `Settings\gta5_settings*.xml` |
 | `ClientClearLogins` | ล้างล็อกอินเกมของลูกค้าคนก่อนตอนบูต | — |
@@ -297,10 +299,52 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 
 ---
 
-## 7. โปรแกรมเสริมใน `Tools\` (ร้านใส่เอง)
+## 7. โปรแกรมเครื่องมือใน `Tools\`
 
-ไฟล์ติดตั้งของโปรแกรมอื่นไม่ได้อยู่ในโปรเจกต์ (เป็นของผู้ผลิตแต่ละราย) ร้านโหลดจากเว็บทางการแล้ววางตามชื่อนี้ งานตอนบูตจะหาเจอเอง
+### 7.1 สาขาที่ติดตั้งด้วย `OSYNC-Setup.exe`: ได้ครบเหมือนร้านต้นทาง 100%
 
+`OSYNC-Setup.exe` (ทำด้วย `OSYNC.bat` → `7` → `19`) **พาโฟลเดอร์ `Tools\` ของร้านต้นทางไปทั้งหมด** พร้อมรายการไฟล์ `Tools\TOOLS-MANIFEST.txt` (SHA256 และขนาดของทุกไฟล์)
+- ติดตั้งเสร็จ ตัวติดตั้งเทียบทุกไฟล์กับรายการ แล้วขึ้น `tools: all <จำนวน> files are the same as the pack (SHA256)` = **เหมือนต้นทางทุกไบต์** ([`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L97))
+- `OSYNC.bat` → `6` (ตรวจระบบ) มีแถว `Tools` บอกว่ายังตรงกับไฟล์ติดตั้งอยู่ไหม (เทียบขนาดทุกไฟล์)
+- อัปเดตด้วย exe ตัวใหม่: ทุกโฟลเดอร์เครื่องมือถูกแทนด้วยของใหม่ (ของเดิมเก็บใน `System\Backup\upgrade-<วันที่>\Tools`) ยกเว้น **`Sunshine0J\config` ของสาขาเอง** ([`Sync-Tools`](../Scripts/Setup-Install.ps1#L77)) · ไฟล์ที่เสียหรือถูกแก้จะกลับเป็นของต้นทาง
+- ไฟล์ exe จึงใหญ่ (ร้าน 0JAYSHOP 20 พ.ย. 2026: 754 MB) และมีโปรแกรมของผู้ผลิตอื่นกับรหัสหน้าเว็บ Sunshine อยู่ข้างใน **ส่งให้สาขาของร้านเองเท่านั้น ห้ามวางให้โหลดสาธารณะ** · ร้านอื่นที่มีโปรแกรมของตัวเอง ทำ exe แบบไม่มีเครื่องมือได้: `Tool-Pack.ps1 -NoTools`
+
+เครื่องมือที่ร้าน 0JAYSHOP มีและติดไปกับ exe (20 พ.ย. 2026, 14 โฟลเดอร์, 6,969 ไฟล์, 1,000 MB):
+
+| โฟลเดอร์ | รุ่น / ไฟล์ | ใช้ทำอะไร |
+|---|---|---|
+| `Sunshine0J` | Sunshine 0JAYSHOP v1.0.0-beta.12 (`2026.1120.185841.dc8e29ad`) | ให้ลูกค้าเล่นทางไกล (เซอร์วิสตอนบูต + การ์ดเมนู) |
+| `WOMic` | `WOMicClientSetup6.4.exe` + ไดรเวอร์ 2.1.0.0 ที่ Microsoft เซ็น | ไมค์จากมือถือ |
+| `VBCABLE` | VB-CABLE `VBCABLE_Setup_x64.exe` 2.1.5.8 ทั้งชุด | ไมค์ / ลำโพงเสมือน |
+| `Parsec` | `parsec-windows.exe` | เล่นทางไกลด้วย Parsec |
+| `VirtualDisplay` | VDD / MttVDD 25.7.23 จอเสมือน 1920x1080 240 Hz | เครื่องที่ไม่มีจอ |
+| `WinRAR` | WinRAR 7.23 x64 ภาษาไทย | เปิดไฟล์บีบอัด |
+| `WebView2` | WebView2 Runtime 1.3.315.17 (ตัวติดตั้ง offline) | โปรแกรมที่มีหน้าต่างแบบเว็บ |
+| `NodeJS` | Node.js 26.13.1 LTS แบบ portable | เครื่องลูกที่ต้องใช้ Node.js |
+| `Python` | Python 3.14.10 64 บิต | เครื่องลูกที่ต้องใช้ Python |
+| `Medal` | Medal 2646.632.1 (รันได้โดยไม่ต้องติดตั้ง) | อัดคลิปเกม (การ์ดเมนู) |
+| `aria2` | `aria2c.exe` | คลังเกมออนไลน์ |
+| `DepotDownloader` | DepotDownloader 3.4.0 | ปุ่ม "ขอเกม" Steam |
+| `FiveM-ReShade`, `FiveM-Mods` | ReShade + ม็อดสำหรับ FiveM | ตัวเลือกในการ์ด FiveM |
+
+**ไม่ได้ติดไปกับ exe (ต้องทำที่สาขา):**
+- **OSLink (LDPlayer, เล่นทางไกล):** ร้าน 0JAYSHOP ติดตั้งไว้ที่ `E:\LDPlayer\OSLink` นอกโฟลเดอร์ OSYNC เป็นโปรแกรมที่ต้องติดตั้งจริง (เซอร์วิส `LDRemoteSvc`) และล็อกอินบัญชีของร้าน สาขาต้องลงจากเว็บของ LDPlayer ไว้ที่ `<ไดรฟ์ที่แชร์>:\LDPlayer\OSLink` แล้วล็อกอินเอง ระบบหาเจอเอง
+- **launcher และเกม:** ลงและล็อกอินที่สาขา ([ข้อ 3.6](#36-ลง-launcher-และเกมแต่ละค่ายไว้ที่ไหน))
+- **ชื่อร้านและโลโก้บนเมนู:** ตัวติดตั้งถามชื่อ (พิมพ์ชื่อเดียวกับร้านหลักได้) โลโก้ใส่ด้วย `Make-Brand.ps1` ([ข้อ 5](#5-ตั้งค่าครั้งแรก-osyncbat-เลข-4))
+
+### 7.2 Sunshine ของสาขา: วง IP และชื่อเครื่อง
+
+Sunshine 0JAYSHOP ตั้งพอร์ตของแต่ละเครื่องจาก IP: เครื่องที่ n มี IP = `SunshineIpBase` + n → พอร์ต `20000 + n x 100` (หน้าเว็บ = พอร์ต + 1)
+ค่าเริ่มต้นคือแผนของร้าน 0JAYSHOP: `SunshineIpBase=192.168.51.100`, `SunshinePcPrefix=KORI`, `SunshinePcCount=72` (KORI01 = 192.168.51.101 พอร์ต 20100 ... KORI72 = 192.168.51.172 พอร์ต 27200)
+
+สาขาที่ใช้วง IP หรือชื่อเครื่องต่างไป:
+1. แก้ 3 ค่านี้ใน `Settings\settings.txt` เช่น เครื่องลูก PC01-PC40 ที่ 192.168.1.101-140 → `SunshineIpBase=192.168.1.100`, `SunshinePcPrefix=PC`, `SunshinePcCount=40`
+2. `OSYNC.bat` → `7` → `24` แสดงก่อนว่าจะเขียนอะไร แล้วถาม → เขียนโปรไฟล์เครื่อง (`shop_ip_profiles`) และเราเตอร์ (`shop_gateway_list`) ลงคอนฟิก Sunshine ([`Tool-SunshineProfiles.ps1`](../Scripts/Tool-SunshineProfiles.ps1)) ค่าอื่นของ Sunshine คงเดิม (UPnP, ปิดจอ VDD ตอนลูกค้าต่อ, รหัสหน้าเว็บ)
+3. รีบูตเครื่องลูก · พอร์ตแต่ละเครื่องต้องเปิดที่เราเตอร์ของสาขา (Sunshine เปิด UPnP ไว้ ถ้าเราเตอร์รองรับจะเปิดให้เอง)
+
+### 7.3 ติดตั้งจาก zip ของ GitHub: ร้านใส่เครื่องมือเอง
+
+zip ของโปรเจกต์ไม่มี `Tools\` (เป็นโปรแกรมของผู้ผลิตแต่ละราย) ร้านโหลดจากเว็บทางการแล้ววางตามชื่อนี้ งานตอนบูตจะหาเจอเอง ตัวที่ไม่มีจะข้าม (`SKIP (no Tools\...)`)
 | โฟลเดอร์ | ใส่อะไร (ชื่อไฟล์ที่โค้ดหา) |
 |---|---|
 | `Tools\WOMic\` | `WOMicClientSetup*.exe` และโฟลเดอร์ `driver\` (`womic.inf`, `womic.sys`, `womic.cat` รุ่น 2.1.0.0 ที่ Microsoft เซ็น, `wolicheng-publisher.cer`, `devcon.exe`) รายละเอียดใน [04-CLIENT-BOOT.md](04-CLIENT-BOOT.md) |
@@ -339,7 +383,8 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 - วิธี A: รัน `OSYNC-Setup.exe` ตัวใหม่ ตอบ `Y` ที่ `Update X:\OSYNC (keeps Settings, games, launchers, menu config)?`
 - วิธี B: โหลด zip ใหม่ แตกที่ใหม่ ดับเบิลคลิก `EASY-INSTALL.bat` แล้วตอบ `Y` แบบเดียวกัน
 - ที่ถูกแทน: `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs` (และโปรแกรมเมนูถ้ามาในไฟล์) ของเดิมเก็บไว้ใน `System\Backup\upgrade-<วันที่>`
-- ที่ไม่ถูกแตะ: `Settings` (ค่าใหม่ที่รุ่นใหม่เพิ่มจะต่อท้ายให้ ค่าเดิมคงไว้), เกม, launcher, `Tools`, ชื่อร้านและหน้าตาเมนู
+- `Tools\`: ทุกโฟลเดอร์เครื่องมือที่มากับ exe ถูกแทนด้วยของใหม่ (เก็บ `Sunshine0J\config` ของสาขาไว้) แล้วตรวจ SHA256 ทุกไฟล์ ([ข้อ 7.1](#71-สาขาที่ติดตั้งด้วย-osync-setupexe-ได้ครบเหมือนร้านต้นทาง-100))
+- ที่ไม่ถูกแตะ: `Settings` (ค่าใหม่ที่รุ่นใหม่เพิ่มจะต่อท้ายให้ ค่าเดิมคงไว้), เกม, launcher, เครื่องมือที่ exe ไม่มี, ชื่อร้านและหน้าตาเมนู
 - `EASY-INSTALL.bat` ในโฟลเดอร์ที่ติดตั้งแล้วใช้อัปเดตตัวเองไม่ได้ (ขึ้น `is an OSYNC that is already installed`) ต้องใช้จากไฟล์ที่โหลดมาใหม่
 
 ---
@@ -349,6 +394,8 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 | อาการ / ข้อความ | สาเหตุ | แก้ |
 |---|---|---|
 | `This folder is a download of OSYNC, not an installed OSYNC - nothing was done.` | ดับเบิลคลิก `OSYNC.bat` ในโฟลเดอร์ที่แตกจาก zip (ยังไม่ได้ติดตั้ง ระบบกันไว้ไม่ให้ทำอะไร) | ดับเบิลคลิก `EASY-INSTALL.bat` ในโฟลเดอร์เดียวกัน |
+| `Tools\<ชื่อ> is in use - not updated` | โปรแกรมในโฟลเดอร์นั้นเปิดอยู่บนเครื่องแม่ (เช่น Medal) | ปิดโปรแกรมนั้น แล้วรัน exe อัปเดตอีกครั้ง |
+| `tools: N of M files are NOT the same as the pack` หรือแถว `Tools` เป็น WARN | ไฟล์เครื่องมือถูกแก้ ถูกลบ หรือคัดลอกไม่ครบ | รัน `OSYNC-Setup.exe` ตัวล่าสุดแบบอัปเดตอีกครั้ง (ใส่ทุกโฟลเดอร์คืน) |
 | `Windows protected your PC` ตอนเปิด exe | ไฟล์ไม่ได้เซ็นชื่อดิจิทัล | **More info** → **Run anyway** |
 | `This file has no OSYNC inside.` | ไฟล์ exe เสียหรือโหลดไม่ครบ | ขอไฟล์ใหม่ |
 | `diskless server: NOT FOUND` | รันบนเครื่องที่ไม่ใช่เครื่องแม่ หรือ diskless ที่โค้ดไม่รู้จัก | รันบนเครื่องแม่ · ถ้าเป็น diskless ตัวอื่น ติดตั้งต่อได้ แต่ตรวจ `SharedDrives` เอง |
@@ -409,7 +456,7 @@ AI (เช่น Claude Code) ทำงานส่วนใหญ่ได้�
 | ร้านและเครื่องลูก | ชื่อร้าน + โลโก้, ยี่ห้อ diskless, จำนวนเครื่องลูก + ชื่อ + ช่วง IP, Image กี่ตัว (Windows 10 / 11), เวลาเปิดปิดร้าน |
 | ไดรฟ์ | แต่ละไดรฟ์ใช้ทำอะไร, ไดรฟ์ไหนห้ามแตะ (Image / write-back), เครื่องลูกเห็นไดรฟ์ไหน, ในไดรฟ์มีอะไรอยู่แล้ว, จะวาง OSYNC ที่ไหน, เกมแต่ละค่ายลงไดรฟ์ไหน, ไดรฟ์ไหนใกล้เต็ม |
 | launcher และเกม | launcher ครบหรือยัง ต้องการเพิ่มตัวไหน, บัญชีของร้านหรือลูกค้าล็อกอินเอง, เกมที่ต้องมีลงครบ / อัปเดตหรือยัง ต้องการลงเพิ่มเกมไหน, เกมนอก launcher, เกมที่มีกันโกงระดับ kernel, เกมที่ไม่อยากให้ขึ้นเมนู |
-| งานตอนบูต | ไมค์ (WO Mic / VB-CABLE), เล่นทางไกล (Parsec / Sunshine / OSLink), จอเสมือน, ล้างล็อกอิน, ห้ามลูกค้าปิดเครื่อง, ไอคอนเดสก์ท็อป, โปรแกรมเสริมใน `Tools\` |
+| งานตอนบูต | ไมค์ (WO Mic / VB-CABLE), เล่นทางไกล (Parsec / Sunshine / OSLink), จอเสมือน, ล้างล็อกอิน, ห้ามลูกค้าปิดเครื่อง, ไอคอนเดสก์ท็อป, โปรแกรมเครื่องมือใน `Tools\` (มากับ exe หรือต้องโหลดเพิ่ม), วง IP และชื่อเครื่องสำหรับ Sunshine |
 | ระบบเดิม | เมนูเกม / ระบบอัปเดตเกมที่ใช้อยู่ ใช้คู่หรือแทน, สิ่งที่ห้ามยุ่งเด็ดขาด |
 
 AI จะไม่ถามรหัสผ่าน ล็อกอินบัญชีต่างๆ ให้เจ้าของร้านทำเอง

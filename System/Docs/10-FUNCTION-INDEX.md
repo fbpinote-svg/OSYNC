@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 84 ไฟล์ · ฟังก์ชัน 635 ตัว · สร้างเมื่อ 20 Nov 2026 20:22 จากโค้ดใน repo นี้
+ไฟล์โค้ด 85 ไฟล์ · ฟังก์ชัน 638 ตัว · สร้างเมื่อ 20 Nov 2026 21:14 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -87,10 +87,10 @@
   - [System/Tests/Test-Console.ps1](#system-tests-test-console-ps1) — 4 ฟังก์ชัน
 - **[แกนกลางและเครื่องมือ](08-CORE-TOOLS.md)**
   - [System/Scripts/Branch-Runner.ps1](#system-scripts-branch-runner-ps1) — 10 ฟังก์ชัน
-  - [System/Scripts/Common.ps1](#system-scripts-common-ps1) — 34 ฟังก์ชัน
+  - [System/Scripts/Common.ps1](#system-scripts-common-ps1) — 35 ฟังก์ชัน
   - [System/Scripts/Http-Lib.ps1](#system-scripts-http-lib-ps1) — 10 ฟังก์ชัน
   - [System/Scripts/OSYNC.ps1](#system-scripts-osync-ps1) — 5 ฟังก์ชัน
-  - [System/Scripts/Setup-Install.ps1](#system-scripts-setup-install-ps1) — 11 ฟังก์ชัน
+  - [System/Scripts/Setup-Install.ps1](#system-scripts-setup-install-ps1) — 13 ฟังก์ชัน
   - [System/Scripts/Setup-Plan.ps1](#system-scripts-setup-plan-ps1) — 3 ฟังก์ชัน
   - [System/Scripts/Tool-Check.ps1](#system-scripts-tool-check-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Tool-Folder-Icons.ps1](#system-scripts-tool-folder-icons-ps1) — 2 ฟังก์ชัน
@@ -99,6 +99,7 @@
   - [System/Scripts/Tool-Organize-Drive.ps1](#system-scripts-tool-organize-drive-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Tool-Pack.ps1](#system-scripts-tool-pack-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Tool-RiotDiag.ps1](#system-scripts-tool-riotdiag-ps1) — 1 ฟังก์ชัน
+  - [System/Scripts/Tool-SunshineProfiles.ps1](#system-scripts-tool-sunshineprofiles-ps1) — 0 ฟังก์ชัน
 
 ## เครื่องแม่
 
@@ -382,11 +383,11 @@
 <a id="system-scripts-client-sunshine0j-ps1"></a>
 ### System/Scripts/Client-Sunshine0J.ps1
 
-94 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Stop`, `Check`, `AutoStart`, `Service` · [เปิดไฟล์](../Scripts/Client-Sunshine0J.ps1)
+96 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Stop`, `Check`, `AutoStart`, `Service` · [เปิดไฟล์](../Scripts/Client-Sunshine0J.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Log`](../Scripts/Client-Sunshine0J.ps1#L20) | 20-20 | `m` |  |
+| 1 | [`Log`](../Scripts/Client-Sunshine0J.ps1#L21) | 21-21 | `m` |  |
 
 <a id="system-scripts-client-vdd-ps1"></a>
 ### System/Scripts/Client-Vdd.ps1
@@ -1218,7 +1219,7 @@
 <a id="system-scripts-common-ps1"></a>
 ### System/Scripts/Common.ps1
 
-407 บรรทัด · 34 ฟังก์ชัน · [เปิดไฟล์](../Scripts/Common.ps1)
+417 บรรทัด · 35 ฟังก์ชัน · [เปิดไฟล์](../Scripts/Common.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -1231,31 +1232,32 @@
 | 7 | [`Read-ExtraGames`](../Scripts/Common.ps1#L85) | 85-88 | - |  |
 | 8 | [`Run-Ps`](../Scripts/Common.ps1#L91) | 91-95 | `File`, `ArgList` | run another script of System\Scripts in this console (its output and colors go straight to the screen, it can ask questions); returns only its exit code |
 | 9 | [`Get-LanIP`](../Scripts/Common.ps1#L97) | 97-102 | - | this PC's shop-LAN IPv4: the adapter that has the default gateway, else the first private address |
-| 10 | [`Test-Admin`](../Scripts/Common.ps1#L103) | 103-103 | - |  |
-| 11 | [`Test-IsMaster`](../Scripts/Common.ps1#L108) | 108-119 | - |  |
-| 12 | [`Find-UninstallPath`](../Scripts/Common.ps1#L140) | 140-150 | `NamePattern` | install folder of a program from its uninstall entry (DisplayName matched as a regex): InstallLocation, else the folder of its icon / uninstaller |
-| 13 | [`Get-Launcher`](../Scripts/Common.ps1#L151) | 151-151 | `Key` |  |
-| 14 | [`Get-LauncherDir`](../Scripts/Common.ps1#L152) | 152-157 | `Key` |  |
-| 15 | [`Get-LauncherExe`](../Scripts/Common.ps1#L158) | 158-158 | `Key` |  |
-| 16 | [`Get-RobloxExe`](../Scripts/Common.ps1#L161) | 161-166 | - | Roblox (per-user app, not in the table: nothing keeps it open): Launchers\Roblox\Versions\version-&lt;hash&gt;\RobloxPlayerBeta.exe, newest one; the master's... |
-| 17 | [`Get-LauncherInstallPath`](../Scripts/Common.ps1#L168) | 168-187 | `Key` | where the launcher is installed according to its own registry/config (wherever that is), '' = not installed |
-| 18 | [`RegVal`](../Scripts/Common.ps1#L169) | 169-169 | `k`, `n` |  |
-| 19 | [`Get-SteamDir`](../Scripts/Common.ps1#L191) | 191-197 | - | ---------- Steam ---------- the Steam folder in Launchers (shared, so clients use it too); on a master not set up yet: where Steam says it is |
-| 20 | [`Get-SteamLibraries`](../Scripts/Common.ps1#L199) | 199-218 | - | every Steam library folder on the shared drives (read from Steam's libraryfolders.vdf, plus X:\Games\Steam / X:\SteamLibrary / X:\Steam) |
-| 21 | [`Test-CfxGameDir`](../Scripts/Common.ps1#L230) | 230-234 | `g`, `dir` | a game folder FiveM / RedM can use: on a drive the clients see, with the game exe (and for FiveM not the Enhanced one) |
-| 22 | [`Find-CfxGameDir`](../Scripts/Common.ps1#L236) | 236-249 | `g` | where the game is: Steam libraries (appmanifest), then Rockstar's registry keys, then GAME\Rockstar / GAME\Epic |
-| 23 | [`Get-RealCasePath`](../Scripts/Common.ps1#L251) | 251-260 | `p` | the same path with the folders' real upper / lower case (Steam's libraryfolders.vdf keeps library paths in lower case) |
-| 24 | [`Get-CfxApps`](../Scripts/Common.ps1#L262) | 262-279 | - | FiveM / RedM on the game disk: where the menu starts them (Menu\data\games.json), and the game folders (not Steam) |
-| 25 | [`Read-CfxIni`](../Scripts/Common.ps1#L281) | 281-286 | `Ini` | CitizenFX.ini lines (Windows INI: ANSI, or UTF-16 with a BOM) |
-| 26 | [`Get-CfxIVPath`](../Scripts/Common.ps1#L287) | 287-291 | `Ini` |  |
-| 27 | [`Set-CfxIVPath`](../Scripts/Common.ps1#L293) | 293-305 | `Ini`, `Path` | sets [Game] IVPath= and keeps every other line of the file |
-| 28 | [`Get-CfxStatus`](../Scripts/Common.ps1#L307) | 307-313 | - | per FiveM / RedM: the game folder found, what CitizenFX.ini says, and whether that is usable |
-| 29 | [`Get-GameFolderStamp`](../Scripts/Common.ps1#L317) | 317-335 | - | what the watcher compares to notice a new / removed game without a launcher telling it: the game folders (GAME\&lt;kind&gt;\&lt;game&gt;, X:\Games\&lt;kind&g... |
-| 30 | [`Get-MenuInfo`](../Scripts/Common.ps1#L339) | 339-348 | - | ---------- game menu ---------- the menu program is Menu\app\&lt;brandName&gt;.exe (Menu\config.json brandName), or the older Menu\app\0JAYSHOP.exe |
-| 31 | [`Show-Live`](../Scripts/Common.ps1#L353) | 353-363 | `text` | ---------- console helpers ---------- Live status line, redrawn in place (and in the window title) so a long install visibly moves; '' clears it. Never logge... |
-| 32 | [`Format-Sec`](../Scripts/Common.ps1#L364) | 364-364 | `s` |  |
-| 33 | [`Invoke-Installer`](../Scripts/Common.ps1#L368) | 368-391 | `Exe`, `ArgList`, `Label`, `TimeoutSec` | Run an installer hidden and wait at most $TimeoutSec, with a live line while it runs; on timeout kill the whole process tree (a leftover child keeps Windows ... |
-| 34 | [`Get-RiotBusy`](../Scripts/Common.ps1#L396) | 396-407 | - | Riot products still downloading/patching on this PC: &lt;name&gt;.manifest is written when a patch starts, &lt;name&gt;.ok when it is done. A manifest older ... |
+| 10 | [`Get-SunshinePlan`](../Scripts/Common.ps1#L106) | 106-113 | - | Sunshine 0JAYSHOP port plan (Tools\Sunshine0J; Client-Sunshine0J.ps1 and Tool-SunshineProfiles.ps1): client PC n has the IP &lt;net&gt;.(offset + n) and the ... |
+| 11 | [`Test-Admin`](../Scripts/Common.ps1#L113) | 113-113 | - |  |
+| 12 | [`Test-IsMaster`](../Scripts/Common.ps1#L118) | 118-129 | - |  |
+| 13 | [`Find-UninstallPath`](../Scripts/Common.ps1#L150) | 150-160 | `NamePattern` | install folder of a program from its uninstall entry (DisplayName matched as a regex): InstallLocation, else the folder of its icon / uninstaller |
+| 14 | [`Get-Launcher`](../Scripts/Common.ps1#L161) | 161-161 | `Key` |  |
+| 15 | [`Get-LauncherDir`](../Scripts/Common.ps1#L162) | 162-167 | `Key` |  |
+| 16 | [`Get-LauncherExe`](../Scripts/Common.ps1#L168) | 168-168 | `Key` |  |
+| 17 | [`Get-RobloxExe`](../Scripts/Common.ps1#L171) | 171-176 | - | Roblox (per-user app, not in the table: nothing keeps it open): Launchers\Roblox\Versions\version-&lt;hash&gt;\RobloxPlayerBeta.exe, newest one; the master's... |
+| 18 | [`Get-LauncherInstallPath`](../Scripts/Common.ps1#L178) | 178-197 | `Key` | where the launcher is installed according to its own registry/config (wherever that is), '' = not installed |
+| 19 | [`RegVal`](../Scripts/Common.ps1#L179) | 179-179 | `k`, `n` |  |
+| 20 | [`Get-SteamDir`](../Scripts/Common.ps1#L201) | 201-207 | - | ---------- Steam ---------- the Steam folder in Launchers (shared, so clients use it too); on a master not set up yet: where Steam says it is |
+| 21 | [`Get-SteamLibraries`](../Scripts/Common.ps1#L209) | 209-228 | - | every Steam library folder on the shared drives (read from Steam's libraryfolders.vdf, plus X:\Games\Steam / X:\SteamLibrary / X:\Steam) |
+| 22 | [`Test-CfxGameDir`](../Scripts/Common.ps1#L240) | 240-244 | `g`, `dir` | a game folder FiveM / RedM can use: on a drive the clients see, with the game exe (and for FiveM not the Enhanced one) |
+| 23 | [`Find-CfxGameDir`](../Scripts/Common.ps1#L246) | 246-259 | `g` | where the game is: Steam libraries (appmanifest), then Rockstar's registry keys, then GAME\Rockstar / GAME\Epic |
+| 24 | [`Get-RealCasePath`](../Scripts/Common.ps1#L261) | 261-270 | `p` | the same path with the folders' real upper / lower case (Steam's libraryfolders.vdf keeps library paths in lower case) |
+| 25 | [`Get-CfxApps`](../Scripts/Common.ps1#L272) | 272-289 | - | FiveM / RedM on the game disk: where the menu starts them (Menu\data\games.json), and the game folders (not Steam) |
+| 26 | [`Read-CfxIni`](../Scripts/Common.ps1#L291) | 291-296 | `Ini` | CitizenFX.ini lines (Windows INI: ANSI, or UTF-16 with a BOM) |
+| 27 | [`Get-CfxIVPath`](../Scripts/Common.ps1#L297) | 297-301 | `Ini` |  |
+| 28 | [`Set-CfxIVPath`](../Scripts/Common.ps1#L303) | 303-315 | `Ini`, `Path` | sets [Game] IVPath= and keeps every other line of the file |
+| 29 | [`Get-CfxStatus`](../Scripts/Common.ps1#L317) | 317-323 | - | per FiveM / RedM: the game folder found, what CitizenFX.ini says, and whether that is usable |
+| 30 | [`Get-GameFolderStamp`](../Scripts/Common.ps1#L327) | 327-345 | - | what the watcher compares to notice a new / removed game without a launcher telling it: the game folders (GAME\&lt;kind&gt;\&lt;game&gt;, X:\Games\&lt;kind&g... |
+| 31 | [`Get-MenuInfo`](../Scripts/Common.ps1#L349) | 349-358 | - | ---------- game menu ---------- the menu program is Menu\app\&lt;brandName&gt;.exe (Menu\config.json brandName), or the older Menu\app\0JAYSHOP.exe |
+| 32 | [`Show-Live`](../Scripts/Common.ps1#L363) | 363-373 | `text` | ---------- console helpers ---------- Live status line, redrawn in place (and in the window title) so a long install visibly moves; '' clears it. Never logge... |
+| 33 | [`Format-Sec`](../Scripts/Common.ps1#L374) | 374-374 | `s` |  |
+| 34 | [`Invoke-Installer`](../Scripts/Common.ps1#L378) | 378-401 | `Exe`, `ArgList`, `Label`, `TimeoutSec` | Run an installer hidden and wait at most $TimeoutSec, with a live line while it runs; on timeout kill the whole process tree (a leftover child keeps Windows ... |
+| 35 | [`Get-RiotBusy`](../Scripts/Common.ps1#L406) | 406-417 | - | Riot products still downloading/patching on this PC: &lt;name&gt;.manifest is written when a patch starts, &lt;name&gt;.ok when it is done. A manifest older ... |
 
 <a id="system-scripts-http-lib-ps1"></a>
 ### System/Scripts/Http-Lib.ps1
@@ -1278,50 +1280,52 @@
 <a id="system-scripts-osync-ps1"></a>
 ### System/Scripts/OSYNC.ps1
 
-179 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
+184 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L24) | 24-24 | - |  |
 | 2 | [`Ask`](../Scripts/OSYNC.ps1#L25) | 25-25 | `q` |  |
 | 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26-32 | - |  |
-| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34-107 | `a`, `x` |  |
-| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L109) | 109-142 | - |  |
+| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34-111 | `a`, `x` |  |
+| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L113) | 113-147 | - |  |
 
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1
 
-216 บรรทัด · 11 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
+260 บรรทัด · 13 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Test-Installed`](../Scripts/Setup-Install.ps1#L16) | 16-16 | `dir` | an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither |
-| 2 | [`Ask`](../Scripts/Setup-Install.ps1#L28) | 28-28 | `q`, `def` |  |
-| 3 | [`YesNo`](../Scripts/Setup-Install.ps1#L29) | 29-29 | `q` |  |
-| 4 | [`Head`](../Scripts/Setup-Install.ps1#L30) | 30-30 | `t` |  |
-| 5 | [`Set-Line`](../Scripts/Setup-Install.ps1#L31) | 31-36 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
-| 6 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L38) | 38-42 | `file`, `name` | set "brandName" in config.json without reformatting the file |
-| 7 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L44) | 44-44 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
-| 8 | [`Expand-Files`](../Scripts/Setup-Install.ps1#L48) | 48-52 | `to` | the files to put in place: payload.zip unpacked, or a copy of the -Source folder (no .git, nothing a master made) |
-| 9 | [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L56) | 56-61 | `file` |  |
-| 10 | [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L63) | 63-70 | `file` | the game menu's config without the other shop's badge, logo, banner, server address and featured games |
-| 11 | [`Quit`](../Scripts/Setup-Install.ps1#L99) | 99-99 | `rc` | leave nothing in TEMP when the person stops at a question |
+| 1 | [`Test-Installed`](../Scripts/Setup-Install.ps1#L18) | 18-18 | `dir` | an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither |
+| 2 | [`Ask`](../Scripts/Setup-Install.ps1#L30) | 30-30 | `q`, `def` |  |
+| 3 | [`YesNo`](../Scripts/Setup-Install.ps1#L31) | 31-31 | `q` |  |
+| 4 | [`Head`](../Scripts/Setup-Install.ps1#L32) | 32-32 | `t` |  |
+| 5 | [`Set-Line`](../Scripts/Setup-Install.ps1#L33) | 33-38 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
+| 6 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L40) | 40-44 | `file`, `name` | set "brandName" in config.json without reformatting the file |
+| 7 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L46) | 46-46 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
+| 8 | [`Expand-Files`](../Scripts/Setup-Install.ps1#L50) | 50-54 | `to` | the files to put in place: payload.zip unpacked, or a copy of the -Source folder (no .git, nothing a master made) |
+| 9 | [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58) | 58-63 | `file` |  |
+| 10 | [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L65) | 65-72 | `file` | the game menu's config without the other shop's badge, logo, banner, server address and featured games |
+| 11 | [`Sync-Tools`](../Scripts/Setup-Install.ps1#L77) | 77-95 | `from`, `root`, `bk` |  |
+| 12 | [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L97) | 97-109 | `root` | proof that Tools\ is the same as the pack: every file in TOOLS-MANIFEST.txt there, same size and SHA256 |
+| 13 | [`Quit`](../Scripts/Setup-Install.ps1#L138) | 138-138 | `rc` | leave nothing in TEMP when the person stops at a question |
 
 <a id="system-scripts-setup-plan-ps1"></a>
 ### System/Scripts/Setup-Plan.ps1
 
-163 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `SharedDrives`, `OutFile`, `PassThru`, `Quiet` · [เปิดไฟล์](../Scripts/Setup-Plan.ps1)
+164 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `SharedDrives`, `OutFile`, `PassThru`, `Quiet` · [เปิดไฟล์](../Scripts/Setup-Plan.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Out`](../Scripts/Setup-Plan.ps1#L15) | 15-15 | `t`, `c` |  |
 | 2 | [`GB`](../Scripts/Setup-Plan.ps1#L16) | 16-16 | `b` |  |
-| 3 | [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L56) | 56-56 | `dir` | ---------- OSYNC already here? (installed = has Launchers\ or System\Data\; a download of the project has neither) ---------- |
+| 3 | [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L57) | 57-57 | `dir` | ---------- OSYNC already here? (installed = has Launchers\ or System\Data\; a download of the project has neither) ---------- |
 
 <a id="system-scripts-tool-check-ps1"></a>
 ### System/Scripts/Tool-Check.ps1
 
-197 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Mode` · [เปิดไฟล์](../Scripts/Tool-Check.ps1)
+212 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Mode` · [เปิดไฟล์](../Scripts/Tool-Check.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -1365,11 +1369,11 @@
 <a id="system-scripts-tool-pack-ps1"></a>
 ### System/Scripts/Tool-Pack.ps1
 
-139 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
+163 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe`, `NoTools` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L22) | 22-26 | `from`, `to`, `xf` |  |
+| 1 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L27) | 27-31 | `from`, `to`, `xf` |  |
 
 <a id="system-scripts-tool-riotdiag-ps1"></a>
 ### System/Scripts/Tool-RiotDiag.ps1
@@ -1379,6 +1383,11 @@
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`A`](../Scripts/Tool-RiotDiag.ps1#L7) | 7-7 | `s` |  |
+
+<a id="system-scripts-tool-sunshineprofiles-ps1"></a>
+### System/Scripts/Tool-SunshineProfiles.ps1
+
+44 บรรทัด · 0 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `DryRun`, `Gateway` · [เปิดไฟล์](../Scripts/Tool-SunshineProfiles.ps1)
 
 ---
 [← กลับสารบัญเอกสาร](README.md)

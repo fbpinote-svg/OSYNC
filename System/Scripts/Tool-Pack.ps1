@@ -4,10 +4,15 @@
 # Nothing to download.
 # In the file: OSYNC.bat, README.md, System\Scripts + Client + Docs, Settings (this shop's values blanked: the setup
 # writes the new shop's), the built game menu (Menu\app, one exe) + Menu\tools + a neutral Menu\config.json.
-# Not in it: games, launchers, Tools, client data (System\Data), backups, Menu\source, this shop's game list / logo.
+# + Tools\ (20 Nov 2026: a branch gets the SAME tool programs as this shop - Sunshine0J, WO Mic, VB-CABLE, Parsec, VDD,
+#   WinRAR, WebView2, Node.js, Python, Medal, aria2, DepotDownloader, FiveM-ReShade ...) with Tools\TOOLS-MANIFEST.txt
+#   (SHA256 + size of every file) so the setup and Tool-Check can prove they are the same. The file is then ~1.2 GB and
+#   holds other makers' programs and the Sunshine web login: give it to your own branches only, never publish it.
+# Not in it: games, launchers, client data (System\Data), backups, Menu\source, this shop's game list / logo, logs.
 #   Tool-Pack.ps1                 -> System\Dist\OSYNC-Setup-<date>.exe
 #   -Out <folder>   -NoExe        (-NoExe: stop after payload.zip + Setup files, e.g. to test the setup by hand)
-param([string]$Out = '', [switch]$NoExe)
+#   -NoTools                      leave Tools\ out (small file, e.g. for another shop that brings its own programs)
+param([string]$Out = '', [switch]$NoExe, [switch]$NoTools)
 . (Join-Path $PSScriptRoot 'Common.ps1')
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
@@ -64,6 +69,25 @@ $cfg = [regex]::Replace($cfg, '("featured"\s*:\s*)\[[^\]]*\]', '${1}[]')
 [IO.File]::WriteAllText((Join-Path $pl 'Menu\config.json'), $cfg, (New-Object Text.UTF8Encoding $false))
 New-Item -ItemType Directory -Force -Path (Join-Path $pl 'Menu\data') | Out-Null
 Write-Host "  menu: $(Split-Path -Leaf $mi.Exe) (renamed to the shop name at setup), tools, neutral config.json"
+
+# 3b Tools\: every tool folder as it is on this master (no logs). Sunshine0J\config goes too (this shop's Sunshine settings
+#    for a new branch - its PC profiles are redone there: OSYNC.bat > 7 > 24); it is the branch's own after that, so it is
+#    not in the manifest and an update keeps the branch's copy.
+if (-not $NoTools -and (Test-Path -LiteralPath $ToolsDir)) {
+  $tl = Join-Path $pl 'Tools'
+  Copy-Dir $ToolsDir $tl @('*.log', '*.log.*', 'TOOLS-MANIFEST.txt')
+  Write-Host '  tools: hashing every file (SHA256) for TOOLS-MANIFEST.txt ...'
+  $man = New-Object System.Collections.Generic.List[string]
+  $man.Add("# OSYNC Tools $stamp from $env:COMPUTERNAME - sha256<TAB>size<TAB>path; Sunshine0J\config is the shop's own and not listed")
+  $tn = 0; $tb = 0.0
+  foreach ($f in @(Get-ChildItem -LiteralPath $tl -Recurse -File -Force | Sort-Object FullName)) {
+    $rel = $f.FullName.Substring($tl.Length + 1)
+    if ($rel -like 'Sunshine0J\config\*') { continue }
+    $man.Add((Get-FileHash -LiteralPath $f.FullName -Algorithm SHA256).Hash + "`t" + $f.Length + "`t" + $rel); $tn++; $tb += $f.Length
+  }
+  [IO.File]::WriteAllLines((Join-Path $tl 'TOOLS-MANIFEST.txt'), [string[]]$man, (New-Object Text.UTF8Encoding $false))
+  Write-Host ("  tools: {0} folders, {1} files, {2:N0} MB ({3})" -f @(Get-ChildItem -LiteralPath $tl -Directory).Count, $tn, ($tb / 1MB), ((Get-ChildItem -LiteralPath $tl -Directory | ForEach-Object Name) -join ', '))
+} else { Write-Host '  tools: left out (-NoTools)' }
 
 # 4 payload.zip + the setup files
 $zip = Join-Path $stage 'payload.zip'

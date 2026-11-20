@@ -4,7 +4,8 @@
 #   1 already running from Tools\Sunshine0J  -> nothing to do (it keeps running)
 #   2 the image's own Sunshine (any service / sunshine.exe from another folder) is stopped first - same ports. Only stopped:
 #     its service stays as it was, so it is back at the next boot (a diskless reboot also resets everything below)
-#   3 port from this PC's IP like the shop Sunshine: 192.168.51.(100+n) -> 20000 + n x 100 (web page = that + 1),
+#   3 port from this PC's IP like the shop Sunshine: <net>.(offset+n) -> 20000 + n x 100 (web page = that + 1), plan from Settings
+#     SunshineIpBase (Get-SunshinePlan, empty = 192.168.51.100: KORI01 = 192.168.51.101 -> 20100),
 #     other IPs -> Sunshine's own default (47989 / web 47990). Display, graphics card, encoder: automatic.
 #   4 Windows Firewall on -> one allow rule for this sunshine.exe (the image's rules are for its own sunshine.exe)
 #   5 sunshine.exe <its config> started hidden (tray icon). Log: C:\Users\Public\OSYNC-Sunshine0J.log
@@ -57,9 +58,10 @@ foreach ($p in @(Get-CimInstance Win32_Process | Where-Object { $_.Name -match '
 }
 
 # 3 port from the IP (the config copy on this PC; a diskless reboot puts the shared one back)
-$ip = @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.IPAddress -match '^192\.168\.51\.(\d+)$' } | ForEach-Object IPAddress) | Select-Object -First 1
+$sp = Get-SunshinePlan
+$ip = @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.IPAddress -like "$($sp.Net).*" } | ForEach-Object IPAddress) | Select-Object -First 1
 $port = $null
-if ($ip -and $ip -match '\.(\d+)$') { $n = [int]$Matches[1] - 100; if ($n -ge 1 -and $n -le 99) { $port = 20000 + $n * 100 } }
+if ($ip -and $ip -match '\.(\d+)$') { $n = [int]$Matches[1] - $sp.Offset; if ($n -ge 1 -and $n -le 99) { $port = 20000 + $n * 100 } }
 $text = [IO.File]::ReadAllText($conf, [Text.Encoding]::UTF8)
 $text = [regex]::Replace($text, '(?m)^\s*port\s*=.*(\r?\n)?', '')
 if ($port) { $text = $text.TrimEnd() + "`r`nport = $port`r`n" }

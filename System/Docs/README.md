@@ -24,7 +24,7 @@ flowchart LR
 
 | บท | เรื่อง | เหมาะกับ |
 |---|---|---|
-| [00-EASY-INSTALL.md](00-EASY-INSTALL.md) | ร้านอื่นติดตั้ง OSYNC: สิ่งที่ต้องมี, ตัวตรวจเครื่องแม่ + ที่วางไฟล์ที่แนะนำ, ติดตั้งจาก zip ของ GitHub (`EASY-INSTALL.bat`) หรือ `OSYNC-Setup.exe`, ค่าที่ต้องตรวจ, โปรแกรมเสริมใน `Tools\` | ร้านใหม่ อ่านบทเดียวจบ |
+| [00-EASY-INSTALL.md](00-EASY-INSTALL.md) | ร้านอื่นติดตั้ง OSYNC: สิ่งที่ต้องมี, ตัวตรวจเครื่องแม่ + ที่วางไฟล์ที่แนะนำ, ติดตั้งจาก zip ของ GitHub (`EASY-INSTALL.bat`) หรือ `OSYNC-Setup.exe`, ค่าที่ต้องตรวจ, โปรแกรมเครื่องมือใน `Tools\` (exe พาไปครบ ตรวจ SHA256), Sunshine ของสาขา | ร้านใหม่ / สาขา อ่านบทเดียวจบ |
 | [01-OVERVIEW.md](01-OVERVIEW.md) | OSYNC คืออะไร, diskless ทำงานยังไง, ภาพใหญ่, โฟลเดอร์, บริการบนเครื่องแม่, วงจรประจำวัน | ทุกคน อ่านก่อน |
 | [02-INSTALL-UPDATE.md](02-INSTALL-UPDATE.md) | ติดตั้งสาขาใหม่, อัปเดตเครื่องแม่, ทำ Image เครื่องลูก, ปุ่มทุกข้อของ `OSYNC.bat`, `Tool-Check` | เจ้าของร้าน / ช่าง |
 | [03-MASTER.md](03-MASTER.md) | ทุกสคริปต์ฝั่งเครื่องแม่: อัปเดต, ตัวเฝ้า, รายชื่อเกม, snapshot launcher, ขอเกม Steam, ตัวรับรายงาน | ช่าง / คนแก้โค้ด |
@@ -34,7 +34,7 @@ flowchart LR
 | [07-CONSOLE-ONLINE-FUNCTIONS.md](07-CONSOLE-ONLINE-FUNCTIONS.md) | คอนโซลแอดมิน (API ทุกเส้น), คลังออนไลน์ (ฮับ, aria2, UPnP) | คนแก้โค้ด |
 | [08-CORE-TOOLS.md](08-CORE-TOOLS.md) | `Common.ps1` (ไลบรารีกลาง), `Http-Lib.ps1`, `OSYNC.ps1`, `Setup-Install.ps1`, `Tool-*` | คนแก้โค้ด |
 | [09-SETTINGS.md](09-SETTINGS.md) | ทุกค่าใน `settings.txt`: ค่าตอนนี้ คำอธิบาย สคริปต์ที่อ่าน (สร้างจากไฟล์จริง) | เจ้าของร้าน / ช่าง |
-| [10-FUNCTION-INDEX.md](10-FUNCTION-INDEX.md) | ฟังก์ชันทั้งหมด 635 ตัว ใน 84 ไฟล์ พร้อมบรรทัดและพารามิเตอร์ (สร้างจากโค้ดอัตโนมัติ) | คนแก้โค้ด |
+| [10-FUNCTION-INDEX.md](10-FUNCTION-INDEX.md) | ฟังก์ชันทั้งหมด 638 ตัว ใน 85 ไฟล์ พร้อมบรรทัดและพารามิเตอร์ (สร้างจากโค้ดอัตโนมัติ) | คนแก้โค้ด |
 
 ## เอกสารเฉพาะเรื่อง
 

@@ -4,8 +4,10 @@
 # New master: puts OSYNC on the game drive the client PCs see, writes Settings for THIS shop (drives, master PC
 #             name + IP), names the game menu after the shop, then starts the first-time setup (Master-Setup.ps1).
 # Master that already has OSYNC: updates it in place - System\Scripts, System\Client, System\Docs, OSYNC.bat,
-#             README.md and the menu program are replaced (old ones -> System\Backup\upgrade-<date>); Settings,
-#             the menu's config / games / posters, Launchers, GAME, Tools and client data stay as they are.
+#             README.md, the menu program and every tool folder the pack has (Tools\<name>, Sunshine0J\config kept) are
+#             replaced (old ones -> System\Backup\upgrade-<date>); Settings, the menu's config / games / posters,
+#             Launchers, GAME, tools the pack does not have and client data stay as they are.
+# Tools\ in the pack (Tool-Pack without -NoTools): checked file by file against Tools\TOOLS-MANIFEST.txt (SHA256) after.
 #   Setup-Install.ps1                              asks where / shop name (Enter = suggested answer)
 #   -Target X:\OSYNC -ShopName "MY SHOP" -Yes      no questions          -NoWizard   do not start the setup afterwards
 #   -Upgrade X:\OSYNC                              update that OSYNC folder       -Payload <zip>   default: next to this file
@@ -68,6 +70,43 @@ function Clear-MenuShop([string]$file) {
   [void]($t | ConvertFrom-Json)
   [IO.File]::WriteAllText($file, $t, (New-Object Text.UTF8Encoding $false))
 }
+# Tools\ from the pack (OSYNC-Setup.exe made without -NoTools): every tool folder there replaces the one this OSYNC has
+# (the old one -> backup), so a branch has the SAME tool programs as the shop that made the pack. Folders only this
+# OSYNC has stay. Kept from the old copy: the shop's own settings inside a tool (Sunshine0J\config).
+$KeepInTools = @('Sunshine0J\config')
+function Sync-Tools([string]$from, [string]$root, [string]$bk) {
+  if (-not (Test-Path -LiteralPath $from)) { return }
+  $to = Join-Path $root 'Tools'; New-Item -ItemType Directory -Force -Path $to | Out-Null
+  $names = @(Get-ChildItem -LiteralPath $from -Directory | ForEach-Object Name); $done = @()
+  foreach ($n in $names) {
+    $new = Join-Path $from $n; $old = Join-Path $to $n
+    if (Test-Path -LiteralPath $old) {
+      $dst = Join-Path $bk "Tools\$n"; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst) | Out-Null
+      try { Move-Item -LiteralPath $old -Destination $dst -ErrorAction Stop } catch { Write-Host "  Tools\$n is in use - not updated (close it, then run this update again)" -ForegroundColor Yellow; continue }
+      foreach ($k in $KeepInTools | Where-Object { $_ -like "$n\*" }) {
+        $sub = $k.Substring($n.Length + 1); $ko = Join-Path $dst $sub; $kn = Join-Path $new $sub
+        if (Test-Path -LiteralPath $ko) { if (Test-Path -LiteralPath $kn) { Remove-Item -LiteralPath $kn -Recurse -Force }; Copy-Item -LiteralPath $ko -Destination $kn -Recurse; Write-Host "  Tools\$k kept (this shop's own)" }
+      }
+    }
+    Move-Item -LiteralPath $new -Destination $old; $done += $n
+  }
+  foreach ($f in @(Get-ChildItem -LiteralPath $from -File)) { Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $to $f.Name) -Force }   # TOOLS-MANIFEST.txt
+  Write-Host "  tools: $($done.Count) of $($names.Count) folders put in place ($($done -join ', '))"
+}
+# proof that Tools\ is the same as the pack: every file in TOOLS-MANIFEST.txt there, same size and SHA256
+function Test-ToolsSame([string]$root) {
+  $tm = Join-Path $root 'Tools\TOOLS-MANIFEST.txt'
+  if (-not (Test-Path -LiteralPath $tm)) { return }
+  $n = 0; $bad = New-Object System.Collections.Generic.List[string]
+  foreach ($l in [IO.File]::ReadAllLines($tm)) {
+    if ($l.StartsWith('#') -or -not $l.Trim()) { continue }
+    $p = $l -split "`t", 3; if ($p.Count -lt 3) { continue }; $n++
+    $f = Join-Path $root "Tools\$($p[2])"
+    if (-not (Test-Path -LiteralPath $f) -or (Get-Item -LiteralPath $f -Force).Length -ne [long]$p[1] -or (Get-FileHash -LiteralPath $f -Algorithm SHA256).Hash -ne $p[0]) { $bad.Add($p[2]) }
+  }
+  if ($bad.Count) { Write-Host "  tools: $($bad.Count) of $n files are NOT the same as the pack: $(($bad | Select-Object -First 5) -join ', ')" -ForegroundColor Red }
+  else { Write-Host "  tools: all $n files are the same as the pack (SHA256)" -ForegroundColor Green }
+}
 Write-Host "OSYNC setup  ($ver)" -ForegroundColor Cyan
 
 # ---------- where: an OSYNC that is already on this PC, or a new folder on the game drive ----------
@@ -112,6 +151,8 @@ if ($Upgrade) {
     Move-Item -LiteralPath $new -Destination $old
     Write-Host "  updated: $rel"
   }
+  Sync-Tools (Join-Path $tmp 'Tools') $root $bk
+  Test-ToolsSame $root
   # settings keys new in this version are added; values the shop set stay
   $newSet = Join-Path $tmp 'Settings\settings.txt'; $curSet = Join-Path $root 'Settings\settings.txt'
   if (Test-Path -LiteralPath $curSet) {
@@ -167,7 +208,10 @@ if ($Upgrade) {
   New-Item -ItemType Directory -Force -Path $root | Out-Null
   foreach ($i in Get-ChildItem -LiteralPath $tmp -Force) { $d = Join-Path $root $i.Name; if (-not (Test-Path -LiteralPath $d)) { Move-Item -LiteralPath $i.FullName -Destination $d } }
   foreach ($d in 'Launchers', 'GAME', 'Tools', 'System\Data', 'System\Backup', 'Menu\data') { New-Item -ItemType Directory -Force -Path (Join-Path $root $d) | Out-Null }
+  # the folder had a Tools\ already: the pack's tool folders go in one by one (old ones -> System\Backup)
+  Sync-Tools (Join-Path $tmp 'Tools') $root (Join-Path $root "System\Backup\setup-$stamp")
   Write-Host '  done'
+  Test-ToolsSame $root
 
   Head 'This shop'
   $set = Join-Path $root 'Settings\settings.txt'

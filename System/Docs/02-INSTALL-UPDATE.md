@@ -82,11 +82,12 @@ flowchart TD
 
 ### เมนู 7 Tools
 
-บนจอเรียงเป็นกลุ่ม: Master (23, 1, 2, 18, 3, 19) · Branch (20-22) · Client (4-14) · Problems (15, 16) · 17 (ขึ้นเฉพาะตอนยังมีโครงเดิม) · 0 กลับ
+บนจอเรียงเป็นกลุ่ม: Master (23, 1, 2, 18, 3, 19, 24) · Branch (20-22) · Client (4-14) · Problems (15, 16) · 17 (ขึ้นเฉพาะตอนยังมีโครงเดิม) · 0 กลับ
 
 | 7 → เลข | ชื่องาน | รันอะไร | เครื่อง | admin |
 |---|---|---|---|---|
 | 23 | `plan` | `Setup-Plan.ps1 -OutFile System\Data\setup-plan.txt` ตรวจเครื่องแม่ (อ่านอย่างเดียว): ไดรฟ์, SSD / HDD, ไดรฟ์ที่เครื่องลูกเห็น, launcher, library ของ Steam, IP แล้วบอกที่วางที่แนะนำ ([00 ข้อ 3](00-EASY-INSTALL.md#3-วางไฟล์ตรงไหนให้เหมาะกับเครื่องแม่ของคุณ)) | แม่ | ไม่ |
+| 24 | `sunshine-profiles` | `Tool-SunshineProfiles.ps1 -DryRun` → ถาม "Write these PC profiles into the Sunshine 0JAYSHOP config?" → เขียนโปรไฟล์เครื่องจาก `SunshineIpBase` / `SunshinePcPrefix` / `SunshinePcCount` ([00 ข้อ 7.2](00-EASY-INSTALL.md#72-sunshine-ของสาขา-วง-ip-และชื่อเครื่อง)) · ร้านนี้ขึ้น `already has these profiles - nothing to change` | แม่ | ไม่ |
 | 1 | `move` | เลือก launcher จากรายการ → `Master-Move-Launcher.ps1 -Launcher <ชื่อ> -DryRun` → ถาม "Move ... now?" → ย้ายจริง | แม่ | ใช่ |
 | 2 | `steam-library` | `Master-Steam-Library.ps1 -DryRun` → ถาม → ย้ายเกม Steam จริง (ปิด Steam ก่อน) | แม่ | ใช่ |
 | 18 | `organize` | `Tool-Organize-Drive.ps1 -DryRun` → ถาม "Shop closed and every client PC off" → ย้ายจริง | แม่ (ร้านปิด) | ใช่ |
@@ -144,16 +145,17 @@ flowchart TD
 
 ### 2.1 ทำไฟล์ติดตั้งบนเครื่องแม่ต้นทาง (7 → 19)
 
-`Tool-Pack.ps1` ทำไฟล์เดียว `System\Dist\OSYNC-Setup-<yyyyMMdd-HHmm>.exe` (เปลี่ยนที่เก็บด้วย `-Out <โฟลเดอร์>`, `-NoExe` = หยุดที่ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ไว้ทดสอบเอง)
+`Tool-Pack.ps1` ทำไฟล์เดียว `System\Dist\OSYNC-Setup-<yyyyMMdd-HHmm>.exe` (เปลี่ยนที่เก็บด้วย `-Out <โฟลเดอร์>`, `-NoExe` = หยุดที่ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ไว้ทดสอบเอง, `-NoTools` = ไม่ใส่ `Tools\`)
 
 | อยู่ในไฟล์ | ไม่อยู่ในไฟล์ |
 |---|---|
-| `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` (เขียนใหม่ตอนแพ็ก) | เกม, launcher, `Tools\`, `System\Data`, `System\Backup` |
+| `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` (เขียนใหม่ตอนแพ็ก) | เกม, launcher, `System\Data`, `System\Backup`, ไฟล์ `*.log`, OSLink (`E:\LDPlayer`, ต้องติดตั้งเองที่สาขา) |
+| `Tools\` ทุกโฟลเดอร์ + `Tools\TOOLS-MANIFEST.txt` (SHA256 + ขนาดทุกไฟล์ ยกเว้น `Sunshine0J\config`) เพิ่ม 20 พ.ย. 2026 · `-NoTools` = ไม่ใส่ · ร้านนี้: 14 โฟลเดอร์ 6,969 ไฟล์ 1,000 MB → exe 754 MB (ทำใน 118 วินาที) · **มีโปรแกรมของผู้ผลิตอื่นและรหัสหน้าเว็บ Sunshine ส่งให้สาขาของร้านเองเท่านั้น** | |
 | `Settings\settings.txt` ที่ล้างค่าเฉพาะร้านนี้เป็นว่าง (`SharedDrives`, `MasterIP`, `MasterPC`, `GameFolders`, `ClientBlockCpuz`, `ClientApexClean`, `ClientSteamVerify`, `ClientSteamVerifyApps`, `OnlineBranch`, `OnlineBranchName`, `OnlineBind`, `OnlineExternalIP`) และ `Role=auto` | `Menu\source`, รายการเกมและโลโก้ของร้านนี้ |
 | `Settings\extra-games.json` ที่ `"games": []` และไฟล์ `.json` / `.xml` อื่นใน `Settings\` (`game-start.json`, `gta5_settings*.xml`, ใส่เพิ่ม 20 พ.ย. 2026) | |
 | `Menu\app` (โปรแกรมเมนูที่ build แล้ว 1 ตัว), `Menu\tools`, `Menu\README-TH.txt`, `Menu\config.json` แบบกลาง (`brandName=GAME CENTER`, ล้างโลโก้ / `apiUrl` / `machineId` / แบนเนอร์, `featured=[]`), `Menu\data` ว่าง | |
 
-ค่าอื่นใน `settings.txt` (สวิตช์เปิดปิดงาน, พอร์ต, `OnlineHub`) ติดไปตามเดิม ตัวติดตั้งล้างรายการเดียวกันซ้ำอีกรอบตอนติดตั้ง ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L56))
+ค่าอื่นใน `settings.txt` (สวิตช์เปิดปิดงาน, พอร์ต, `OnlineHub`) ติดไปตามเดิม ตัวติดตั้งล้างรายการเดียวกันซ้ำอีกรอบตอนติดตั้ง ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58))
 **แก้ 20 พ.ย. 2026:** บนเครื่องที่ `%TEMP%` เป็นชื่อสั้นแบบ 8.3 (ชื่อผู้ใช้ยาวเกิน 8 ตัว เช่นเครื่องแม่ร้านนี้ `C:\Users\CCU_MA~1`) ชื่อไฟล์ทุกตัวใน `payload.zip` เคยขึ้นต้นด้วย `d/` ทำให้ exe หา `Setup-Install.ps1` ไม่เจอ (`OSYNC setup failed: Value cannot be null.`) ตอนนี้ใช้ชื่อเต็มของ `%TEMP%` แล้ว ทดสอบ exe ที่ทำใหม่ติดตั้งลงโฟลเดอร์ทดสอบผ่าน
 
 ### 2.2 รันบนเครื่องแม่ใหม่
@@ -178,19 +180,20 @@ flowchart TD
 ### 2.3 ขั้นตอนที่ `Setup-Install.ps1` ทำ (ติดตั้งใหม่)
 
 1. อ่านรุ่นจาก `System/VERSION.txt` ใน payload (หรือในโฟลเดอร์ `-Source`) แล้วแสดง
-2. หาไดรฟ์ fixed ทุกตัวยกเว้นไดรฟ์ระบบ และหา OSYNC ที่ติดตั้งแล้ว ([`Test-Installed`](../Scripts/Setup-Install.ps1#L16): ที่รากไดรฟ์ หรือโฟลเดอร์ชั้นแรก ที่มี `OSYNC.bat` + `System\Scripts\Common.ps1` + `Launchers\` หรือ `System\Data\` โฟลเดอร์ที่แตกจาก zip จึงไม่นับ) ถ้าเจอ ถามว่าจะอัปเดตไหม
+2. หาไดรฟ์ fixed ทุกตัวยกเว้นไดรฟ์ระบบ และหา OSYNC ที่ติดตั้งแล้ว ([`Test-Installed`](../Scripts/Setup-Install.ps1#L18): ที่รากไดรฟ์ หรือโฟลเดอร์ชั้นแรก ที่มี `OSYNC.bat` + `System\Scripts\Common.ps1` + `Launchers\` หรือ `System\Data\` โฟลเดอร์ที่แตกจาก zip จึงไม่นับ) ถ้าเจอ ถามว่าจะอัปเดตไหม
 3. หาไดรฟ์ที่เครื่องลูกเห็น: ถ้ามี `C:\lwserver\config\lwservice.db` และมี Node.js อ่านตาราง `tServerDiskMng` (แบบอ่านอย่างเดียว) ไม่งั้นใช้ไดรฟ์ fixed ทุกตัวยกเว้น C: (เรียงตามตัวอักษร)
-4. แตกไฟล์ลงโฟลเดอร์ชั่วคราว ([`Expand-Files`](../Scripts/Setup-Install.ps1#L48): payload.zip หรือคัดลอกโฟลเดอร์ `-Source` โดยไม่เอา `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules`)
+4. แตกไฟล์ลงโฟลเดอร์ชั่วคราว ([`Expand-Files`](../Scripts/Setup-Install.ps1#L50): payload.zip หรือคัดลอกโฟลเดอร์ `-Source` โดยไม่เอา `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules`)
 5. **ตรวจเครื่อง** `Setup-Plan.ps1 -PassThru` (อ่านอย่างเดียว แสดงผลแบบ [00 ข้อ 3.5](00-EASY-INSTALL.md#35-ตัวอย่างผลตรวจเครื่องจริง)) แล้วใช้ที่วางที่แนะนำเป็นค่าตั้งต้น (ไม่มีผล = `<ไดรฟ์แรกที่เครื่องลูกเห็น>:\OSYNC` แบบเดิม)
-6. ถามโฟลเดอร์ · ถ้าไดรฟ์ไม่อยู่ในรายการ เตือนแล้วถาม · ถ้าโฟลเดอร์มี `OSYNC.bat` แล้ว หยุด · ถ้าไม่ว่าง ถามก่อน (ไม่ลบอะไร) · ตอบไม่ = ลบโฟลเดอร์ชั่วคราวแล้วจบ ([`Quit`](../Scripts/Setup-Install.ps1#L99))
+6. ถามโฟลเดอร์ · ถ้าไดรฟ์ไม่อยู่ในรายการ เตือนแล้วถาม · ถ้าโฟลเดอร์มี `OSYNC.bat` แล้ว หยุด · ถ้าไม่ว่าง ถามก่อน (ไม่ลบอะไร) · ตอบไม่ = ลบโฟลเดอร์ชั่วคราวแล้วจบ ([`Quit`](../Scripts/Setup-Install.ps1#L138))
 7. ย้ายไฟล์เข้าโฟลเดอร์ (ของที่มีอยู่แล้วไม่ทับ) สร้าง `Launchers`, `GAME`, `Tools`, `System\Data`, `System\Backup`, `Menu\data`
-8. ล้างค่าของร้านต้นทางใน `settings.txt` ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L56) รายการเดียวกับข้อ 2.1) และใน `Menu\config.json` ([`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L63): `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, แบนเนอร์, `featured=[]`) แล้วบันทึกผลตรวจเครื่องที่ `System\Data\setup-plan.txt`
+8. ล้างค่าของร้านต้นทางใน `settings.txt` ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58) รายการเดียวกับข้อ 2.1) และใน `Menu\config.json` ([`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L65): `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, แบนเนอร์, `featured=[]`) แล้วบันทึกผลตรวจเครื่องที่ `System\Data\setup-plan.txt`
 9. เขียน `Settings\settings.txt`: `SharedDrives`, `MasterPC=<ชื่อเครื่องนี้>`, `MasterIP=<IP ของการ์ดที่มี gateway>`
 10. ถามชื่อร้าน → แก้ `"brandName"` ใน `Menu\config.json` (ไม่จัดรูปไฟล์ใหม่) และเปลี่ยนชื่อ exe ตัวใหญ่ (>50 MB) ใน `Menu\app` เป็น `<ชื่อร้าน>.exe` · ไม่มีโปรแกรมเมนู (ติดตั้งจาก zip) = บอกว่าขั้นตั้งค่าครั้งแรกข้อ 4 จะ build ให้
-11. `Unblock-File` ทุกไฟล์ใน `System`, `Menu\app`, `Menu\tools` แล้วลบโฟลเดอร์ชั่วคราว
-12. ถามบรรทัดติดตั้ง branch runner (กด Enter = ข้าม) · ร้านนี้กด Enter
-13. เปิด `OSYNC.bat setup` (= เลข 4, ขอ admin เปิดหน้าต่างของตัวเอง)
-14. บอกขั้นต่อไป: เครื่องลูก 1 เครื่องต่อ 1 Image โหมด super: `OSYNC.bat client` แล้วบันทึก Image
+11. `Tools\`: ถ้าโฟลเดอร์ปลายทางมี `Tools\` อยู่แล้ว ใส่ทีละโฟลเดอร์ ([`Sync-Tools`](../Scripts/Setup-Install.ps1#L77)) แล้วเทียบทุกไฟล์กับ `TOOLS-MANIFEST.txt` ([`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L97)): `tools: all <n> files are the same as the pack (SHA256)` · ทดสอบ 20 พ.ย. 2026: 6,969 ไฟล์ตรงทั้งหมด
+12. `Unblock-File` ทุกไฟล์ใน `System`, `Menu\app`, `Menu\tools` แล้วลบโฟลเดอร์ชั่วคราว
+13. ถามบรรทัดติดตั้ง branch runner (กด Enter = ข้าม) · ร้านนี้กด Enter
+14. เปิด `OSYNC.bat setup` (= เลข 4, ขอ admin เปิดหน้าต่างของตัวเอง)
+15. บอกขั้นต่อไป: เครื่องลูก 1 เครื่องต่อ 1 Image โหมด super: `OSYNC.bat client` แล้วบันทึก Image
 
 ```mermaid
 flowchart TD
@@ -240,12 +243,13 @@ flowchart TD
 | ถูกแทนที่ (ของเก่าไปไว้ `System\Backup\upgrade-<yyyyMMdd-HHmmss>`) | คงไว้ตามเดิม |
 |---|---|
 | `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` | `Settings\` (เพิ่มเฉพาะคีย์ใหม่ พร้อมบรรทัดคำอธิบายของคีย์นั้น ค่าที่ร้านตั้งไม่เปลี่ยน) |
-| `Menu\app` (เฉพาะตอนเมนูปิด หรือยอมให้ปิด) ของเก่าไป `...\Menu-app` ชื่อ exe ตั้งตาม `brandName` | `Menu\config.json`, รายการเกม, โปสเตอร์, `Launchers`, `GAME`, `Tools`, `System\Data` |
+| `Menu\app` (เฉพาะตอนเมนูปิด หรือยอมให้ปิด) ของเก่าไป `...\Menu-app` ชื่อ exe ตั้งตาม `brandName` | `Menu\config.json`, รายการเกม, โปสเตอร์, `Launchers`, `GAME`, `System\Data` |
+| `Tools\<ชื่อ>` ทุกโฟลเดอร์ที่ไฟล์ติดตั้งมี (ของเก่าไป `...\Tools\<ชื่อ>`) + `Tools\TOOLS-MANIFEST.txt` แล้วตรวจ SHA256 ทุกไฟล์ | `Tools\Sunshine0J\config` ของร้านนั้น, โฟลเดอร์ใน `Tools\` ที่ไฟล์ติดตั้งไม่มี |
 
 ขั้นตอน:
 1. แตก payload ลง `%TEMP%\osync-setup-<เวลา>` สร้างโฟลเดอร์สำรอง
 2. หยุดตัวเฝ้า (`Master-Watch.ps1`) ของโฟลเดอร์นั้น ระหว่างเปลี่ยนสคริปต์
-3. ย้ายของเก่าไปโฟลเดอร์สำรอง แล้ววางของใหม่ ทีละรายการ
+3. ย้ายของเก่าไปโฟลเดอร์สำรอง แล้ววางของใหม่ ทีละรายการ · `Tools\` ทีละโฟลเดอร์ (`Sync-Tools`, คืน `Sunshine0J\config` เดิม) แล้ว `Test-ToolsSame` · ทดสอบ 20 พ.ย. 2026: แก้คอนฟิก Sunshine + ทำไฟล์ `WinRAR\SOURCE.txt` เสียไว้ก่อน → อัปเดตแล้วคอนฟิกของสาขายังอยู่ ไฟล์ที่เสียกลับเป็นของต้นทาง และ 6,969 ไฟล์ตรงทั้งหมด
 4. เพิ่มคีย์ใหม่ใน `settings.txt` · ตั้ง `MasterPC` ถ้ายังว่าง
 5. เมนูเปิดอยู่ → ถาม "Close it to update the menu program?" · ตอบไม่ = ไม่อัปเดตโปรแกรมเมนู · ปิดแล้วอัปเดต และเปิดเมนูคืนผ่าน `System\Client\Menu.vbs`
 6. ตัวเฝ้าเคยทำงาน → `Master-Watch.ps1 -Register` เปิดใหม่ด้วยสคริปต์ใหม่

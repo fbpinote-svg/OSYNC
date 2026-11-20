@@ -195,8 +195,8 @@ flowchart TD
 - **แบบบูต** (`-Boot`): รันทุกครั้งที่บูตผ่าน `Boot.ps1` ไม่ถามอะไร ลงเฉพาะของที่ยังไม่มี (เกมใหม่ไม่ต้องแก้อิมเมจ แค่รีบูตเครื่องลูก) ไม่ทำขั้น 5, 6, 7
 
 **เรียกจาก / ทำงานเมื่อไหร่:**
-- `OSYNC.bat` > 5 "Install everything on this client", หรือ `OSYNC.bat client` (`OSYNC.ps1` บรรทัด 44-47)
-- ดับเบิลคลิก `OSYNC.bat` บนเครื่องลูกโดยไม่ใส่คำสั่ง = `client` (`OSYNC.ps1` บรรทัด 134)
+- `OSYNC.bat` > 5 "Install everything on this client", หรือ `OSYNC.bat client` (`OSYNC.ps1` บรรทัด 53-56)
+- ดับเบิลคลิก `OSYNC.bat` บนเครื่องลูกโดยไม่ใส่คำสั่ง = `client` (`OSYNC.ps1` บรรทัด 150)
 - `Boot.ps1` → `-Boot` (งาน `OSYNC-Client-Boot`)
 
 **พารามิเตอร์:**
@@ -485,7 +485,7 @@ flowchart TD
 - เซอร์วิส `SunshineService` (`sc create` / `sc config`, start= auto, DisplayName `Sunshine Service`) ในโหมด `-Service`
 - โหมดการ์ด: หยุดเซอร์วิส/โปรเซส Sunshine ของอิมเมจ (แค่หยุด เซอร์วิสกลับมาในบูตถัดไป)
 
-**พอร์ต:** IP `192.168.51.(100+n)` โดย n = 1-99 → พอร์ต `20000 + n x 100`, หน้าเว็บ = พอร์ต + 1 (เช่น `.123` → `22300`, เว็บ `22301`) · IP อื่น → ค่าเริ่มต้นของ Sunshine `47989` (เว็บ `47990`)
+**พอร์ต:** IP `<net>.(offset+n)` โดย n = 1-99 → พอร์ต `20000 + n x 100`, หน้าเว็บ = พอร์ต + 1 · แผนจาก Settings `SunshineIpBase` ([`Get-SunshinePlan`](../Scripts/Common.ps1#L106), เพิ่ม 20 พ.ย. 2026 ให้สาขาที่วง IP ต่างกันตั้งได้) ร้านนี้ `192.168.51.100` (เช่น `.123` → `22300`, เว็บ `22301`) · IP อื่น → ค่าเริ่มต้นของ Sunshine `47989` (เว็บ `47990`)
 
 **Log:** `C:\Users\Public\OSYNC-Sunshine0J.log` (และ log ของ Sunshine เองใน `Tools\Sunshine0J\config`)
 
@@ -525,7 +525,7 @@ flowchart TD
 **ฟังก์ชัน:**
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Log`](../Scripts/Client-Sunshine0J.ps1#L20) | 20 | ใส่เวลา พิมพ์ขึ้นจอ และต่อท้าย `C:\Users\Public\OSYNC-Sunshine0J.log` (UTF-8) |
+| [`Log`](../Scripts/Client-Sunshine0J.ps1#L21) | 21 | ใส่เวลา พิมพ์ขึ้นจอ และต่อท้าย `C:\Users\Public\OSYNC-Sunshine0J.log` (UTF-8) |
 
 **ค่าในร้านนี้ตอนนี้:** `ClientSunshineAutoStart=on` · มี `Tools\Sunshine0J\sunshine.exe` และ `tools\sunshinesvc.exe`
 
@@ -1152,7 +1152,7 @@ flowchart TD
 
 **หน้าที่:** เปิด Windows Firewall บนเครื่องลูก แต่ยังให้คอนโซล diskless บนเครื่องแม่รีโมตได้ · ใช้ในโหมด super workstation (แก้อิมเมจ) แล้วบันทึกอิมเมจ ไม่ได้อยู่ในบูต
 
-**เรียกจาก / ทำงานเมื่อไหร่:** OSYNC.bat > 7 Tools > 11 (`master`) / 12 (`lan`) / 13 (`off`) หรือ `OSYNC.bat firewall <master|lan|off>` (`OSYNC.ps1` บรรทัด 82)
+**เรียกจาก / ทำงานเมื่อไหร่:** OSYNC.bat > 7 Tools > 11 (`master`) / 12 (`lan`) / 13 (`off`) หรือ `OSYNC.bat firewall <master|lan|off>` (`OSYNC.ps1` บรรทัด 91)
 
 **พารามิเตอร์:**
 | พารามิเตอร์ | ความหมาย |
