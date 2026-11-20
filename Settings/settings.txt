@@ -46,6 +46,8 @@ ClientVdd=on
 ClientSteamNoUpdate=on
 # WinRAR: เครื่องลูกที่ยังไม่มี ลงให้เองแบบเงียบตอนบูต (Tools\WinRAR) และให้ไฟล์ .rar .zip .7z ฯลฯ เปิดด้วย WinRAR · on = เปิดใช้ / off = ปิด
 ClientWinRAR=on
+# BlueStacks 5 (โปรแกรมเล่นเกมมือถือ) บนเครื่องลูก: ใช้จากไดรฟ์เกมที่เครื่องแม่ย้ายไว้ (OSYNC.bat > 7 > 25) ตอนบูตใส่ registry + ไดรเวอร์ให้ · off = ไม่ทำ
+ClientBlueStacks=on
 # Sunshine 0JAYSHOP เปิดเองตอนเข้า Windows แบบพับไว้ในถาด เฉพาะเครื่องที่ยังไม่มี Sunshine ของตัวเอง (เครื่องที่มีอยู่แล้ว = ไม่เปิดทับ)
 # on = ทุกเครื่องที่ไม่มี Sunshine / off = ปิด / ใส่ชื่อเครื่อง = เฉพาะเครื่องนั้น
 ClientSunshineAutoStart=on

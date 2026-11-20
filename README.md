@@ -31,7 +31,7 @@ OSYNC ทำให้เกม ตัวเปิดเกม (launcher) แล�
 
 ## เริ่มใช้
 
-**เครื่องแม่:** ดับเบิลคลิก `H:\OSYNC\OSYNC.bat` จะเห็นเมนูนี้ (ข้อความจริงจาก [`System/Scripts/OSYNC.ps1`](System/Scripts/OSYNC.ps1#L153)):
+**เครื่องแม่:** ดับเบิลคลิก `H:\OSYNC\OSYNC.bat` จะเห็นเมนูนี้ (ข้อความจริงจาก [`System/Scripts/OSYNC.ps1`](System/Scripts/OSYNC.ps1#L158)):
 
 ```
  OSYNC   DESKTOP-3ORJAGC = MASTER   H:\OSYNC

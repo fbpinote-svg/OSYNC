@@ -92,7 +92,7 @@ flowchart LR
 1. dot-source `Common.ps1` → ถ้าโฟลเดอร์นี้ไม่มีทั้ง `Launchers\` และ `System\Data\` (= โฟลเดอร์ที่แตกจาก zip ของโปรเจกต์ ยังไม่ได้ติดตั้ง) และไม่ใช่โครงเดิมก่อนขั้น B: ขึ้น `This folder is a download of OSYNC, not an installed OSYNC - nothing was done.` บอกให้ใช้ `EASY-INSTALL.bat` แล้ว exit 1 ([บรรทัด 8-16](../Scripts/OSYNC.ps1#L8), เพิ่ม 20 พ.ย. 2026: `settings.txt` ในโฟลเดอร์นั้นยังเป็นชื่อเครื่องแม่ของร้านต้นทาง ถ้าไม่กัน เครื่องแม่ของร้านใหม่จะถูกนับเป็นเครื่องลูกและดับเบิลคลิกเดียวจะติดตั้งของเครื่องลูกลงไป) → `$isMaster = Test-IsMaster`
 2. ตั้งรายการงานที่ต้อง admin ([บรรทัด 18](../Scripts/OSYNC.ps1#L18)): `setup client move steam-library organize steam-firstrun ea-install ea-uninstall ea-anticheat eac newthings riot-startup-on riot-startup-off firewall boot-off migrate branch branch-off`
 3. `$preB = Test-PreMigration` และรายการงานที่กันก่อนขั้น B: `master update watch-on setup client move steam-library`
-4. ไม่มีชื่องาน และไม่ใช่เครื่องแม่ → งาน = `client` ([บรรทัด 150](../Scripts/OSYNC.ps1#L150))
+4. ไม่มีชื่องาน และไม่ใช่เครื่องแม่ → งาน = `client` ([บรรทัด 155](../Scripts/OSYNC.ps1#L155))
 5. มีชื่องาน → `Invoke-Action` → `Pause-End` → ออก
 6. ไม่มี → วนแสดงเมนูหลัก (1-7, 0) จนกด 0
 
@@ -104,7 +104,7 @@ flowchart LR
 | [`Ask`](../Scripts/OSYNC.ps1#L25) | 25 | ถาม `[Y/N]` คืน `$true` เมื่อตอบขึ้นต้นด้วย Y |
 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26 | แสดง `Title` ของ `$LauncherTable` เป็นเลข คืน `Key` ที่เลือก หรือ '' |
 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34 | ตัวแจกงาน: กันงานก่อนขั้น B → ถ้าต้อง admin แต่ยังไม่ใช่ เปิด `powershell.exe -Verb RunAs` ด้วยงานเดิมแล้วจบ → `switch` รันสคริปต์ของงาน (งานที่ย้ายของ = DryRun ก่อนแล้วถาม) |
-| [`Show-Tools`](../Scripts/OSYNC.ps1#L113) | 113 | เมนู 7 Tools: ตาราง `[ordered]` เลข → `งาน[:ค่า]` แสดงเป็นกลุ่ม · เลข 17 ใส่เฉพาะเมื่อมี `GAMELUNCHER` · แยก `งาน:ค่า` แล้วส่ง `Invoke-Action` |
+| [`Show-Tools`](../Scripts/OSYNC.ps1#L117) | 117 | เมนู 7 Tools: ตาราง `[ordered]` เลข → `งาน[:ค่า]` แสดงเป็นกลุ่ม · เลข 17 ใส่เฉพาะเมื่อมี `GAMELUNCHER` · แยก `งาน:ค่า` แล้วส่ง `Invoke-Action` |
 
 ### `Invoke-Action` — จุดที่ควรรู้
 

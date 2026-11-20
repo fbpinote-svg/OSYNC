@@ -112,6 +112,7 @@ flowchart TD
 | [1v](#st-1v) | Battle.net Update Agent | ในไฟล์ | `ClientBattleNet` (`on`) | ไม่มีในไฟล์ = `on` |
 | [1s](#st-1s) | WinRAR (ลงเมื่อยังไม่มี) | [`Client-WinRAR.ps1`](#s11) | `ClientWinRAR` (`on`) | `on` |
 | [1t](#st-1t) | Rockstar Games Launcher บนดิสก์เกม | ในไฟล์ | `ClientRockstar` (`on`) | ไม่มีในไฟล์ = `on` |
+| 1w | BlueStacks 5 จากไดรฟ์เกม | [`Client-BlueStacks.ps1`](../Scripts/Client-BlueStacks.ps1) | `ClientBlueStacks` on / off (`on`) | `on` · ข้ามจนกว่าเครื่องแม่จะย้าย BlueStacks (`OSYNC.bat` → 7 → 25) |
 | [2](#st-2) | Steam first-run ของทุกเกม | `Client-Steam-FirstRun.ps1` → [05](05-CLIENT-GAMES.md) | ไม่มีค่า | — |
 | [3](#st-3) | EA app / เกม EA / EA AntiCheat | `Client-EA.ps1` → [05](05-CLIENT-GAMES.md) | ไม่มีค่า (ทำเมื่อมี `System\Data\EA\ea-client.reg`) | — |
 | [4](#st-4) | EasyAntiCheat (Epic และอื่น ๆ) | `Client-EAC.ps1` → [05](05-CLIENT-GAMES.md) | ไม่มีค่า | — |
@@ -410,29 +411,34 @@ flowchart TD
 - **ร้านนี้:** ไม่มี `ClientRockstar` ในไฟล์ = `on`
 
 <a id="st-2"></a>
+#### ขั้น `1w BlueStacks - Android emulator from the game disk` ([บรรทัด 505](../Scripts/Client-Install.ps1#L505)) · [`Client-BlueStacks.ps1`](../Scripts/Client-BlueStacks.ps1)
+- 20 พ.ย. 2026 เจ้าของร้านให้ย้าย BlueStacks 5 ออกจาก C: ของเครื่องแม่เข้าเมนู: `Master-Move-BlueStacks.ps1` (`OSYNC.bat` → 7 → 25) ย้ายไป `<ไดรฟ์>:\Emulator\BlueStacks` แล้วทำ `System\Data\BlueStacks\bluestacks.reg` (`HKLM\SOFTWARE\BlueStacks_nxt` + คลาส COM, ProgID, TypeLib และ interface ทุกตัวที่ใช้ proxy stub ของ BlueStacks ตามที่เครื่องแม่ลงทะเบียนไว้) และ `bluestacks.txt` (ที่อยู่โปรแกรม, รุ่น)
+- ขั้นนี้บนเครื่องลูก: ข้ามบนเครื่องแม่ / `ClientBlueStacks=off` / ยังไม่มี `bluestacks.reg` · `reg import` ไฟล์นั้น (ข้ามถ้า `InstallDir` ตรงและนำเข้าไฟล์รุ่นเดียวกันแล้ว เครื่อง diskless จึงนำเข้าทุกบูต) · สร้างหรือแก้เซอร์วิสไดรเวอร์ `BlueStacksDrv_nxt` (kernel, demand) ให้ชี้ `\??\<โปรแกรม>\BstkDrv_nxt.sys` บนไดรฟ์เกม แล้ว start · ไม่คัดลอกอะไรลง C:
+- การ์ดเมนู "BlueStacks 5" (หมวด Mobile) เปิด `<โปรแกรม>\HD-Player.exe --instance <ชื่อ instance>` เหมือนทางลัดบนเครื่องแม่
+- **ร้านนี้:** `ClientBlueStacks=on` · รอเครื่องแม่ย้ายก่อน (ขั้นนี้ขึ้น SKIP) · ยังไม่ได้ทดสอบบนเครื่องลูก
 #### ขั้น `2 Steam - first-run setup of every game` ([บรรทัด 502](../Scripts/Client-Install.ps1#L502))
 - รัน `Client-Steam-FirstRun.ps1` (บูตส่ง `-SkipFailed`) → [05](05-CLIENT-GAMES.md) · ไม่มีการข้ามบนเครื่องแม่ในขั้นนี้
 
 <a id="st-3"></a>
-#### ขั้น `3 EA    - EA app, games, EA AntiCheat` ([บรรทัด 505](../Scripts/Client-Install.ps1#L505))
+#### ขั้น `3 EA    - EA app, games, EA AntiCheat` ([บรรทัด 513](../Scripts/Client-Install.ps1#L513))
 - ไม่มี `System\Data\EA\ea-client.reg` → `SKIP (no EA data yet: OSYNC.bat > 1 on the master first)` · รัน `Client-EA.ps1` → [05](05-CLIENT-GAMES.md)
 
 <a id="st-4"></a>
-#### ขั้น `4 EAC   - EasyAntiCheat (Epic and others)` ([บรรทัด 509](../Scripts/Client-Install.ps1#L509))
+#### ขั้น `4 EAC   - EasyAntiCheat (Epic and others)` ([บรรทัด 517](../Scripts/Client-Install.ps1#L517))
 - รัน `Client-EAC.ps1` → [05](05-CLIENT-GAMES.md)
 
 <a id="st-5"></a>
-#### ขั้น `5 Menu  - game menu` ([บรรทัด 514](../Scripts/Client-Install.ps1#L514)) · เฉพาะทำอิมเมจ
+#### ขั้น `5 Menu  - game menu` ([บรรทัด 522](../Scripts/Client-Install.ps1#L522)) · เฉพาะทำอิมเมจ
 - ไม่มีโปรแกรมเมนู → `SKIP (build the menu on the master: OSYNC.bat > Tools)` · รัน [`Client-Menu.ps1 -NoStart`](#s5)
 - **ทำไม `-NoStart`:** หน้าล็อกของเมนูอยู่บนสุดเสมอ ถ้าเปิดตอนนี้จะบังหน้าต่างนี้และ "Press Enter" จนรีบูต · เมนูเปิดเองหลังรีบูต
 
 <a id="st-6"></a>
-#### ขั้น `6 NT    - NEWTHINGS-GAMES (GTA SA)` ([บรรทัด 520](../Scripts/Client-Install.ps1#L520)) · เฉพาะทำอิมเมจ
+#### ขั้น `6 NT    - NEWTHINGS-GAMES (GTA SA)` ([บรรทัด 528](../Scripts/Client-Install.ps1#L528)) · เฉพาะทำอิมเมจ
 - รัน `Client-NEWTHINGS.ps1` (ส่ง `-FixThaiText` เมื่อคำถามตอนต้นตอบแก้) → [05](05-CLIENT-GAMES.md)
 - **ร้านนี้:** `ClientThaiFix=on` = แก้โดยไม่ถาม (มีผลหลังรีสตาร์ต)
 
 <a id="st-7"></a>
-#### ขั้น `7 Boot  - set up new games at every boot` ([บรรทัด 523](../Scripts/Client-Install.ps1#L523)) · เฉพาะทำอิมเมจ
+#### ขั้น `7 Boot  - set up new games at every boot` ([บรรทัด 531](../Scripts/Client-Install.ps1#L531)) · เฉพาะทำอิมเมจ
 - ข้ามบนเครื่องแม่
 - สร้างงาน **`OSYNC-Client-Boot`**:
   - Action: `powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -EncodedCommand <...>` — คำสั่งข้างในคือ วนรอสูงสุด 90 รอบ x 2 วินาที (3 นาที) จนเห็น `<OSYNC>\System\Client\Boot.ps1` แล้วรันไฟล์นั้น (ดิสก์เกมอาจโผล่หลังเครื่องเริ่มไม่นาน)
@@ -442,7 +448,7 @@ flowchart TD
 - path ของ `Boot.ps1` ถูกฝังลงในงาน ถ้าย้ายโฟลเดอร์ OSYNC ต้องทำอิมเมจใหม่
 
 <a id="st-8"></a>
-#### ขั้น `8 Desktop - only the game menu icon` ([บรรทัด 540](../Scripts/Client-Install.ps1#L540))
+#### ขั้น `8 Desktop - only the game menu icon` ([บรรทัด 548](../Scripts/Client-Install.ps1#L548))
 - คอมเมนต์ 17 พ.ย. (เจ้าของร้าน): เดสก์ท็อปมีแค่ไอคอนเมนู · อยู่ท้าย ๆ ทั้งตอนบูตและทำอิมเมจ เพราะต้องรอหลังตัวติดตั้งที่เพิ่มไอคอน (WO Mic, Parsec ...)
 - ข้ามบนเครื่องแม่ · `ClientDesktopMenuOnly` off = ข้าม · รัน [`Client-DesktopClean.ps1`](#s12)
 - **ร้านนี้:** `ClientDesktopMenuOnly=on`
@@ -454,7 +460,7 @@ flowchart TD
 - อ่านผล: Apex เข้าได้ = ต้นเหตุอยู่ในขั้นที่ข้าม (เปิดคืนทีละขั้นเพื่อหาตัว) · ยังดับ = อยู่ที่ Image / Steam / วิธีเปิด
 - **ร้านนี้:** `ClientApexMinimal=KORI23` (20 พ.ย. 2026) · ผลเสียบนเครื่องนั้นระหว่างทดสอบ: ไม่มี Sunshine / ไมค์ / OSLink จากระบบเรา
 
-#### ขั้น `9 Apex  - clean test PC (ClientApexClean)` ([บรรทัด 549](../Scripts/Client-Install.ps1#L549))
+#### ขั้น `9 Apex  - clean test PC (ClientApexClean)` ([บรรทัด 557](../Scripts/Client-Install.ps1#L557))
 - 19 พ.ย. 2026: Apex ดับบนเครื่องลูกแต่เปิดได้บนเครื่องแม่ เครื่องใน `ClientApexClean` จึงเป็นเครื่องทดสอบแบบสะอาด
 - ข้ามบนเครื่องแม่ · ไม่มีชื่อเครื่องนี้ (หรือไม่ใช่ on) → ข้าม
 - ปิด (`Disable-PnpDevice`) อุปกรณ์ที่ใช้เซอร์วิส `WOVAD`, `ViGEmBus`, `VBAudioVACMME` หรือ HardwareID มี `zako` → รอ 3 วินาที → รายงานสถานะไดรเวอร์ (รวมไดรเวอร์ชื่อ zako / cpuz*) → WOVAD ยังรัน → `Stop-WoMicDriver` อีกครั้ง → ยังมีตัวไหนโหลดอยู่ = `FAIL (still loaded: ...)`

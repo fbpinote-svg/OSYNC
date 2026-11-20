@@ -31,6 +31,7 @@
   - [15. `Master-Setup.ps1` — ตั้งค่าเครื่องแม่ครั้งแรก](#15-master-setupps1--ตั้งค่าเครื่องแม่ครั้งแรก)
   - [16. `Master-Move-Launcher.ps1` — ย้าย launcher เข้าโฟลเดอร์ Launchers](#16-master-move-launcherps1--ย้าย-launcher-เข้าโฟลเดอร์-launchers)
   - [17. `Master-Steam-Library.ps1` — ย้ายเกม Steam ออกจากโฟลเดอร์โปรแกรม](#17-master-steam-libraryps1--ย้ายเกม-steam-ออกจากโฟลเดอร์โปรแกรม)
+  - [18. `Master-Move-BlueStacks.ps1` — ย้าย BlueStacks 5 เข้าไดรฟ์เกม + เมนู](#18-master-move-bluestacksps1--ย้าย-bluestacks-5-เข้าไดรฟ์เกม--เมนู)
 - [ปัญหาที่เคยเจอ / ข้อควรรู้](#ปัญหาที่เคยเจอ--ข้อควรรู้)
 
 ---
@@ -1329,6 +1330,28 @@ flowchart TD
 
 ---
 
+## 18. `Master-Move-BlueStacks.ps1` — ย้าย BlueStacks 5 เข้าไดรฟ์เกม + เมนู
+
+**หน้าที่:** ย้าย BlueStacks 5 (`BlueStacks_nxt`) ออกจากไดรฟ์ระบบไปไดรฟ์ที่เครื่องลูกเห็น ใส่การ์ดในเมนู และทำไฟล์ให้เครื่องลูกเปิดจากไดรฟ์เกมได้ (20 พ.ย. 2026 เจ้าของร้านสั่ง)
+**เรียกจาก / ทำงานเมื่อไหร่:** `OSYNC.bat` 7 → 25 (`-DryRun` ก่อน แล้วถาม ต้องใช้ admin)
+**พารามิเตอร์:** `-DryRun` · `-Target X:\Emulator\BlueStacks` (ค่าเริ่ม = ไดรฟ์ใน `SharedDrives` ที่ว่างมากที่สุด ไม่ใช่ไดรฟ์ระบบ) · `-ExportOnly` ทำ `System\Data\BlueStacks` + การ์ดใหม่ (หลังย้ายแล้วเท่านั้น)
+**อ่านค่า:** `HKLM\SOFTWARE\BlueStacks_nxt` (`InstallDir`, `UserDefinedDir`, `Version`), `Engine\Manager\BstkGlobal.xml` (ชื่อ instance), โปรเซส `HD-*` / `Bstk*` และโปรเซสจากโฟลเดอร์โปรแกรม, ไดรเวอร์ `BlueStacksDrv_nxt`
+**เขียน / เปลี่ยน:** `<target>\Program` และ `\Data` (robocopy แล้วเทียบจำนวนไฟล์และขนาด ไม่ตรง = หยุดก่อนแก้อะไร) · ไฟล์ข้อความใน `Data` / `Program` ที่มีที่อยู่เดิม (`.xml .bstk .conf .json .cfg .ini`) · registry ทุกค่าที่ชี้โฟลเดอร์เดิมใน `HKLM\SOFTWARE\BlueStacks_nxt`, `Classes\CLSID`, `Classes\TypeLib`, `CurrentVersion\Uninstall` / `App Paths` / `Run`, `HKCU\Software\BlueStacks_nxt` / `BlueStacksInstaller` · `sc config BlueStacksDrv_nxt binPath=` แล้ว start · shortcut ทุกคนบน Desktop / Start Menu · กฎไฟร์วอลล์ · โฟลเดอร์เดิมย้ายไป `C:\_ลบได้\BlueStacks_nxt-Program|Data-<เวลา>` · `System\Data\BlueStacks\bluestacks.reg` + `bluestacks.txt` · การ์ด `app-bluestacks` ใน `Settings\extra-games.json` (หมวด Mobile)
+**Log:** `C:\Users\Public\OSYNC-Move-BlueStacks.log`
+**ไม่แตะ:** BlueStacks X (`E:\BlueStacks X`) และ `BlueStacksServices` (โปรแกรมอื่นของผู้ผลิตเดียวกัน)
+
+| ฟังก์ชัน | บรรทัด | หลักการทำงาน |
+|---|---|---|
+| [`Get-Size`](../Scripts/Master-Move-BlueStacks.ps1#L44) | 44 | จำนวนไฟล์และขนาดรวมของโฟลเดอร์ (ใช้เทียบหลังคัดลอก) |
+| [`Find-RegKeys`](../Scripts/Master-Move-BlueStacks.ps1#L46) | 46 | `reg query /s /f <โฟลเดอร์> /d` เฉพาะส่วนที่ BlueStacks เขียน (ค้นทั้ง `HKCU\Software` ใช้เวลาหลายนาที จึงจำกัดที่) |
+| [`Update-RegKey`](../Scripts/Master-Move-BlueStacks.ps1#L56) | 56 | ทุกค่า `REG_SZ` / `REG_EXPAND_SZ` ในคีย์: แทนที่อยู่เดิมด้วยที่ใหม่ (ไม่สนตัวพิมพ์) คงชนิดค่าเดิม |
+| [`Get-Instances`](../Scripts/Master-Move-BlueStacks.ps1#L73) | 73 | ชื่อ instance จาก `BstkGlobal.xml` (`...\<ชื่อ>\<ชื่อ>.bstk`) ตัวแรก = ของการ์ดเมนู |
+| [`Export-ForClients`](../Scripts/Master-Move-BlueStacks.ps1#L) |  | รวม `reg export` ของ `HKLM\SOFTWARE\BlueStacks_nxt`, CLSID ที่ชี้โฟลเดอร์โปรแกรม + ProgID + TypeLib, และ Interface ทุกตัวที่ `ProxyStubClsid32` = CLSID `PSFactoryBuffer` ของ BlueStacks เป็นไฟล์ UTF-16 เดียว |
+| [`Add-MenuCard`](../Scripts/Master-Move-BlueStacks.ps1#L115) | 115 | แทรกการ์ด `app-bluestacks` ต้นรายการ `games` ของ `extra-games.json` เป็นข้อความ (ไฟล์คงรูปแบบเดิม) ครั้งเดียว แล้วเช็กว่ายังเป็น JSON |
+
+**ค่าในร้านนี้ตอนนี้ (20 พ.ย. 2026):** BlueStacks 5.22.291.1008 ยังอยู่ `C:\Program Files\BlueStacks_nxt` (490 MB, 260 ไฟล์) + `C:\ProgramData\BlueStacks_nxt` (4,148 MB, 130 ไฟล์, instance `Nougat32`) ไดรเวอร์ `Running Auto` · `-DryRun`: ไป `F:\Emulator\BlueStacks` (F: ว่าง 339 GB) registry ที่ชี้ที่เดิม 9 คีย์ (`BlueStacks_nxt`, CLSID 5, TypeLib 2, Uninstall) · ไฟล์ engine ที่มีที่อยู่เดิม: `BstkGlobal.xml`, `Nougat32.bstk` · ยังไม่ได้ย้ายจริง (ต้องใช้ admin)
+
+---
 ## ปัญหาที่เคยเจอ / ข้อควรรู้
 
 รวบรวมจากคอมเมนต์ในโค้ดเท่านั้น

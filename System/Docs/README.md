@@ -34,7 +34,7 @@ flowchart LR
 | [07-CONSOLE-ONLINE-FUNCTIONS.md](07-CONSOLE-ONLINE-FUNCTIONS.md) | คอนโซลแอดมิน (API ทุกเส้น), คลังออนไลน์ (ฮับ, aria2, UPnP) | คนแก้โค้ด |
 | [08-CORE-TOOLS.md](08-CORE-TOOLS.md) | `Common.ps1` (ไลบรารีกลาง), `Http-Lib.ps1`, `OSYNC.ps1`, `Setup-Install.ps1`, `Tool-*` | คนแก้โค้ด |
 | [09-SETTINGS.md](09-SETTINGS.md) | ทุกค่าใน `settings.txt`: ค่าตอนนี้ คำอธิบาย สคริปต์ที่อ่าน (สร้างจากไฟล์จริง) | เจ้าของร้าน / ช่าง |
-| [10-FUNCTION-INDEX.md](10-FUNCTION-INDEX.md) | ฟังก์ชันทั้งหมด 638 ตัว ใน 85 ไฟล์ พร้อมบรรทัดและพารามิเตอร์ (สร้างจากโค้ดอัตโนมัติ) | คนแก้โค้ด |
+| [10-FUNCTION-INDEX.md](10-FUNCTION-INDEX.md) | ฟังก์ชันทั้งหมด 644 ตัว ใน 87 ไฟล์ พร้อมบรรทัดและพารามิเตอร์ (สร้างจากโค้ดอัตโนมัติ) | คนแก้โค้ด |
 
 ## เอกสารเฉพาะเรื่อง
 

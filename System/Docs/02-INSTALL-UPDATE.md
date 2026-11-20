@@ -82,11 +82,12 @@ flowchart TD
 
 ### เมนู 7 Tools
 
-บนจอเรียงเป็นกลุ่ม: Master (23, 1, 2, 18, 3, 19, 24) · Branch (20-22) · Client (4-14) · Problems (15, 16) · 17 (ขึ้นเฉพาะตอนยังมีโครงเดิม) · 0 กลับ
+บนจอเรียงเป็นกลุ่ม: Master (23, 1, 2, 18, 3, 19, 24, 25) · Branch (20-22) · Client (4-14) · Problems (15, 16) · 17 (ขึ้นเฉพาะตอนยังมีโครงเดิม) · 0 กลับ
 
 | 7 → เลข | ชื่องาน | รันอะไร | เครื่อง | admin |
 |---|---|---|---|---|
 | 23 | `plan` | `Setup-Plan.ps1 -OutFile System\Data\setup-plan.txt` ตรวจเครื่องแม่ (อ่านอย่างเดียว): ไดรฟ์, SSD / HDD, ไดรฟ์ที่เครื่องลูกเห็น, launcher, library ของ Steam, IP แล้วบอกที่วางที่แนะนำ ([00 ข้อ 3](00-EASY-INSTALL.md#3-วางไฟล์ตรงไหนให้เหมาะกับเครื่องแม่ของคุณ)) | แม่ | ไม่ |
+| 25 | `bluestacks` | `Master-Move-BlueStacks.ps1 -DryRun` → ถาม "Move BlueStacks now (it is closed first) and put it in the game menu?" → ย้าย BlueStacks 5 จาก `C:\Program Files\BlueStacks_nxt` + `C:\ProgramData\BlueStacks_nxt` ไป `<ไดรฟ์ที่แชร์ที่ว่างที่สุด>:\Emulator\BlueStacks\Program` + `\Data` แก้ registry / COM / ไฟล์ engine / ไดรเวอร์ `BlueStacksDrv_nxt` / shortcut / ไฟร์วอลล์ ทำไฟล์ให้เครื่องลูก (`System\Data\BlueStacks`) และใส่การ์ด "BlueStacks 5" ในเมนู · ร้านนี้ DryRun 20 พ.ย. 2026: ไป `F:\Emulator\BlueStacks` (490 MB + 4,148 MB, F: ว่าง 339 GB), registry ที่ต้องแก้ 9 คีย์ | แม่ | ใช่ |
 | 24 | `sunshine-profiles` | `Tool-SunshineProfiles.ps1 -DryRun` → ถาม "Write these PC profiles into the Sunshine 0JAYSHOP config?" → เขียนโปรไฟล์เครื่องจาก `SunshineIpBase` / `SunshinePcPrefix` / `SunshinePcCount` ([00 ข้อ 7.2](00-EASY-INSTALL.md#72-sunshine-ของสาขา-วง-ip-และชื่อเครื่อง)) · ร้านนี้ขึ้น `already has these profiles - nothing to change` | แม่ | ไม่ |
 | 1 | `move` | เลือก launcher จากรายการ → `Master-Move-Launcher.ps1 -Launcher <ชื่อ> -DryRun` → ถาม "Move ... now?" → ย้ายจริง | แม่ | ใช่ |
 | 2 | `steam-library` | `Master-Steam-Library.ps1 -DryRun` → ถาม → ย้ายเกม Steam จริง (ปิด Steam ก่อน) | แม่ | ใช่ |

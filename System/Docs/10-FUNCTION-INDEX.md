@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 85 ไฟล์ · ฟังก์ชัน 638 ตัว · สร้างเมื่อ 20 Nov 2026 21:46 จากโค้ดใน repo นี้
+ไฟล์โค้ด 87 ไฟล์ · ฟังก์ชัน 644 ตัว · สร้างเมื่อ 20 Nov 2026 22:47 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -14,6 +14,7 @@
   - [System/Scripts/Master-ClientReports.ps1](#system-scripts-master-clientreports-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Master-FiveMShare.ps1](#system-scripts-master-fivemshare-ps1) — 14 ฟังก์ชัน
   - [System/Scripts/Master-GameList.ps1](#system-scripts-master-gamelist-ps1) — 10 ฟังก์ชัน
+  - [System/Scripts/Master-Move-BlueStacks.ps1](#system-scripts-master-move-bluestacks-ps1) — 6 ฟังก์ชัน
   - [System/Scripts/Master-Move-Launcher.ps1](#system-scripts-master-move-launcher-ps1) — 7 ฟังก์ชัน
   - [System/Scripts/Master-OslinkLogins.ps1](#system-scripts-master-oslinklogins-ps1) — 7 ฟังก์ชัน
   - [System/Scripts/Master-Setup.ps1](#system-scripts-master-setup-ps1) — 2 ฟังก์ชัน
@@ -40,6 +41,7 @@
   - [System/Scripts/Client-Vdd.ps1](#system-scripts-client-vdd-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-WinRAR.ps1](#system-scripts-client-winrar-ps1) — 0 ฟังก์ชัน
 - **[เครื่องลูก: เกม ตัวเปิดเกม บัญชี](05-CLIENT-GAMES.md)**
+  - [System/Scripts/Client-BlueStacks.ps1](#system-scripts-client-bluestacks-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Client-ClearLogins.ps1](#system-scripts-client-clearlogins-ps1) — 8 ฟังก์ชัน
   - [System/Scripts/Client-EA-AntiCheat.ps1](#system-scripts-client-ea-anticheat-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-EA.ps1](#system-scripts-client-ea-ps1) — 1 ฟังก์ชัน
@@ -158,6 +160,20 @@
 | 8 | [`Find-StartExe`](../Scripts/Master-GameList.ps1#L187) | 187-191 | `folderPath`, `name` |  |
 | 9 | [`Test-Covered`](../Scripts/Master-GameList.ps1#L200) | 200-200 | `fp` | a folder already listed: a listed path is the folder, inside it, or the folder is inside a listed game |
 | 10 | [`Add-AutoGame`](../Scripts/Master-GameList.ps1#L201) | 201-210 | `fp`, `idName`, `title`, `cat`, `platform`, `exe` |  |
+
+<a id="system-scripts-master-move-bluestacks-ps1"></a>
+### System/Scripts/Master-Move-BlueStacks.ps1
+
+220 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `DryRun`, `ExportOnly` · [เปิดไฟล์](../Scripts/Master-Move-BlueStacks.ps1)
+
+| # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
+|---|---|---|---|---|
+| 1 | [`Get-Size`](../Scripts/Master-Move-BlueStacks.ps1#L44) | 44-44 | `d` | ---------- helpers ---------- |
+| 2 | [`Find-RegKeys`](../Scripts/Master-Move-BlueStacks.ps1#L46) | 46-54 | `needles` | registry keys (reg.exe paths) under these roots with a value that names one of the folders |
+| 3 | [`Update-RegKey`](../Scripts/Master-Move-BlueStacks.ps1#L56) | 56-71 | `regExePath`, `map` | one registry key: every string value that names an old folder gets the new one (same value kind) |
+| 4 | [`Get-Instances`](../Scripts/Master-Move-BlueStacks.ps1#L73) | 73-77 | `data` | the instance names (Engine\Manager\BstkGlobal.xml MachineEntry ...\&lt;name&gt;\&lt;name&gt;.bstk), first one = the menu card's |
+| 5 | [`Export-ForClients`](../Scripts/Master-Move-BlueStacks.ps1#L80) | 80-113 | - | System\Data\BlueStacks\bluestacks.reg for the clients: HKLM\SOFTWARE\BlueStacks_nxt, its COM classes (found by the program path), their ProgIDs and TypeLib, ... |
+| 6 | [`Add-MenuCard`](../Scripts/Master-Move-BlueStacks.ps1#L115) | 115-128 | `prog`, `root`, `instance` | the menu card (Settings\extra-games.json "games"), written once; text inserted so the file keeps its own layout |
 
 <a id="system-scripts-master-move-launcher-ps1"></a>
 ### System/Scripts/Master-Move-Launcher.ps1
@@ -310,7 +326,7 @@
 <a id="system-scripts-client-install-ps1"></a>
 ### System/Scripts/Client-Install.ps1
 
-583 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Boot` · [เปิดไฟล์](../Scripts/Client-Install.ps1)
+591 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Boot` · [เปิดไฟล์](../Scripts/Client-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -407,6 +423,11 @@
 ## เครื่องลูก: เกม ตัวเปิดเกม บัญชี
 
 คำอธิบายเต็ม: [05-CLIENT-GAMES.md](05-CLIENT-GAMES.md)
+
+<a id="system-scripts-client-bluestacks-ps1"></a>
+### System/Scripts/Client-BlueStacks.ps1
+
+45 บรรทัด · 0 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Check` · [เปิดไฟล์](../Scripts/Client-BlueStacks.ps1)
 
 <a id="system-scripts-client-clearlogins-ps1"></a>
 ### System/Scripts/Client-ClearLogins.ps1
@@ -1280,15 +1301,15 @@
 <a id="system-scripts-osync-ps1"></a>
 ### System/Scripts/OSYNC.ps1
 
-184 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
+189 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L24) | 24-24 | - |  |
 | 2 | [`Ask`](../Scripts/OSYNC.ps1#L25) | 25-25 | `q` |  |
 | 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26-32 | - |  |
-| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34-111 | `a`, `x` |  |
-| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L113) | 113-147 | - |  |
+| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34-115 | `a`, `x` |  |
+| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L117) | 117-152 | - |  |
 
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1

@@ -499,7 +499,15 @@ Step '1t Rockstar - launcher on the game disk (FiveM / GTA V)' {
   }
   Write-Host "    Rockstar Games Launcher $ver : $dir (was: $(if ($old) { $old } else { 'not registered' })); $svcMsg"
 }
-Step '2 Steam - first-run setup of every game' {
+# BlueStacks 5 (20 Nov 2026): runs from the game disk where Master-Move-BlueStacks.ps1 put it (OSYNC.bat > 7 > 25 on the
+# master): its registry + COM registration from System\Data\BlueStacks and its kernel driver BlueStacksDrv_nxt from the game
+# disk (Client-BlueStacks.ps1). Not moved yet = skipped. Settings ClientBlueStacks=off skips this.
+Step '1w BlueStacks - Android emulator from the game disk' {
+  if (Test-IsMaster) { return 'SKIP (this is the master)' }
+  if ((Get-Setting 'ClientBlueStacks' 'on') -match '^(?i)(off|no|0|false)$') { return 'SKIP (ClientBlueStacks=off)' }
+  if (-not (Test-Path -LiteralPath (Join-Path $DataDir 'BlueStacks\bluestacks.reg'))) { return 'SKIP (not moved to a game disk yet: OSYNC.bat > 7 > 25 on the master)' }
+  Run-Script (Join-Path $ScriptsDir 'Client-BlueStacks.ps1')
+}Step '2 Steam - first-run setup of every game' {
   Run-Script (Join-Path $ScriptsDir 'Client-Steam-FirstRun.ps1') $(if ($Boot) { @('-SkipFailed') } else { @() })
 }
 Step '3 EA    - EA app, games, EA AntiCheat' {
