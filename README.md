@@ -8,6 +8,7 @@ OSYNC ทำให้เกม ตัวเปิดเกม (launcher) แล�
 
 > **ร้านอื่นที่จะนำไปใช้:** อ่าน [00 · Easy Install](System/Docs/00-EASY-INSTALL.md) บทเดียว ตัวติดตั้งตรวจเครื่องแม่ของคุณ แนะนำที่วางไฟล์ให้เหมาะกับเครื่อง แล้วติดตั้งให้
 > (โหลด zip จากปุ่ม **Code → Download ZIP** แตกแล้วดับเบิลคลิก `EASY-INSTALL.bat` หรือใช้ `OSYNC-Setup.exe` ที่ร้านที่ใช้อยู่ทำให้)
+> ใช้ AI (เช่น Claude Code) ช่วยติดตั้ง: ข้อความแรกที่พิมพ์ให้ AI อยู่ใน [00 ข้อ 11](System/Docs/00-EASY-INSTALL.md#เริ่มยังไง-ข้อความแรกที่พิมพ์ให้-ai)
 
 ![เมนูเกม 0JAYSHOP บนเครื่องลูก](System/Docs/images/menu-01-all.png)
 
