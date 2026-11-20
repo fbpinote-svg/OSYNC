@@ -1,7 +1,14 @@
-# KNOWLEDGE.md — ความรู้ที่ได้จากการตั้งระบบร้านเกม diskless (สาขาหลัก)
+﻿# KNOWLEDGE.md — ความรู้ที่ได้จากการตั้งระบบร้านเกม diskless (สาขาหลัก)
 
 สรุปสิ่งที่เจอจริงตอนตั้งระบบ OSYNC: อาการ → สาเหตุ → วิธีแก้ และข้อควรระวัง
 AI / คนที่ตั้งระบบสาขาใหม่ควรอ่านไฟล์นี้ก่อน `SETUP-AI.md` (ตัวอย่าง path เป็นของสาขาหลัก — ของสาขาอื่นอาจต่างไป)
+
+> **ชื่อในเอกสารนี้เป็นของโครงเดิม** (ก่อน พ.ย. 2026) — เทียบกับโครงใหม่:
+> `GAMELUNCHER\` = `Launchers\` (โฟลเดอร์ `RiotClient` = `Riot`, `EA Desktop` = `EA`, `Epic Games` = `Epic`, `Rockstar Games Launcher` = `Rockstar`, `Modrinth App` = `Modrinth`) ·
+> `GAMELUNCHER\ClientSetup\*.bat` และปุ่ม 3 ตัวที่ราก = `OSYNC.bat` (เมนูตัวเลข / เครื่องมือในข้อ 7) ·
+> `ClientSetup\_system\*.ps1` = `System\Scripts\` (`Master-*`, `Client-*`, `Tool-*`) · ข้อมูล snapshot (`Metadata`, `ea-client.reg`, ...) = `System\Data\` ·
+> `RiotSilent.vbs` / `EpicSilent.vbs` = `System\Client\Riot.vbs` / `Epic.vbs` · `settings.txt` = `Settings\settings.txt` · `Settings.ps1` = `System\Scripts\Common.ps1` ·
+> `GCafe\` = `Menu\` · `GCafe\data\games.custom.json` = `Settings\extra-games.json` · `MASTER-Start-All` = OSYNC.bat > 2 · `MASTER-Update-All` = OSYNC.bat > 1 · `CLIENT-Install-All` = OSYNC.bat > 5
 
 ---
 
@@ -31,6 +38,15 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 - EA app: โฟลเดอร์มี symlink แบบ relative `EA Desktop` → `<เวอร์ชัน>\EA Desktop` — ต้องสร้างใหม่ด้วย `cmd /c mklink /D` (PowerShell 5.1 สร้าง relative symlink ไม่ได้)
 - HoYoPlay: จำตำแหน่งเกมในไฟล์ `gamedata.dat` (binary + .crc) แก้ไม่ได้ — ย้ายเกมแล้วต้องกด "Locate game" ใน HoYoPlay 1 ครั้ง
 - Ubisoft: ย้ายทั้งโฟลเดอร์ `Program Files (x86)\Ubisoft` (มี `Ubisoft Game Launcher Core` ที่บริการ `UpcElevationService` ใช้)
+- Steam: `Master-Move\Move-Steam.bat` ย้ายทั้งโฟลเดอร์ Steam (library 0 = `<Steam>\steamapps` ไปด้วย) และแก้ `libraryfolders.vdf` (path เขียนแบบ `\\`) ให้;
+  ปิด Steam ด้วย `steam.exe -shutdown` ก่อนจะสะอาดกว่าโดน kill — เปิดจากที่ใหม่แล้ว Steam เขียน `SteamPath`/`SteamExe` เอง
+  หลังย้าย ให้เพิ่ม `X:\SteamLibrary` ใน Steam → Settings → Storage แล้วตั้งเป็นค่าเริ่มต้น ไม่งั้นเกมใหม่ลงไปใน `GAMELUNCHER\Steam\steamapps`
+- **Riot Client ขึ้น "COULDN'T UPDATE" หลังย้ายข้ามไดรฟ์** (log `%LOCALAPPDATA%\Riot Games\RiotClient\Logs\Launcher\*.log`:
+  `Failed moving current launcher ... OS error 5: Access is denied`): Riot อัปเดตตัวเองด้วยสิทธิ์ผู้ใช้ — ที่ C:\ ได้ Authenticated Users Modify มาจากราก C:
+  แต่ก๊อปไปไดรฟ์อื่นด้วย admin ได้ ACL ของไดรฟ์นั้น (มักแค่ Users Write+Read ไม่มี Delete) → ตัวเฝ้าเปิด Riot ใหม่ทุก 10 นาทีแล้วเด้ง error ซ้ำ
+  แก้: `icacls "<GAMELUNCHER>\RiotClient" /grant *S-1-5-11:(OI)(CI)M /T` (admin) — Move-Launcher ทำให้แล้วสำหรับ Riot
+  Riot Client รุ่น 143 ใช้ metadata ใหม่ `C:\ProgramData\Riot Games\Metadata\RiotClient` (ไม่มีเว้นวรรค; ของเก่า `Riot Client` ค้างไว้ได้)
+- Move-Launcher จับชื่อโฟลเดอร์แบบเต็มคำ (`E:\Steam` ไม่โดน `E:\SteamLibrary`) — เดิมใช้ IndexOf ทำให้ uninstall entry ของเกมใน SteamLibrary ถูกแก้ผิด
 
 ## 3. Riot (VALORANT / LoL / TFT) บนเครื่องลูก
 - อาการ: เครื่องลูกขึ้น **REPAIR NEEDED** / Install ทั้งที่เกมมีอยู่
@@ -55,6 +71,8 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 - เครื่องลูกต้องมีรายการเกมของ Epic: `C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests\*.item` + `C:\ProgramData\Epic\UnrealEngineLauncher\LauncherInstalled.dat`
   → `EpicSilent.vbs` ก๊อปจาก snapshot (robocopy `/XO` = ไม่ทับไฟล์ที่ใหม่กว่า เครื่องแม่จึงไม่โดนทับ) แล้วเปิด
   `EpicGamesLauncher.exe "com.epicgames.launcher://apps/<namespace>%3A<itemId>%3A<appName>?action=launch&silent=true"`
+- เครื่องแม่ที่ลง Epic แล้วแต่ยังไม่มีเกม Epic: ไม่มี `Data\Manifests` / `LauncherInstalled.dat` → `Snapshot-Epic.ps1` ข้าม (OK) แทน FAIL
+  (เดิม robocopy exit 16 ทำให้ MASTER-Update-All FAIL และตัวเฝ้ารันซ้ำทุก 30 นาที)
 - Fortnite ใช้ EasyAntiCheat แต่ไม่มี `Settings.json` บอก productid → เอา productid จาก `HKLM\SOFTWARE\WOW6432Node\EasyAntiCheat_EOS\ProductsInstalled` ของเครื่องแม่
 
 ## 6. Steam
@@ -91,7 +109,7 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
   (ANSI code page = 65001) หรือภาษาระบบไม่ใช่ไทย → แก้: ภาษาระบบ Thai + ปิด UTF-8 beta (code page 874) แล้วรีสตาร์ท
   เช็กเร็วๆ: cmd → `chcp` → `65001` = เปิด beta อยู่, `874` = ไทยปกติ
 - **ห้ามใช้ชื่อโฟลเดอร์ภาษาไทยกับเกม/launcher** (เช่น `H:\รวม NT`): บนเครื่องที่ code page ไม่ใช่ไทย เกม ANSI อ่าน path ไม่ได้ (เปิดไม่ติด)
-  และตัวสร้าง shortcut ของ Windows (WScript) error "Value does not fall within the expected range" → ใช้ชื่อภาษาอังกฤษ เช่น `H:\Online\NEWTHINGS-GAMES`
+  และตัวสร้าง shortcut ของ Windows (WScript) error "Value does not fall within the expected range" → ใช้ชื่อภาษาอังกฤษ เช่น `H:\OSYNC\GAME\Online\NEWTHINGS-GAMES` (เดิม `H:\Online\NEWTHINGS-GAMES` ย้ายตอนขั้น B 17 พ.ย. 2026)
 - สคริปต์ PowerShell 5.1 ที่มีตัวอักษรไทยต้องบันทึกเป็น UTF-8 **มี BOM** ไม่งั้นอ่านเพี้ยน — ทางที่ดีอย่าใส่ภาษาไทยในสคริปต์ ให้หา path ตอนรันแทน
 
 ## 9. เกมเฉพาะที่เจอ
@@ -109,6 +127,15 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 
 ## 11. เมนูเกม GCafe (0JAYSHOP)
 - Build ได้โดยไม่ต้องลง Node.js: `ELECTRON_RUN_AS_NODE=1 electron.exe node_modules\next\dist\bin\next build` (Build-App.ps1 ทำให้)
+- Electron 44 **ไม่โหลด** `electron.exe` ตอน `npm ci` แล้ว (โหลดตอนใช้ครั้งแรก) → Build-App ขึ้น "node_modules is missing" ทั้งที่ npm ci ผ่าน
+  แก้: `node node_modules\electron\install.js`; ถ้าขึ้น "Cannot find native binding" (Windows บล็อก `.node` ของ `@electron-internal/extract-zip`)
+  zip ถูกโหลดไว้แล้วที่ `%LOCALAPPDATA%\electron\Cache\...\electron-v<ver>-win32-x64.zip` → เช็ก SHA256 กับ `node_modules\electron\checksums.json`
+  แล้ว `Expand-Archive` ลง `node_modules\electron\dist` + เขียนไฟล์ `node_modules\electron\path.txt` = `electron.exe`
+- **เมนูเครื่องลูกขึ้น 0 เกม (หมวด Hot Games/Epic/EA... ว่างหมด) แต่ชื่อร้าน/โลโก้ขึ้นปกติ**: ตัวเฝ้า (MASTER-Start-All) รัน Build-GameList ทุกชั่วโมง
+  และเดิมเขียน `games.json` ทับทุกครั้ง → เครื่องลูกที่บูตก่อนหน้านั้นอ่านไฟล์ที่ถูกเขียนทับไม่ได้ (ได้ขยะ → JSON พัง → รายการว่าง) จนกว่าจะรีบูต
+  แก้: Build-GameList เขียน `games.json` เฉพาะเมื่อรายการเปลี่ยน ("unchanged, not rewritten") + เมนูจำรายการที่อ่านได้ตอนเปิดโปรแกรมไว้ใช้แทนถ้าอ่านใหม่พัง
+  build เมนูใหม่ (`app\`) ก็เป็นการเขียนทับบนไดรฟ์เกม — เครื่องลูกที่เปิดอยู่ต้องรีบูต
+- self-test ขึ้น "Script failed to execute" ตอนยังไม่มีเกมในเมนู = ไม่มีการ์ดให้ hover (ไม่ใช่เมนูพัง) — สแกนเกมก่อนแล้ว build ใหม่
 - ตัวโปรแกรมที่ build แล้วรัน `0JAYSHOP.exe --imagetool <jobs.json>` เพื่อทำรูปปก (Chromium อ่าน webp/bmp/ico ได้ — WIC ของ Windows อ่าน webp บางไฟล์ไม่ได้)
 - ปิด 0JAYSHOP แล้ว antivirus อาจล็อก exe อยู่หลายวินาที → robocopy ต้อง retry (`/R:10 /W:3`)
 - เดา exe ของเกมใหม่ (Build-GameList): launcher/portable +5, start/play +3, ชื่อคล้ายโฟลเดอร์ +3, ลบ 1 ต่อชั้นโฟลเดอร์ย่อย,
@@ -124,6 +151,35 @@ AI / คนที่ตั้งระบบสาขาใหม่ควรอ
 - Electron app ที่มี single-instance lock: โหมดเครื่องมือ (`--imagetool`) ต้องเช็กก่อน lock
 - หยุด Windows Update นานเกิน 5 สัปดาห์: `HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings` →
   `FlightSettingsMaxPauseDays`, `Pause*StartTime` / `PauseUpdatesExpiryTime` / `Pause*UpdatesEndTime` (เวลา UTC แบบ ISO) — ให้เจ้าของร้านรันเอง
+- **ชื่อตัวแปรไม่แยกตัวพิมพ์เล็ก/ใหญ่**: `$dataDir` กับ `$DataDir` คือตัวเดียวกัน — สคริปต์ที่ dot-source `Common.ps1` ห้ามตั้งตัวแปรชื่อ
+  `$Root`, `$DataDir`, `$Menu`, `$Launchers`, `$ClientDir` ฯลฯ ซ้ำ (เคยทำให้ตัวสแกนเกมหา VALORANT ไม่เจอ เพราะ `$dataDir` ของเมนูไปทับ `System\Data`)
+- เรียกสคริปต์ลูกใน function แบบ `& powershell.exe ...` → ข้อความของลูกกลายเป็นค่าที่ function คืน (ไม่ขึ้นจอ และ `$rc = ...` ได้ array แทนเลข exit)
+  → ใช้ `Run-Ps` ใน `Common.ps1` (Start-Process -NoNewWindow -Wait -PassThru)
+- `ConvertFrom-Json` ของ 5.1 คืน array ทั้งก้อนเป็นค่าเดียว: `@(... | ConvertFrom-Json)` นับได้ 1 → ใช้ `@((... | ConvertFrom-Json) | ForEach-Object { $_ })`
+
+## 14. โครงใหม่ (พ.ย. 2026 · ทำที่ร้าน AT9 `E:\Autosync` · ร้านนี้ `H:\OSYNC`) — สิ่งที่เจอตอนย้าย
+- โครงใหม่วางอยู่ในโฟลเดอร์เดิม (AT9 `E:\Autosync` · ร้านนี้ `H:\OSYNC`) ข้างโครงเดิม: ระหว่างที่ `GAMELUNCHER\` ยังอยู่และยังไม่มี `Launchers\` สคริปต์ที่เขียนของให้เครื่องลูก
+  (อัปเดตเครื่องลูก, ตัวเฝ้า, ติดตั้งเครื่องลูก, ตั้งค่าครั้งแรก) จะไม่ยอมทำงาน (`Stop-IfPreMigration` ใน `Common.ps1`) จนกว่าจะทำขั้น B
+- **ตัวติดตั้งที่ถูกชี้ไปที่ `GAMELUNCHER` ตรงๆ จะเทไฟล์ลงรากโฟลเดอร์** (Rockstar Games Launcher เคยทำ: 54 ไฟล์ + InstallFolder = GAMELUNCHER)
+  ห้ามกดถอนการติดตั้งตัวนั้น (ตัวถอนอาจลบทั้งโฟลเดอร์) — ให้รวมไฟล์ของมันเข้าโฟลเดอร์ของตัวเองแล้วแก้เฉพาะ Registry / บริการ / shortcut ของมัน
+  ตอนติดตั้งให้เลือก `GAMELUNCHER\<ชื่อค่าย>` เสมอ ตัวย้ายจะปฏิเสธถ้าตำแหน่งเดิมคือโฟลเดอร์ launcher ทั้งก้อน; ตัวตรวจระบบเตือน "Loose launcher files"
+- Ubisoft Connect สร้าง `C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher Core\UpcElevationService.exe` กลับมาเองหลังย้าย (ไม่มีผลเสีย)
+- ตัวติดตั้งที่เปิด launcher ต่อเองตอนจบ (HoYoPlay): `Start-Process -Wait` ของ 5.1 รอทั้งกลุ่ม process → ค้างจนกว่า launcher จะปิด ใช้ `$p.WaitForExit()` แทน
+- เกมเก็บที่ `<OSYNC>\GAME` (Settings `GamesFolder`) แยกตามค่าย; `GAME\Online` = เกมค่ายเล็ก / ค่ายที่มีเกมเดียว (ที่ AT9: Juvio/HoN, WarZ TH, FiveM, RedM · ร้านนี้มีแค่ NEWTHINGS-GAMES — FiveM อยู่ `I:\Online\FiveM`, WarZ TH อยู่ `G:\Online\WarZ TH`)
+- เมนูแอดเกมเองจาก 2 ทาง: โฟลเดอร์ (`GAME\<หมวด>\<เกม>`) และรายการ "โปรแกรมที่ติดตั้ง" ของ Windows ที่ InstallLocation อยู่บนไดรฟ์ที่แชร์
+  Riot เขียน InstallLocation ด้วย `/` → ต้องแปลงเป็น `\` ก่อนเทียบ ไม่งั้นนับ Riot Client / VALORANT ซ้ำเป็นเกม Online
+- FC Online (Garena): ไฟล์ข้างนอกเป็น symlink 0 ไบต์ ตัวเดาจะเลือก `mojitodata\fclauncher.exe` — ตัวเปิดที่ถูกคือ `launcher\fco-th.exe` (ใส่ไว้ใน extra-games.json — ที่ AT9 ด้วย `{GAMES}` · ร้านนี้ใส่ path เต็ม `D:\FIFA\32836\launcher\fco-th.exe`)
+- FiveM / RedM ย้ายได้ทั้งโฟลเดอร์ (ข้อมูลอยู่ใน `FiveM.app` ข้างตัวโปรแกรม) แก้ `HKCU\Software\CitizenFX\<เกม>\Last Run Location` + uninstall + shortcut
+- ฟอนต์ไทยของเมนู: เดิมโหลด Kanit/Prompt จาก Google Fonts ตอนเปิด (เน็ตยังไม่มา = ฟอนต์สำรอง) → ฝังไฟล์ไว้ใน `Menu\source\public\fonts` + `src\app\fonts.css`
+- Image เก่า: งานตอนบูตเรียก `<OSYNC>\_system\Install-All.ps1 -Boot` → เก็บไฟล์ส่งต่อไว้ใน `_system` (ซ่อน) ให้ไปที่ `System\Client\Boot.ps1`
+  และตอนบูตทำไอคอนเมนูใหม่ด้วย (`Client-Menu.ps1 -NoStart`) เครื่องลูกจึงซ่อมตัวเองได้โดยไม่ต้องรีบทำ Image
+- **Steam first-run ของเครื่องลูกไม่เคยทำงานที่ร้าน AT9**: สคริปต์เดิมหาเกม Steam แค่ `X:\SteamLibrary` กับ `X:\Steam` แต่เกมอยู่ใน
+  `E:\Autosync\GAMELUNCHER\Steam\steamapps` → dry-run เดิมได้ 0 รายการ (ไม่มี Social Club / Rockstar Launcher ของ GTA V, RDR2 บนเครื่องลูก)
+  แก้: ทุกสคริปต์อ่าน library จาก `libraryfolders.vdf` ของ Steam (`Get-SteamLibraries`) → dry-run ใหม่ได้ 18 รายการ — มีผลหลังทำ Image ใหม่ (OSYNC.bat > 5)
+- เครื่องลูกเรียกได้แค่ `System\Client\` (Boot.ps1, Riot.vbs, Epic.vbs, Menu.vbs) — Image จำ path พวกนี้ไว้ จัดของข้างในใหม่ได้โดยไม่ต้องทำ Image ใหม่
+- ย้าย launcher จากโครงเดิม: `Master-Move-Launcher.ps1` อ่านตำแหน่งจาก Registry อยู่แล้ว จึงย้ายจาก `GAMELUNCHER\` เข้า `Launchers\` ได้ด้วยตัวเดียวกัน
+  (ร้าน AT9: Registry 80 ค่า, บริการ EABackgroundService + EpicGamesUpdater, shortcut 15 ตัว, Riot: `RiotClientInstalls.json`; ไฟล์อื่นใน ProgramData ที่มี path เดิมมีแค่ log)
+- ทดสอบสคริปต์ใหม่ก่อนย้ายจริง: ตั้ง `$env:OSYNC_LAUNCHERS` / `$env:OSYNC_MENU` ให้ชี้โฟลเดอร์เดิม และสั่งตัวสแกนเกมด้วย `-Out <ไฟล์ทดสอบ>` จะไม่เขียนทับของที่ใช้งานอยู่
 
 ## 13. กฎการทำงานที่ใช้กับร้านนี้
 - **ไม่ลบไฟล์ถาวรเอง** — ย้ายไป `X:\_ลบได้` แล้วให้คำสั่งลบกับเจ้าของร้าน
