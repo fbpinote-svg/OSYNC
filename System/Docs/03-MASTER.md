@@ -84,6 +84,7 @@ flowchart TD
 | 4b BNet | `Master-Snapshot-BattleNet.ps1` | `System\Data\BattleNet\Agent` |
 | 5 Menu | `Master-GameList.ps1` | `Menu\data\games.json` |
 | 6 Cfx | `Master-CitizenFX.ps1` | `CitizenFX.ini` ข้าง FiveM / RedM บนดิสก์เกม |
+| 7 OSLink | [`Master-Snapshot-Oslink.ps1`](../Scripts/Master-Snapshot-Oslink.ps1) (20 พ.ย. 2026) | `System\Data\Oslink\trusted.txt`: SHA256 + ใบรับรองของ `devcon.exe`, `*.sys`, `*.cat`, `Wdf*.dll` ใน bin ของ OSLink ที่ลายเซ็น Valid บนเครื่องแม่ (ผู้ผลิต OSLink หรือ Microsoft) · เครื่องลูกยอมใช้ไฟล์ที่ตรงทั้ง SHA256 และใบรับรอง · ร้านนี้: 8 ไฟล์ |
 
 ---
 
@@ -311,7 +312,7 @@ flowchart TD
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Step`](../Scripts/Master-Update.ps1#L24) | 24 | ไม่มีไฟล์ = `SKIP` · รันด้วย `powershell.exe -File` แยกโปรเซส (ขั้นพังไม่ลากขั้นอื่น) · เยื้องผล 4 ช่อง · `$LASTEXITCODE` 0 = `OK` อื่น = `FAIL` |
+| [`Step`](../Scripts/Master-Update.ps1#L25) | 25 | ไม่มีไฟล์ = `SKIP` · รันด้วย `powershell.exe -File` แยกโปรเซส (ขั้นพังไม่ลากขั้นอื่น) · เยื้องผล 4 ช่อง · `$LASTEXITCODE` 0 = `OK` อื่น = `FAIL` |
 
 **ค่าในร้านนี้ตอนนี้:** ไม่มีค่าที่ตั้งได้ · ทั้ง 7 สคริปต์มีอยู่ใน `System\Scripts`
 

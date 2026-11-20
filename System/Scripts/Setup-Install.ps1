@@ -230,6 +230,10 @@ if ($Upgrade) {
   $set = Join-Path $root 'Settings\settings.txt'
   Clear-ShopValues $set
   Clear-MenuShop (Join-Path $root 'Menu\config.json')
+  # extra-games.json: the games list of the shop the files came from is emptied (paths of its drives; the game list finds this
+  # shop's games by itself) - the same as Tool-Pack does
+  $xg = Join-Path $root 'Settings\extra-games.json'
+  if (Test-Path -LiteralPath $xg) { $xt = [IO.File]::ReadAllText($xg, [Text.Encoding]::UTF8); $xt2 = [regex]::Replace($xt, '"games"\s*:\s*\[[\s\S]*?\r?\n  \]', '"games": []'); if ($xt2 -ne $xt) { [void]($xt2 | ConvertFrom-Json); [IO.File]::WriteAllText($xg, $xt2, (New-Object Text.UTF8Encoding $false)); Write-Host '  extra-games.json: the source shop''s games list emptied' } }
   if ($plan) { [IO.File]::WriteAllText((Join-Path $root 'System\Data\setup-plan.txt'), $plan.Text, (New-Object Text.UTF8Encoding $true)); Write-Host "  the check of this PC is saved in $root\System\Data\setup-plan.txt" }
   $ip = (@(Get-CimInstance Win32_NetworkAdapterConfiguration -Filter 'IPEnabled=TRUE' | Where-Object { $_.DefaultIPGateway } | ForEach-Object { $_.IPAddress } | Where-Object { $_ -match '^\d+\.\d+\.\d+\.\d+$' -and $_ -notmatch '^169\.254\.' }) + @('')) | Select-Object -First 1
   Set-Line $set 'SharedDrives' $shared; Set-Line $set 'MasterPC' $env:COMPUTERNAME; Set-Line $set 'MasterIP' $ip

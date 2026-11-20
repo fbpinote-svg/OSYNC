@@ -44,6 +44,11 @@ $PinnedToolCerts = @(
 $PinnedFileHashes = @(
   'A0E6271C610F096959D047D985DC69BC8819BBF26FB4CBD12CD776A24E625FA6'   # E:\LDPlayer\OSLink\bin\devcon.exe (103752 bytes, 3 Oct 2026)
 )
+# 20 Nov 2026 (other shops, newer OSLink builds): files the MASTER checked with a full, online certificate store
+# (Master-Snapshot-Oslink.ps1, Master-Update step 7): System\Data\Oslink\trusted.txt "<SHA256> <signer thumbprint> <file>"
+$TrustedByMaster = @{}
+$tf = Join-Path $DataDir 'Oslink\trusted.txt'
+if (Test-Path -LiteralPath $tf) { foreach ($l in [IO.File]::ReadAllLines($tf)) { if ($l -match '^([0-9A-F]{64}) ([0-9A-F]{40}) ') { $TrustedByMaster[$Matches[1]] = $Matches[2] } } }
 $Drivers = @(
   [pscustomobject]@{ Svc = 'LdVMou';    Name = 'virtual mouse';       HwId = 'LdVMouse';       Inf = 'LdVMou.inf';    Extra = @() }
   [pscustomobject]@{ Svc = 'LdVKbd';    Name = 'virtual keyboard';    HwId = 'LdVKeyboard';    Inf = 'LdVKbd.inf';    Extra = @() }
@@ -95,6 +100,14 @@ function Test-PinnedSignature([string]$File, [string[]]$Pins) {
       $PinnedFileHashes -contains (Get-FileHash -LiteralPath $File -Algorithm SHA256).Hash) {
     Write-Host "  $(Split-Path -Leaf $File): signature $($s.Status) (root not on this PC yet) - accepted: pinned signer and pinned file content"
     return ''
+  }
+  # the master checked this exact file (same content, same signer) with its full certificate store
+  if ($s.SignerCertificate -and $TrustedByMaster.Count) {
+    $h = (Get-FileHash -LiteralPath $File -Algorithm SHA256).Hash
+    if ($TrustedByMaster[$h] -and $TrustedByMaster[$h] -eq $s.SignerCertificate.Thumbprint) {
+      if ($s.Status -ne 'Valid' -or $Pins -notcontains $s.SignerCertificate.Thumbprint) { Write-Host "  $(Split-Path -Leaf $File): signature $($s.Status) - accepted: the master checked this exact file (System\Data\Oslink\trusted.txt)" }
+      return ''
+    }
   }
   if ($s.Status -ne 'Valid') { return "$(Split-Path -Leaf $File): signature $($s.Status)" }
   if ($Pins -notcontains $s.SignerCertificate.Thumbprint) { return "$(Split-Path -Leaf $File): signed by a certificate that is not pinned ($($s.SignerCertificate.Subject -replace ',.*$', '') $($s.SignerCertificate.Thumbprint))" }

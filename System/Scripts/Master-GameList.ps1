@@ -266,6 +266,16 @@ $wmSetup = Get-ChildItem -LiteralPath (Join-Path $ToolsDir 'WOMic') -Filter 'WOM
 if ($wmSetup) { $id = 'tool-womic'; Add-Game $id 'WO Mic' 'Apps' ('wscript.exe "' + (Join-Path $ClientDir 'WOMic.vbs') + '"') '' (Poster $id '') 'WO Mic'; $iconOf[$id] = $wmSetup.FullName }
 $vbCp = Join-Path $ToolsDir 'VBCABLE\VBCABLE_ControlPanel.exe'
 if (Test-Path -LiteralPath $vbCp) { $id = 'tool-vbcable'; Add-Game $id 'VB-CABLE' 'Apps' ('"' + $vbCp + '"') (Split-Path -Parent $vbCp) (Poster $id '') 'VB-Audio'; $iconOf[$id] = $vbCp }
+# OSLink (LDPlayer remote play): where its service / installer says, else <shared drive>:\LDPlayer\OSLink\bin - one card
+# (category Apps) unless Settings\extra-games.json has one already (id app-oslink). 20 Nov 2026: a new shop gets it by itself.
+if (-not @($games | Where-Object { $_.id -eq 'app-oslink' }).Count) {
+  $olc = New-Object System.Collections.Generic.List[string]
+  $olIp = "$((Get-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Services\LDRemoteSvc' -ErrorAction SilentlyContinue).ImagePath)"
+  $olM = [regex]::Match($olIp, '^\s*"?([^"]+?\.exe)'); if ($olM.Success) { $olc.Add((Split-Path -Parent $olM.Groups[1].Value)) }
+  foreach ($d in (Get-SharedDrives).ToCharArray()) { $olc.Add("${d}:\LDPlayer\OSLink\bin") }
+  $olBin = $olc | Where-Object { $_ -and (Get-SharedDrives).Contains($_.Substring(0, 1).ToUpper()) -and (Test-Path -LiteralPath (Join-Path $_ 'ldremote.exe')) } | Select-Object -First 1
+  if ($olBin) { $id = 'app-oslink'; $olExe = Join-Path $olBin 'ldremote.exe'; Add-Game $id 'OSLink' 'Apps' ('"' + $olExe + '"') $olBin (Poster $id (Split-Path -Parent $olBin)) 'OSLink'; $iconOf[$id] = $olExe }
+}
 
 # ---------- apply overrides, write ----------
 # 20 Nov 2026 (iPlay's way of starting anti-cheat games): the cards in Settings\game-start.json start through

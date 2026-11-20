@@ -1045,6 +1045,8 @@ sequenceDiagram
 
 ## 18. `Client-OslinkDrivers.ps1` — ไดรเวอร์ OSLink
 
+> **20 พ.ย. 2026:** นอกจากใบรับรองและ SHA256 ที่ปักในโค้ด ไฟล์ที่เครื่องแม่ตรวจแล้ว (`System\Data\Oslink\trusted.txt` จาก `Master-Snapshot-Oslink.ps1` ขั้น 7 ของ `Master-Update`) ก็ใช้ได้เมื่อ SHA256 และใบรับรองตรงทั้งคู่ (ขึ้น `accepted: the master checked this exact file`) ให้ร้านอื่น / OSLink รุ่นใหม่ใส่ไดรเวอร์ได้โดยไม่ต้องแก้โค้ด · การ์ด OSLink ในเมนูมาเองจาก `Master-GameList` ถ้า `extra-games.json` ยังไม่มี `app-oslink`
+
 **หน้าที่:** ลงไดรเวอร์ของ OSLink 3 ตัวแบบเงียบ **เฉพาะเมื่อยังไม่โหลด** ถ้าขาด OSLink จะขึ้น "ไดร์เวอร์ผิดปกติ คลิกเพื่อซ่อมแซม" และที่ Repair ลงบนเครื่องลูก diskless ก็หายตอนรีบูต
 
 | ไดรเวอร์ (บริการ) | ชื่อ | hardware id | inf / cat |
@@ -1104,11 +1106,11 @@ flowchart TD
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Get-FakeState`](../Scripts/Client-OslinkDrivers.ps1#L59) | 59 | (ทดสอบ) สถานะจาก `state.json` ไม่มี = missing |
-| [`Test-Loaded`](../Scripts/Client-OslinkDrivers.ps1#L62) | 62 | จริงเมื่อ `Services\<ไดรเวอร์>\Enum\Count` ≥ 1 |
-| [`Find-OslinkBin`](../Scripts/Client-OslinkDrivers.ps1#L74) | 74 | หาโฟลเดอร์ bin ที่มี `LdVMou.inf` จากบริการ → registry ของ OSLink → `X:\LDPlayer\OSLink\bin` |
-| [`Test-PinnedSignature`](../Scripts/Client-OslinkDrivers.ps1#L91) | 91 | คืนค่าว่างเมื่อลายเซ็น Valid และผู้เซ็นอยู่ในรายการปัก ไม่อย่างนั้นคืนเหตุผล |
-| [`Invoke-Tool`](../Scripts/Client-OslinkDrivers.ps1#L155) | 155 | รันโปรแกรมแบบซ่อน เก็บ stdout / stderr เกินเวลา = `taskkill /T /F` |
+| [`Get-FakeState`](../Scripts/Client-OslinkDrivers.ps1#L64) | 64 | (ทดสอบ) สถานะจาก `state.json` ไม่มี = missing |
+| [`Test-Loaded`](../Scripts/Client-OslinkDrivers.ps1#L67) | 67 | จริงเมื่อ `Services\<ไดรเวอร์>\Enum\Count` ≥ 1 |
+| [`Find-OslinkBin`](../Scripts/Client-OslinkDrivers.ps1#L79) | 79 | หาโฟลเดอร์ bin ที่มี `LdVMou.inf` จากบริการ → registry ของ OSLink → `X:\LDPlayer\OSLink\bin` |
+| [`Test-PinnedSignature`](../Scripts/Client-OslinkDrivers.ps1#L96) | 96 | คืนค่าว่างเมื่อลายเซ็น Valid และผู้เซ็นอยู่ในรายการปัก ไม่อย่างนั้นคืนเหตุผล |
+| [`Invoke-Tool`](../Scripts/Client-OslinkDrivers.ps1#L168) | 168 | รันโปรแกรมแบบซ่อน เก็บ stdout / stderr เกินเวลา = `taskkill /T /F` |
 
 ### `Test-PinnedSignature` — รับไฟล์แบบไหน
 - **ปกติ:** สถานะลายเซ็นต้องเป็น `Valid` และ thumbprint ของผู้เซ็นอยู่ในรายการปัก

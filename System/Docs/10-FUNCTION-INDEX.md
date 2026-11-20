@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 87 ไฟล์ · ฟังก์ชัน 646 ตัว · สร้างเมื่อ 20 Nov 2026 23:05 จากโค้ดใน repo นี้
+ไฟล์โค้ด 88 ไฟล์ · ฟังก์ชัน 646 ตัว · สร้างเมื่อ 20 Nov 2026 23:09 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -21,6 +21,7 @@
   - [System/Scripts/Master-Snapshot-BattleNet.ps1](#system-scripts-master-snapshot-battlenet-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-EA.ps1](#system-scripts-master-snapshot-ea-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-Epic.ps1](#system-scripts-master-snapshot-epic-ps1) — 0 ฟังก์ชัน
+  - [System/Scripts/Master-Snapshot-Oslink.ps1](#system-scripts-master-snapshot-oslink-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Snapshot-Riot.ps1](#system-scripts-master-snapshot-riot-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-Steam-Library.ps1](#system-scripts-master-steam-library-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Master-SteamQueue.ps1](#system-scripts-master-steamqueue-ps1) — 11 ฟังก์ชัน
@@ -146,7 +147,7 @@
 <a id="system-scripts-master-gamelist-ps1"></a>
 ### System/Scripts/Master-GameList.ps1
 
-330 บรรทัด · 10 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out` · [เปิดไฟล์](../Scripts/Master-GameList.ps1)
+340 บรรทัด · 10 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out` · [เปิดไฟล์](../Scripts/Master-GameList.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -230,6 +231,11 @@
 
 27 บรรทัด · 0 ฟังก์ชัน · [เปิดไฟล์](../Scripts/Master-Snapshot-Epic.ps1)
 
+<a id="system-scripts-master-snapshot-oslink-ps1"></a>
+### System/Scripts/Master-Snapshot-Oslink.ps1
+
+37 บรรทัด · 0 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Check` · [เปิดไฟล์](../Scripts/Master-Snapshot-Oslink.ps1)
+
 <a id="system-scripts-master-snapshot-riot-ps1"></a>
 ### System/Scripts/Master-Snapshot-Riot.ps1
 
@@ -262,11 +268,11 @@
 <a id="system-scripts-master-update-ps1"></a>
 ### System/Scripts/Master-Update.ps1
 
-42 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `GameListOut` · [เปิดไฟล์](../Scripts/Master-Update.ps1)
+44 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `GameListOut` · [เปิดไฟล์](../Scripts/Master-Update.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Step`](../Scripts/Master-Update.ps1#L24) | 24-29 | `name`, `file`, `extra` |  |
+| 1 | [`Step`](../Scripts/Master-Update.ps1#L25) | 25-30 | `name`, `file`, `extra` |  |
 
 <a id="system-scripts-master-watch-ps1"></a>
 ### System/Scripts/Master-Watch.ps1
@@ -532,15 +538,15 @@
 <a id="system-scripts-client-oslinkdrivers-ps1"></a>
 ### System/Scripts/Client-OslinkDrivers.ps1
 
-204 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `TestDir` · [เปิดไฟล์](../Scripts/Client-OslinkDrivers.ps1)
+217 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `TestDir` · [เปิดไฟล์](../Scripts/Client-OslinkDrivers.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Get-FakeState`](../Scripts/Client-OslinkDrivers.ps1#L59) | 59-59 | `d` |  |
-| 2 | [`Test-Loaded`](../Scripts/Client-OslinkDrivers.ps1#L62) | 62-67 | `d` | loaded = Windows runs the driver for at least one device (volatile Services\&lt;driver&gt;\Enum, written when it loads it) |
-| 3 | [`Find-OslinkBin`](../Scripts/Client-OslinkDrivers.ps1#L74) | 74-86 | - | ---------- OSLink's bin folder ---------- |
-| 4 | [`Test-PinnedSignature`](../Scripts/Client-OslinkDrivers.ps1#L91) | 91-102 | `File`, `Pins` | '' = valid signature made with a pinned certificate; else why not |
-| 5 | [`Invoke-Tool`](../Scripts/Client-OslinkDrivers.ps1#L155) | 155-168 | `Exe`, `Arguments`, `Seconds` | ---------- install (hidden, at most 90 s each) ---------- |
+| 1 | [`Get-FakeState`](../Scripts/Client-OslinkDrivers.ps1#L64) | 64-64 | `d` |  |
+| 2 | [`Test-Loaded`](../Scripts/Client-OslinkDrivers.ps1#L67) | 67-72 | `d` | loaded = Windows runs the driver for at least one device (volatile Services\&lt;driver&gt;\Enum, written when it loads it) |
+| 3 | [`Find-OslinkBin`](../Scripts/Client-OslinkDrivers.ps1#L79) | 79-91 | - | ---------- OSLink's bin folder ---------- |
+| 4 | [`Test-PinnedSignature`](../Scripts/Client-OslinkDrivers.ps1#L96) | 96-115 | `File`, `Pins` | '' = valid signature made with a pinned certificate; else why not |
+| 5 | [`Invoke-Tool`](../Scripts/Client-OslinkDrivers.ps1#L168) | 168-181 | `Exe`, `Arguments`, `Seconds` | ---------- install (hidden, at most 90 s each) ---------- |
 
 <a id="system-scripts-client-oslinkhelper-ps1"></a>
 ### System/Scripts/Client-OslinkHelper.ps1
@@ -1316,7 +1322,7 @@
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1
 
-273 บรรทัด · 13 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand`, `PlanOnly` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
+277 บรรทัด · 13 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand`, `PlanOnly` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
