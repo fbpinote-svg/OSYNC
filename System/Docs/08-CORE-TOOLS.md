@@ -430,6 +430,7 @@ sequenceDiagram
 3. เมนู: `Menu\app` (ข้าม exe ใหญ่ตัวอื่นที่ไม่ใช่ตัวหลัก เช่นสำเนา `0JAYSHOP.exe` เก่า), `Menu\tools`, `README-TH.txt`, `config.json` แบบกลาง (`brandName=GAME CENTER`, ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText`, `featured=[]`), `Menu\data` ว่าง
 4. บีบ `payload.zip` ทีละไฟล์ด้วย `/` + คัดลอก `Setup-Install.ps1` + เขียน `Setup.cmd` (ล้าง `PSModulePath` แล้วรัน `Setup-Install.ps1 %*`) · `-NoExe` = จบตรงนี้
 5. คอมไพล์ตัวเปิด C# `OsyncSetup` ด้วย `csc.exe` แล้วต่อไฟล์: **stub exe + payload.zip + ท้าย 16 ไบต์** (8 ไบต์ = ตำแหน่งเริ่มของ zip, 8 ไบต์ = `OSYNCPK1`)
+6. คัดลอก `SETUP-AI.md` และ `00-EASY-INSTALL.md` ไปไว้ข้างไฟล์ exe ใน `-Out` (คู่มือชุดที่ตรงกับรุ่นของ exe ให้สาขา)
 
 ```mermaid
 flowchart LR
@@ -456,6 +457,7 @@ flowchart LR
 **เรียกจาก / ทำงานเมื่อไหร่:** ตัวเปิด C# ใน `OSYNC-Setup.exe` หรือ `Setup.cmd` (ทั้งคู่ทำโดย `Tool-Pack`) · [`EASY-INSTALL.bat`](../../EASY-INSTALL.bat) ในโฟลเดอร์ที่แตกจาก zip ของโปรเจกต์ (`-Source <โฟลเดอร์นั้น>`) · ไม่ dot-source `Common.ps1` (ทำงานก่อนมี OSYNC ในเครื่อง) แต่เรียก `Setup-Plan.ps1` จากไฟล์ที่แตกแล้ว
 **พารามิเตอร์:**
 - `-Target <โฟลเดอร์>` ที่ติดตั้งใหม่ · `-ShopName "<ชื่อ>"` ชื่อร้าน (ค่าเริ่ม `GAME CENTER`) · `-Upgrade <โฟลเดอร์>` อัปเดต OSYNC นั้น
+- `-PlanOnly` แค่ตรวจเครื่องแล้วจบ (ดึง `System/Scripts/*` จาก payload ลงโฟลเดอร์ชั่วคราวแล้วรัน `Setup-Plan.ps1`, ไม่ถามเรื่องอัปเดต)
 - `-Payload <zip>` (ค่าเริ่ม `payload.zip` ข้างไฟล์) · `-Source <โฟลเดอร์>` ไฟล์จากโฟลเดอร์แทน zip (ไม่มีโปรแกรมเมนูที่ build แล้ว) · `-Yes` ไม่ถาม · `-NoWizard` ไม่เปิดขั้นต่อไป · `-BranchCommand <บรรทัด>` ติดตั้ง branch runner
 
 **อ่านค่า:** `System/VERSION.txt` ใน zip, ไดรฟ์ fixed (`Win32_LogicalDisk`), `C:\lwserver\config\lwservice.db` ตาราง `tServerDiskMng` (ผ่าน Node.js `node:sqlite` แบบ readOnly), IP ของการ์ดที่มี gateway, `Menu\config.json` เดิม, process ที่รันจาก `Menu\app` และ `Master-Watch.ps1`, `C:\AT9-Branch\state.json`
@@ -476,19 +478,19 @@ flowchart LR
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Test-Installed`](../Scripts/Setup-Install.ps1#L18) | 18 | โฟลเดอร์เป็น OSYNC ที่ติดตั้งแล้วไหม: `OSYNC.bat` + `System\Scripts\Common.ps1` + (`Launchers\` หรือ `System\Data\`) · โฟลเดอร์ที่แตกจาก zip ไม่มีสองโฟลเดอร์หลัง จึงไม่นับ |
-| [`Ask`](../Scripts/Setup-Install.ps1#L30) | 30 | ถามพร้อมค่าแนะนำ `[ค่า]` Enter = ค่าแนะนำ · `-Yes` = คืนค่าแนะนำทันที |
-| [`YesNo`](../Scripts/Setup-Install.ps1#L31) | 31 | ถาม `[Y/N]` · `-Yes` = `$true` ทันที |
-| [`Head`](../Scripts/Setup-Install.ps1#L32) | 32 | พิมพ์หัวขั้น `== <ข้อความ>` สีเหลือง |
-| [`Set-Line`](../Scripts/Setup-Install.ps1#L33) | 33 | ตั้ง `คีย์=ค่า` ในไฟล์ (แทนบรรทัดแรกที่ตรง ไม่มี = ต่อท้าย) · `-OnlyIfEmpty` = ไม่ทับค่าที่มีอยู่ · เขียน UTF-8 ไม่มี BOM |
-| [`Set-BrandName`](../Scripts/Setup-Install.ps1#L40) | 40 | แทนค่า `"brandName": "..."` ตัวแรกด้วย regex โดยไม่จัดรูปไฟล์ใหม่ · UTF-8 ไม่มี BOM |
-| [`Get-Watchers`](../Scripts/Setup-Install.ps1#L46) | 46 | process `powershell.exe` ที่ command line มี `<root>\System\Scripts\Master-Watch.ps1` |
-| [`Expand-Files`](../Scripts/Setup-Install.ps1#L50) | 50 | วางไฟล์ลงโฟลเดอร์ชั่วคราว: แตก `payload.zip` หรือ `robocopy` โฟลเดอร์ `-Source` โดยข้าม `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules` · exit ≥ 8 = throw |
-| [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58) | 58 | ล้างค่าใน `$ShopKeys` เป็นว่างและ `Role=auto` (regex ต่อบรรทัด ไม่แตะท้ายบรรทัด CRLF) · UTF-8 ไม่มี BOM |
-| [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L65) | 65 | ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText` และ `featured=[]` ใน `Menu\config.json` แล้วเช็กว่ายังเป็น JSON |
-| [`Sync-Tools`](../Scripts/Setup-Install.ps1#L77) | 77 | ใส่ `Tools\` จากไฟล์ติดตั้งทีละโฟลเดอร์: โฟลเดอร์เดิมย้ายไป `<backup>\Tools\<ชื่อ>` (ย้ายไม่ได้เพราะเปิดอยู่ = ขึ้น `is in use - not updated` แล้วข้าม) · คืน `$KeepInTools` (`Sunshine0J\config`) จากของเดิม · คัดลอก `TOOLS-MANIFEST.txt` · โฟลเดอร์ที่ไฟล์ติดตั้งไม่มีไม่แตะ |
-| [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L97) | 97 | อ่าน `Tools\TOOLS-MANIFEST.txt` ทุกบรรทัด: ไฟล์ต้องมี ขนาดเท่า และ SHA256 ตรง → `tools: all <n> files are the same as the pack (SHA256)` (เขียว) หรือรายชื่อไฟล์ที่ไม่ตรง 5 ตัวแรก (แดง) |
-| [`Quit`](../Scripts/Setup-Install.ps1#L138) | 138 | ลบโฟลเดอร์ชั่วคราวแล้ว `exit <รหัส>` (ใช้ตอนผู้ใช้ตอบไม่ที่คำถามเรื่องโฟลเดอร์) |
+| [`Test-Installed`](../Scripts/Setup-Install.ps1#L19) | 19 | โฟลเดอร์เป็น OSYNC ที่ติดตั้งแล้วไหม: `OSYNC.bat` + `System\Scripts\Common.ps1` + (`Launchers\` หรือ `System\Data\`) · โฟลเดอร์ที่แตกจาก zip ไม่มีสองโฟลเดอร์หลัง จึงไม่นับ |
+| [`Ask`](../Scripts/Setup-Install.ps1#L31) | 31 | ถามพร้อมค่าแนะนำ `[ค่า]` Enter = ค่าแนะนำ · `-Yes` = คืนค่าแนะนำทันที |
+| [`YesNo`](../Scripts/Setup-Install.ps1#L32) | 32 | ถาม `[Y/N]` · `-Yes` = `$true` ทันที |
+| [`Head`](../Scripts/Setup-Install.ps1#L33) | 33 | พิมพ์หัวขั้น `== <ข้อความ>` สีเหลือง |
+| [`Set-Line`](../Scripts/Setup-Install.ps1#L34) | 34 | ตั้ง `คีย์=ค่า` ในไฟล์ (แทนบรรทัดแรกที่ตรง ไม่มี = ต่อท้าย) · `-OnlyIfEmpty` = ไม่ทับค่าที่มีอยู่ · เขียน UTF-8 ไม่มี BOM |
+| [`Set-BrandName`](../Scripts/Setup-Install.ps1#L41) | 41 | แทนค่า `"brandName": "..."` ตัวแรกด้วย regex โดยไม่จัดรูปไฟล์ใหม่ · UTF-8 ไม่มี BOM |
+| [`Get-Watchers`](../Scripts/Setup-Install.ps1#L47) | 47 | process `powershell.exe` ที่ command line มี `<root>\System\Scripts\Master-Watch.ps1` |
+| [`Expand-Files`](../Scripts/Setup-Install.ps1#L51) | 51 | วางไฟล์ลงโฟลเดอร์ชั่วคราว: แตก `payload.zip` หรือ `robocopy` โฟลเดอร์ `-Source` โดยข้าม `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules` · exit ≥ 8 = throw |
+| [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L59) | 59 | ล้างค่าใน `$ShopKeys` เป็นว่างและ `Role=auto` (regex ต่อบรรทัด ไม่แตะท้ายบรรทัด CRLF) · UTF-8 ไม่มี BOM |
+| [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L66) | 66 | ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText` และ `featured=[]` ใน `Menu\config.json` แล้วเช็กว่ายังเป็น JSON |
+| [`Sync-Tools`](../Scripts/Setup-Install.ps1#L78) | 78 | ใส่ `Tools\` จากไฟล์ติดตั้งทีละโฟลเดอร์: โฟลเดอร์เดิมย้ายไป `<backup>\Tools\<ชื่อ>` (ย้ายไม่ได้เพราะเปิดอยู่ = ขึ้น `is in use - not updated` แล้วข้าม) · คืน `$KeepInTools` (`Sunshine0J\config`) จากของเดิม · คัดลอก `TOOLS-MANIFEST.txt` · โฟลเดอร์ที่ไฟล์ติดตั้งไม่มีไม่แตะ |
+| [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L98) | 98 | อ่าน `Tools\TOOLS-MANIFEST.txt` ทุกบรรทัด: ไฟล์ต้องมี ขนาดเท่า และ SHA256 ตรง → `tools: all <n> files are the same as the pack (SHA256)` (เขียว) หรือรายชื่อไฟล์ที่ไม่ตรง 5 ตัวแรก (แดง) |
+| [`Quit`](../Scripts/Setup-Install.ps1#L139) | 139 | ลบโฟลเดอร์ชั่วคราวแล้ว `exit <รหัส>` (ใช้ตอนผู้ใช้ตอบไม่ที่คำถามเรื่องโฟลเดอร์) |
 
 ### `Setup-Plan.ps1` — ตรวจเครื่องแม่และแนะนำที่วางไฟล์ (อ่านอย่างเดียว)
 

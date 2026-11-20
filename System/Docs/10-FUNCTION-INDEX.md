@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 85 ไฟล์ · ฟังก์ชัน 638 ตัว · สร้างเมื่อ 20 Nov 2026 21:14 จากโค้ดใน repo นี้
+ไฟล์โค้ด 85 ไฟล์ · ฟังก์ชัน 638 ตัว · สร้างเมื่อ 20 Nov 2026 21:28 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -1293,23 +1293,23 @@
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1
 
-260 บรรทัด · 13 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
+273 บรรทัด · 13 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand`, `PlanOnly` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Test-Installed`](../Scripts/Setup-Install.ps1#L18) | 18-18 | `dir` | an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither |
-| 2 | [`Ask`](../Scripts/Setup-Install.ps1#L30) | 30-30 | `q`, `def` |  |
-| 3 | [`YesNo`](../Scripts/Setup-Install.ps1#L31) | 31-31 | `q` |  |
-| 4 | [`Head`](../Scripts/Setup-Install.ps1#L32) | 32-32 | `t` |  |
-| 5 | [`Set-Line`](../Scripts/Setup-Install.ps1#L33) | 33-38 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
-| 6 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L40) | 40-44 | `file`, `name` | set "brandName" in config.json without reformatting the file |
-| 7 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L46) | 46-46 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
-| 8 | [`Expand-Files`](../Scripts/Setup-Install.ps1#L50) | 50-54 | `to` | the files to put in place: payload.zip unpacked, or a copy of the -Source folder (no .git, nothing a master made) |
-| 9 | [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58) | 58-63 | `file` |  |
-| 10 | [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L65) | 65-72 | `file` | the game menu's config without the other shop's badge, logo, banner, server address and featured games |
-| 11 | [`Sync-Tools`](../Scripts/Setup-Install.ps1#L77) | 77-95 | `from`, `root`, `bk` |  |
-| 12 | [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L97) | 97-109 | `root` | proof that Tools\ is the same as the pack: every file in TOOLS-MANIFEST.txt there, same size and SHA256 |
-| 13 | [`Quit`](../Scripts/Setup-Install.ps1#L138) | 138-138 | `rc` | leave nothing in TEMP when the person stops at a question |
+| 1 | [`Test-Installed`](../Scripts/Setup-Install.ps1#L19) | 19-19 | `dir` | an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither |
+| 2 | [`Ask`](../Scripts/Setup-Install.ps1#L31) | 31-31 | `q`, `def` |  |
+| 3 | [`YesNo`](../Scripts/Setup-Install.ps1#L32) | 32-32 | `q` |  |
+| 4 | [`Head`](../Scripts/Setup-Install.ps1#L33) | 33-33 | `t` |  |
+| 5 | [`Set-Line`](../Scripts/Setup-Install.ps1#L34) | 34-39 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
+| 6 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L41) | 41-45 | `file`, `name` | set "brandName" in config.json without reformatting the file |
+| 7 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L47) | 47-47 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
+| 8 | [`Expand-Files`](../Scripts/Setup-Install.ps1#L51) | 51-55 | `to` | the files to put in place: payload.zip unpacked, or a copy of the -Source folder (no .git, nothing a master made) |
+| 9 | [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L59) | 59-64 | `file` |  |
+| 10 | [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L66) | 66-73 | `file` | the game menu's config without the other shop's badge, logo, banner, server address and featured games |
+| 11 | [`Sync-Tools`](../Scripts/Setup-Install.ps1#L78) | 78-96 | `from`, `root`, `bk` |  |
+| 12 | [`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L98) | 98-110 | `root` | proof that Tools\ is the same as the pack: every file in TOOLS-MANIFEST.txt there, same size and SHA256 |
+| 13 | [`Quit`](../Scripts/Setup-Install.ps1#L139) | 139-139 | `rc` | leave nothing in TEMP when the person stops at a question |
 
 <a id="system-scripts-setup-plan-ps1"></a>
 ### System/Scripts/Setup-Plan.ps1
@@ -1369,7 +1369,7 @@
 <a id="system-scripts-tool-pack-ps1"></a>
 ### System/Scripts/Tool-Pack.ps1
 
-163 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe`, `NoTools` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
+166 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe`, `NoTools` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|

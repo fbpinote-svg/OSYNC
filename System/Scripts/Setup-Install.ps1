@@ -12,7 +12,8 @@
 #   -Target X:\OSYNC -ShopName "MY SHOP" -Yes      no questions          -NoWizard   do not start the setup afterwards
 #   -Upgrade X:\OSYNC                              update that OSYNC folder       -Payload <zip>   default: next to this file
 #   -Source <folder>                               files from that folder instead of payload.zip (EASY-INSTALL.bat; no built menu)
-param([string]$Target = '', [string]$ShopName = '', [string]$Upgrade = '', [string]$Payload = '', [string]$Source = '', [switch]$Yes, [switch]$NoWizard, [string]$BranchCommand = '')
+#   -PlanOnly                                      only the check of this PC (Setup-Plan.ps1) - installs nothing (an AI runs it first)
+param([string]$Target = '', [string]$ShopName = '', [string]$Upgrade = '', [string]$Payload = '', [string]$Source = '', [switch]$Yes, [switch]$NoWizard, [string]$BranchCommand = '', [switch]$PlanOnly)
 $ErrorActionPreference = 'Stop'
 # an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither
 function Test-Installed([string]$dir) { (Test-Path -LiteralPath (Join-Path $dir 'OSYNC.bat')) -and (Test-Path -LiteralPath (Join-Path $dir 'System\Scripts\Common.ps1')) -and ((Test-Path -LiteralPath (Join-Path $dir 'Launchers')) -or (Test-Path -LiteralPath (Join-Path $dir 'System\Data'))) }
@@ -116,7 +117,7 @@ $existing = @(foreach ($d in $drives) {
     foreach ($c in @("$($d.DeviceID)\") + @(Get-ChildItem "$($d.DeviceID)\" -Directory -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })) {
       if ((Test-Installed $c) -and ($c.TrimEnd('\') -ine $Source)) { $c.TrimEnd('\') }
     } })
-if (-not $Upgrade -and -not $Target -and $existing) {
+if (-not $Upgrade -and -not $Target -and -not $PlanOnly -and $existing) {
   Write-Host "OSYNC found on this PC: $($existing -join ', ')"
   # never updated without a person saying so (with -Yes an update needs -Upgrade <folder>)
   if ($Yes) { Write-Host 'Use -Upgrade <folder> to update it, or -Target <folder> for a new one.' -ForegroundColor Red; exit 1 }
@@ -136,6 +137,18 @@ $shared = (($shared.ToCharArray() | Sort-Object -Unique) -join '')
 $tmp = Join-Path $env:TEMP "osync-setup-$stamp"
 # leave nothing in TEMP when the person stops at a question
 function Quit([int]$rc) { if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }; exit $rc }
+# -PlanOnly: the read-only check of this PC and nothing else (only System\Scripts is taken out of payload.zip)
+if ($PlanOnly) {
+  if ($Source) { $ps = Join-Path $Source 'System\Scripts\Setup-Plan.ps1' }
+  else {
+    $z = [IO.Compression.ZipFile]::OpenRead($Payload)
+    try { foreach ($e in @($z.Entries | Where-Object { $_.FullName -like 'System/Scripts/*' -and $_.Name })) { $d = Join-Path $tmp ($e.FullName -replace '/', '\'); New-Item -ItemType Directory -Force -Path (Split-Path -Parent $d) | Out-Null; [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $d, $true) } } finally { $z.Dispose() }
+    $ps = Join-Path $tmp 'System\Scripts\Setup-Plan.ps1'
+  }
+  & $ps -SharedDrives $shared
+  if ($existing) { Write-Host "`nOSYNC already installed here: $($existing -join ', ') - an update: -Upgrade <that folder>" -ForegroundColor Cyan }
+  Quit 0
+}
 if ($Upgrade) {
   # ---------- update in place ----------
   $root = $Upgrade.TrimEnd('\')

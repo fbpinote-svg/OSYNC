@@ -145,7 +145,7 @@ flowchart TD
 
 ### 2.1 ทำไฟล์ติดตั้งบนเครื่องแม่ต้นทาง (7 → 19)
 
-`Tool-Pack.ps1` ทำไฟล์เดียว `System\Dist\OSYNC-Setup-<yyyyMMdd-HHmm>.exe` (เปลี่ยนที่เก็บด้วย `-Out <โฟลเดอร์>`, `-NoExe` = หยุดที่ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ไว้ทดสอบเอง, `-NoTools` = ไม่ใส่ `Tools\`)
+`Tool-Pack.ps1` ทำไฟล์เดียว `System\Dist\OSYNC-Setup-<yyyyMMdd-HHmm>.exe` และคัดลอก `SETUP-AI.md` + `00-EASY-INSTALL.md` ไว้ข้างกัน (ให้คน / AI ที่สาขาอ่านก่อนติดตั้ง) (เปลี่ยนที่เก็บด้วย `-Out <โฟลเดอร์>`, `-NoExe` = หยุดที่ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ไว้ทดสอบเอง, `-NoTools` = ไม่ใส่ `Tools\`)
 
 | อยู่ในไฟล์ | ไม่อยู่ในไฟล์ |
 |---|---|
@@ -155,7 +155,7 @@ flowchart TD
 | `Settings\extra-games.json` ที่ `"games": []` และไฟล์ `.json` / `.xml` อื่นใน `Settings\` (`game-start.json`, `gta5_settings*.xml`, ใส่เพิ่ม 20 พ.ย. 2026) | |
 | `Menu\app` (โปรแกรมเมนูที่ build แล้ว 1 ตัว), `Menu\tools`, `Menu\README-TH.txt`, `Menu\config.json` แบบกลาง (`brandName=GAME CENTER`, ล้างโลโก้ / `apiUrl` / `machineId` / แบนเนอร์, `featured=[]`), `Menu\data` ว่าง | |
 
-ค่าอื่นใน `settings.txt` (สวิตช์เปิดปิดงาน, พอร์ต, `OnlineHub`) ติดไปตามเดิม ตัวติดตั้งล้างรายการเดียวกันซ้ำอีกรอบตอนติดตั้ง ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58))
+ค่าอื่นใน `settings.txt` (สวิตช์เปิดปิดงาน, พอร์ต, `OnlineHub`) ติดไปตามเดิม ตัวติดตั้งล้างรายการเดียวกันซ้ำอีกรอบตอนติดตั้ง ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L59))
 **แก้ 20 พ.ย. 2026:** บนเครื่องที่ `%TEMP%` เป็นชื่อสั้นแบบ 8.3 (ชื่อผู้ใช้ยาวเกิน 8 ตัว เช่นเครื่องแม่ร้านนี้ `C:\Users\CCU_MA~1`) ชื่อไฟล์ทุกตัวใน `payload.zip` เคยขึ้นต้นด้วย `d/` ทำให้ exe หา `Setup-Install.ps1` ไม่เจอ (`OSYNC setup failed: Value cannot be null.`) ตอนนี้ใช้ชื่อเต็มของ `%TEMP%` แล้ว ทดสอบ exe ที่ทำใหม่ติดตั้งลงโฟลเดอร์ทดสอบผ่าน
 
 ### 2.2 รันบนเครื่องแม่ใหม่
@@ -172,6 +172,7 @@ flowchart TD
 | `-Upgrade X:\OSYNC` | อัปเดต OSYNC ที่มีอยู่ (ดู[ข้อ 3](#3-อัปเดตเครื่องแม่ที่มี-osync-อยู่แล้ว)) |
 | `-NoWizard` | ไม่เปิดขั้นต่อไปให้ (ติดตั้งใหม่ = ไม่เปิด `OSYNC.bat setup`, อัปเดต = ไม่รัน `Tool-Check`) แค่บอกว่าต้องกดอะไรต่อ |
 | `-Payload <zip>` | ไฟล์ payload (ตัว exe ใส่ให้เอง) |
+| `-PlanOnly` | แค่ตรวจเครื่อง (`Setup-Plan.ps1`, ดึงเฉพาะ `System\Scripts` ออกจาก payload) ไม่ติดตั้ง · เจอ OSYNC ที่ติดตั้งแล้วบอก `OSYNC already installed here: ...` · ไม่ถามเรื่องอัปเดต |
 | `-Source <โฟลเดอร์>` | เอาไฟล์จากโฟลเดอร์ที่แตกจาก zip ของโปรเจกต์แทน payload (`EASY-INSTALL.bat` ใส่ให้เอง) · ถ้าโฟลเดอร์นั้นเป็น OSYNC ที่ติดตั้งแล้ว (มี `Launchers\` หรือ `System\Data\`) หยุดทันที |
 | `-BranchCommand "<บรรทัด>"` | ติดตั้ง branch runner ต่อเลย (ร้านนี้ไม่ใช้) |
 
@@ -180,16 +181,16 @@ flowchart TD
 ### 2.3 ขั้นตอนที่ `Setup-Install.ps1` ทำ (ติดตั้งใหม่)
 
 1. อ่านรุ่นจาก `System/VERSION.txt` ใน payload (หรือในโฟลเดอร์ `-Source`) แล้วแสดง
-2. หาไดรฟ์ fixed ทุกตัวยกเว้นไดรฟ์ระบบ และหา OSYNC ที่ติดตั้งแล้ว ([`Test-Installed`](../Scripts/Setup-Install.ps1#L18): ที่รากไดรฟ์ หรือโฟลเดอร์ชั้นแรก ที่มี `OSYNC.bat` + `System\Scripts\Common.ps1` + `Launchers\` หรือ `System\Data\` โฟลเดอร์ที่แตกจาก zip จึงไม่นับ) ถ้าเจอ ถามว่าจะอัปเดตไหม
+2. หาไดรฟ์ fixed ทุกตัวยกเว้นไดรฟ์ระบบ และหา OSYNC ที่ติดตั้งแล้ว ([`Test-Installed`](../Scripts/Setup-Install.ps1#L19): ที่รากไดรฟ์ หรือโฟลเดอร์ชั้นแรก ที่มี `OSYNC.bat` + `System\Scripts\Common.ps1` + `Launchers\` หรือ `System\Data\` โฟลเดอร์ที่แตกจาก zip จึงไม่นับ) ถ้าเจอ ถามว่าจะอัปเดตไหม
 3. หาไดรฟ์ที่เครื่องลูกเห็น: ถ้ามี `C:\lwserver\config\lwservice.db` และมี Node.js อ่านตาราง `tServerDiskMng` (แบบอ่านอย่างเดียว) ไม่งั้นใช้ไดรฟ์ fixed ทุกตัวยกเว้น C: (เรียงตามตัวอักษร)
-4. แตกไฟล์ลงโฟลเดอร์ชั่วคราว ([`Expand-Files`](../Scripts/Setup-Install.ps1#L50): payload.zip หรือคัดลอกโฟลเดอร์ `-Source` โดยไม่เอา `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules`)
+4. แตกไฟล์ลงโฟลเดอร์ชั่วคราว ([`Expand-Files`](../Scripts/Setup-Install.ps1#L51): payload.zip หรือคัดลอกโฟลเดอร์ `-Source` โดยไม่เอา `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules`)
 5. **ตรวจเครื่อง** `Setup-Plan.ps1 -PassThru` (อ่านอย่างเดียว แสดงผลแบบ [00 ข้อ 3.5](00-EASY-INSTALL.md#35-ตัวอย่างผลตรวจเครื่องจริง)) แล้วใช้ที่วางที่แนะนำเป็นค่าตั้งต้น (ไม่มีผล = `<ไดรฟ์แรกที่เครื่องลูกเห็น>:\OSYNC` แบบเดิม)
-6. ถามโฟลเดอร์ · ถ้าไดรฟ์ไม่อยู่ในรายการ เตือนแล้วถาม · ถ้าโฟลเดอร์มี `OSYNC.bat` แล้ว หยุด · ถ้าไม่ว่าง ถามก่อน (ไม่ลบอะไร) · ตอบไม่ = ลบโฟลเดอร์ชั่วคราวแล้วจบ ([`Quit`](../Scripts/Setup-Install.ps1#L138))
+6. ถามโฟลเดอร์ · ถ้าไดรฟ์ไม่อยู่ในรายการ เตือนแล้วถาม · ถ้าโฟลเดอร์มี `OSYNC.bat` แล้ว หยุด · ถ้าไม่ว่าง ถามก่อน (ไม่ลบอะไร) · ตอบไม่ = ลบโฟลเดอร์ชั่วคราวแล้วจบ ([`Quit`](../Scripts/Setup-Install.ps1#L139))
 7. ย้ายไฟล์เข้าโฟลเดอร์ (ของที่มีอยู่แล้วไม่ทับ) สร้าง `Launchers`, `GAME`, `Tools`, `System\Data`, `System\Backup`, `Menu\data`
-8. ล้างค่าของร้านต้นทางใน `settings.txt` ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L58) รายการเดียวกับข้อ 2.1) และใน `Menu\config.json` ([`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L65): `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, แบนเนอร์, `featured=[]`) แล้วบันทึกผลตรวจเครื่องที่ `System\Data\setup-plan.txt`
+8. ล้างค่าของร้านต้นทางใน `settings.txt` ([`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L59) รายการเดียวกับข้อ 2.1) และใน `Menu\config.json` ([`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L66): `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, แบนเนอร์, `featured=[]`) แล้วบันทึกผลตรวจเครื่องที่ `System\Data\setup-plan.txt`
 9. เขียน `Settings\settings.txt`: `SharedDrives`, `MasterPC=<ชื่อเครื่องนี้>`, `MasterIP=<IP ของการ์ดที่มี gateway>`
 10. ถามชื่อร้าน → แก้ `"brandName"` ใน `Menu\config.json` (ไม่จัดรูปไฟล์ใหม่) และเปลี่ยนชื่อ exe ตัวใหญ่ (>50 MB) ใน `Menu\app` เป็น `<ชื่อร้าน>.exe` · ไม่มีโปรแกรมเมนู (ติดตั้งจาก zip) = บอกว่าขั้นตั้งค่าครั้งแรกข้อ 4 จะ build ให้
-11. `Tools\`: ถ้าโฟลเดอร์ปลายทางมี `Tools\` อยู่แล้ว ใส่ทีละโฟลเดอร์ ([`Sync-Tools`](../Scripts/Setup-Install.ps1#L77)) แล้วเทียบทุกไฟล์กับ `TOOLS-MANIFEST.txt` ([`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L97)): `tools: all <n> files are the same as the pack (SHA256)` · ทดสอบ 20 พ.ย. 2026: 6,969 ไฟล์ตรงทั้งหมด
+11. `Tools\`: ถ้าโฟลเดอร์ปลายทางมี `Tools\` อยู่แล้ว ใส่ทีละโฟลเดอร์ ([`Sync-Tools`](../Scripts/Setup-Install.ps1#L78)) แล้วเทียบทุกไฟล์กับ `TOOLS-MANIFEST.txt` ([`Test-ToolsSame`](../Scripts/Setup-Install.ps1#L98)): `tools: all <n> files are the same as the pack (SHA256)` · ทดสอบ 20 พ.ย. 2026: 6,969 ไฟล์ตรงทั้งหมด
 12. `Unblock-File` ทุกไฟล์ใน `System`, `Menu\app`, `Menu\tools` แล้วลบโฟลเดอร์ชั่วคราว
 13. ถามบรรทัดติดตั้ง branch runner (กด Enter = ข้าม) · ร้านนี้กด Enter
 14. เปิด `OSYNC.bat setup` (= เลข 4, ขอ admin เปิดหน้าต่างของตัวเอง)

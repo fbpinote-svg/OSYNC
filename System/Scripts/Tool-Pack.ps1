@@ -160,4 +160,7 @@ try {
 } finally { $fs.Dispose() }
 Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host ("`nOSYNC-Setup: {0}  ({1:N0} MB)" -f $exe, ((Get-Item -LiteralPath $exe).Length / 1MB)) -ForegroundColor Green
+# the guides for the person / AI at the branch, next to the exe (SETUP-AI.md: what an AI does first, before anything is installed)
+foreach ($g in 'SETUP-AI.md', '00-EASY-INSTALL.md') { Copy-Item -LiteralPath (Join-Path $DocsDir $g) -Destination (Join-Path $Out $g) -Force }
 Write-Host 'Copy this one file to a master PC and run it: it installs OSYNC there, or updates the OSYNC that is already there.'
+Write-Host "With an AI: copy SETUP-AI.md and 00-EASY-INSTALL.md from $Out too (the AI reads them first; OSYNC-Setup.exe -PlanOnly = check only)."
