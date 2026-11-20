@@ -85,6 +85,7 @@ function Invoke-Action([string]$a, [string]$x) {
         'link-scan' { [void](Run-Ps 'Tool-LinkScan.ps1') }
         'migrate'  { [void](Run-Ps 'Tool-Migrate.ps1') }
         'pack'     { [void](Run-Ps 'Tool-Pack.ps1') }
+        'plan'     { [void](Run-Ps 'Setup-Plan.ps1' @('-OutFile', (Join-Path $DataDir 'setup-plan.txt'))) }
         'branch'   { [void](Run-Ps 'Branch-Runner.ps1' $(if ($x) { @('-Install', '-Command', $x) } else { @('-Install') })) }
         'branch-status' { [void](Run-Ps 'Branch-Runner.ps1' @('-Status')) }
         'branch-off' { if (Ask 'Remove the branch runner from this PC (the web can no longer wake this branch''s PCs)?') { [void](Run-Ps 'Branch-Runner.ps1' @('-Uninstall')) } }
@@ -102,6 +103,7 @@ function Show-Tools {
         '3' = @('build-menu', 'Build the menu program (after a change in Menu\source or the logo)')
         '18' = @('organize', 'Tidy the game drive: Games\, Tools\ (shop closed)')
         '19' = @('pack', 'Make OSYNC-Setup.exe: one file that installs / updates OSYNC on any master')
+        '23' = @('plan', 'Check this master: where each part should go (read only)')
         '4' = @('steam-firstrun', 'Steam first-run setup only'); '5' = @('ea-install', 'EA app + EA AntiCheat only'); '6' = @('ea-uninstall', 'EA app: remove')
         '7' = @('eac', 'EasyAntiCheat only'); '8' = @('newthings', 'NEWTHINGS-GAMES (GTA SA) + Thai text fix')
         '9' = @('riot-startup-on', 'Riot silent start at logon: ON'); '10' = @('riot-startup-off', 'Riot silent start at logon: OFF')
@@ -115,7 +117,7 @@ function Show-Tools {
     Write-Host ''
     Write-Host ' Tools' -ForegroundColor Cyan
     Write-Host '  Master' -ForegroundColor DarkGray
-    foreach ($k in '1', '2', '18', '3', '19') { Write-Host ('  {0,3}  {1}' -f $k, $items[$k][1]) }
+    foreach ($k in '23', '1', '2', '18', '3', '19') { Write-Host ('  {0,3}  {1}' -f $k, $items[$k][1]) }
     Write-Host '  Branch (this master <-> the shop web, folder C:\AT9-Branch)' -ForegroundColor DarkGray
     foreach ($k in '20', '21', '22') { Write-Host ('  {0,3}  {1}' -f $k, $items[$k][1]) }
     Write-Host '  Client (super workstation mode, then save the image)' -ForegroundColor DarkGray

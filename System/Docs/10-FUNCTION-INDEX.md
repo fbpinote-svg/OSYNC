@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 83 ไฟล์ · ฟังก์ชัน 626 ตัว · สร้างเมื่อ 20 Nov 2026 13:44 จากโค้ดใน repo นี้
+ไฟล์โค้ด 84 ไฟล์ · ฟังก์ชัน 635 ตัว · สร้างเมื่อ 20 Nov 2026 20:16 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -32,7 +32,7 @@
   - [System/Scripts/Client-Firewall.ps1](#system-scripts-client-firewall-ps1) — 0 ฟังก์ชัน
   - [System/Scripts/Client-Install.ps1](#system-scripts-client-install-ps1) — 3 ฟังก์ชัน
   - [System/Scripts/Client-Menu.ps1](#system-scripts-client-menu-ps1) — 0 ฟังก์ชัน
-  - [System/Scripts/Client-Mic.ps1](#system-scripts-client-mic-ps1) — 17 ฟังก์ชัน
+  - [System/Scripts/Client-Mic.ps1](#system-scripts-client-mic-ps1) — 18 ฟังก์ชัน
   - [System/Scripts/Client-Parsec.ps1](#system-scripts-client-parsec-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Client-PopupGuard.ps1](#system-scripts-client-popupguard-ps1) — 1 ฟังก์ชัน
   - [System/Scripts/Client-Runtimes.ps1](#system-scripts-client-runtimes-ps1) — 4 ฟังก์ชัน
@@ -90,7 +90,8 @@
   - [System/Scripts/Common.ps1](#system-scripts-common-ps1) — 34 ฟังก์ชัน
   - [System/Scripts/Http-Lib.ps1](#system-scripts-http-lib-ps1) — 10 ฟังก์ชัน
   - [System/Scripts/OSYNC.ps1](#system-scripts-osync-ps1) — 5 ฟังก์ชัน
-  - [System/Scripts/Setup-Install.ps1](#system-scripts-setup-install-ps1) — 6 ฟังก์ชัน
+  - [System/Scripts/Setup-Install.ps1](#system-scripts-setup-install-ps1) — 11 ฟังก์ชัน
+  - [System/Scripts/Setup-Plan.ps1](#system-scripts-setup-plan-ps1) — 3 ฟังก์ชัน
   - [System/Scripts/Tool-Check.ps1](#system-scripts-tool-check-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Tool-Folder-Icons.ps1](#system-scripts-tool-folder-icons-ps1) — 2 ฟังก์ชัน
   - [System/Scripts/Tool-LinkScan.ps1](#system-scripts-tool-linkscan-ps1) — 0 ฟังก์ชัน
@@ -190,7 +191,7 @@
 <a id="system-scripts-master-setup-ps1"></a>
 ### System/Scripts/Master-Setup.ps1
 
-93 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `DryRun` · [เปิดไฟล์](../Scripts/Master-Setup.ps1)
+100 บรรทัด · 2 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `DryRun` · [เปิดไฟล์](../Scripts/Master-Setup.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
@@ -324,27 +325,28 @@
 <a id="system-scripts-client-mic-ps1"></a>
 ### System/Scripts/Client-Mic.ps1
 
-379 บรรทัด · 17 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `WatchDefaults`, `WatchMinutes` · [เปิดไฟล์](../Scripts/Client-Mic.ps1)
+417 บรรทัด · 18 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `CheckOnly`, `WatchDefaults`, `WatchMinutes` · [เปิดไฟล์](../Scripts/Client-Mic.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L28) | 28-28 | `p` | x64 program? (PE machine 0x8664) |
-| 2 | [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L35) | 35-39 | `Pattern` |  |
-| 3 | [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L42) | 42-44 | `Pattern` | 20 Nov 2026: only a device that WORKS counts - Windows can keep a root device with no driver (empty class and name, only the HardwareID; the master has one f... |
-| 4 | [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L45) | 45-57 | - |  |
-| 5 | [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L60) | 60-68 | `Exe`, `Arguments`, `Seconds` | runs a setup hidden; stops it (and what it started) when it is still busy after $Seconds - a setup waiting on a window nobody can see (SYSTEM at boot) must n... |
-| 6 | [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L133) | 133-137 | `Id` |  |
-| 7 | [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L138) | 138-143 | - |  |
-| 8 | [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L144) | 144-147 | `When` |  |
-| 9 | [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L151) | 151-155 | `Flow` | the PC's own active speaker (flow 0) / mic (flow 1): not ours, not another program's virtual device |
-| 10 | [`WLog`](../Scripts/Client-Mic.ps1#L159) | 159-159 | `s` |  |
-| 11 | [`Get-Devcon`](../Scripts/Client-Mic.ps1#L188) | 188-195 | - | x64 client) - then OSLink's x64 devcon is used (game disk, signed by its maker, the same one Client-OslinkDrivers uses) 19 Nov 2026: "UnknownError" = its roo... |
-| 12 | [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L197) | 197-197 | `r` | devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed |
-| 13 | [`Show-Sound`](../Scripts/Client-Mic.ps1#L202) | 202-205 | `When` | Owner, 20 Nov 2026: only the sound / mic drivers of OUR menu system (WO Mic, VB-CABLE) are handled here - never the PC's own sound card, Windows' sound servi... |
-| 14 | [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L264) | 264-264 | - | root device(s) with VB-CABLE's HardwareID but no working driver (the setup / an old install left them) |
-| 15 | [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L266) | 266-280 | `before` | Windows may switch the default to the new CABLE device a moment after it appears: watch ~20 s, put the old one back |
-| 16 | [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L344) | 344-355 | - | on "CABLE Output". A VB-CABLE speaker / mic that was disabled (in the image; several PCs show one renamed "NOT USE") is not seen at all - so they are enabled... |
-| 17 | [`Format-EpState`](../Scripts/Client-Mic.ps1#L356) | 356-356 | `s` |  |
+| 1 | [`Test-X64Exe`](../Scripts/Client-Mic.ps1#L33) | 33-33 | `p` | x64 program? (PE machine 0x8664) |
+| 2 | [`Get-MediaDevice`](../Scripts/Client-Mic.ps1#L40) | 40-44 | `Pattern` |  |
+| 3 | [`Get-WorkingDevice`](../Scripts/Client-Mic.ps1#L47) | 47-49 | `Pattern` | 20 Nov 2026: only a device that WORKS counts - Windows can keep a root device with no driver (empty class and name, only the HardwareID; the master has one f... |
+| 4 | [`Find-WoMicClient`](../Scripts/Client-Mic.ps1#L50) | 50-62 | - |  |
+| 5 | [`Invoke-Setup`](../Scripts/Client-Mic.ps1#L65) | 65-73 | `Exe`, `Arguments`, `Seconds` | runs a setup hidden; stops it (and what it started) when it is still busy after $Seconds - a setup waiting on a window nobody can see (SYSTEM at boot) must n... |
+| 6 | [`Get-EndpointName`](../Scripts/Client-Mic.ps1#L138) | 138-142 | `Id` |  |
+| 7 | [`Get-AudioDefaults`](../Scripts/Client-Mic.ps1#L143) | 143-148 | - |  |
+| 8 | [`Show-AudioDefaults`](../Scripts/Client-Mic.ps1#L149) | 149-152 | `When` |  |
+| 9 | [`Get-RealEndpoint`](../Scripts/Client-Mic.ps1#L156) | 156-160 | `Flow` | the PC's own active speaker (flow 0) / mic (flow 1): not ours, not another program's virtual device |
+| 10 | [`WLog`](../Scripts/Client-Mic.ps1#L164) | 164-164 | `s` |  |
+| 11 | [`Get-Devcon`](../Scripts/Client-Mic.ps1#L193) | 193-200 | - | x64 client) - then OSLink's x64 devcon is used (game disk, signed by its maker, the same one Client-OslinkDrivers uses) 19 Nov 2026: "UnknownError" = its roo... |
+| 12 | [`Test-WoMicPackage`](../Scripts/Client-Mic.ps1#L204) | 204-216 | - | WO Mic's x64 driver for the direct install (Tools\WOMic\driver): 2.1.0.0 out of WOMicClientSetup6.4.exe, signed by Microsoft (Windows Hardware Compatibility ... |
+| 13 | [`Format-DevconExit`](../Scripts/Client-Mic.ps1#L218) | 218-218 | `r` | devcon exit codes: 0 done, 1 done but Windows wants a restart, 2 failed |
+| 14 | [`Show-Sound`](../Scripts/Client-Mic.ps1#L223) | 223-226 | `When` | Owner, 20 Nov 2026: only the sound / mic drivers of OUR menu system (WO Mic, VB-CABLE) are handled here - never the PC's own sound card, Windows' sound servi... |
+| 15 | [`Get-VbBroken`](../Scripts/Client-Mic.ps1#L302) | 302-302 | - | root device(s) with VB-CABLE's HardwareID but no working driver (the setup / an old install left them) |
+| 16 | [`Restore-AudioDefaults`](../Scripts/Client-Mic.ps1#L304) | 304-318 | `before` | Windows may switch the default to the new CABLE device a moment after it appears: watch ~20 s, put the old one back |
+| 17 | [`Get-VbEndpoints`](../Scripts/Client-Mic.ps1#L382) | 382-393 | - | on "CABLE Output". A VB-CABLE speaker / mic that was disabled (in the image; several PCs show one renamed "NOT USE") is not seen at all - so they are enabled... |
+| 18 | [`Format-EpState`](../Scripts/Client-Mic.ps1#L394) | 394-394 | `s` |  |
 
 <a id="system-scripts-client-parsec-ps1"></a>
 ### System/Scripts/Client-Parsec.ps1
@@ -1276,29 +1278,45 @@
 <a id="system-scripts-osync-ps1"></a>
 ### System/Scripts/OSYNC.ps1
 
-168 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
+170 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L15) | 15-15 | - |  |
 | 2 | [`Ask`](../Scripts/OSYNC.ps1#L16) | 16-16 | `q` |  |
 | 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L17) | 17-23 | - |  |
-| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L25) | 25-97 | `a`, `x` |  |
-| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L99) | 99-131 | - |  |
+| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L25) | 25-98 | `a`, `x` |  |
+| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L100) | 100-133 | - |  |
 
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1
 
-169 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Yes`, `NoWizard`, `BranchCommand` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
+216 บรรทัด · 11 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Target`, `ShopName`, `Upgrade`, `Payload`, `Source`, `Yes`, `NoWizard`, `BranchCommand` · [เปิดไฟล์](../Scripts/Setup-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Ask`](../Scripts/Setup-Install.ps1#L16) | 16-16 | `q`, `def` |  |
-| 2 | [`YesNo`](../Scripts/Setup-Install.ps1#L17) | 17-17 | `q` |  |
-| 3 | [`Head`](../Scripts/Setup-Install.ps1#L18) | 18-18 | `t` |  |
-| 4 | [`Set-Line`](../Scripts/Setup-Install.ps1#L19) | 19-24 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
-| 5 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L26) | 26-30 | `file`, `name` | set "brandName" in config.json without reformatting the file |
-| 6 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L32) | 32-32 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
+| 1 | [`Test-Installed`](../Scripts/Setup-Install.ps1#L16) | 16-16 | `dir` | an INSTALLED OSYNC has Launchers\ or System\Data\ (made by this setup); a download of the project has neither |
+| 2 | [`Ask`](../Scripts/Setup-Install.ps1#L28) | 28-28 | `q`, `def` |  |
+| 3 | [`YesNo`](../Scripts/Setup-Install.ps1#L29) | 29-29 | `q` |  |
+| 4 | [`Head`](../Scripts/Setup-Install.ps1#L30) | 30-30 | `t` |  |
+| 5 | [`Set-Line`](../Scripts/Setup-Install.ps1#L31) | 31-36 | `file`, `key`, `value`, `OnlyIfEmpty` |  |
+| 6 | [`Set-BrandName`](../Scripts/Setup-Install.ps1#L38) | 38-42 | `file`, `name` | set "brandName" in config.json without reformatting the file |
+| 7 | [`Get-Watchers`](../Scripts/Setup-Install.ps1#L44) | 44-44 | `root` | the OSYNC watcher of a folder (it keeps launchers open); stopped while its scripts are replaced |
+| 8 | [`Expand-Files`](../Scripts/Setup-Install.ps1#L48) | 48-52 | `to` | the files to put in place: payload.zip unpacked, or a copy of the -Source folder (no .git, nothing a master made) |
+| 9 | [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L56) | 56-61 | `file` |  |
+| 10 | [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L63) | 63-70 | `file` | the game menu's config without the other shop's badge, logo, banner, server address and featured games |
+| 11 | [`Quit`](../Scripts/Setup-Install.ps1#L99) | 99-99 | `rc` | leave nothing in TEMP when the person stops at a question |
+
+<a id="system-scripts-setup-plan-ps1"></a>
+### System/Scripts/Setup-Plan.ps1
+
+163 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `SharedDrives`, `OutFile`, `PassThru`, `Quiet` · [เปิดไฟล์](../Scripts/Setup-Plan.ps1)
+
+| # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
+|---|---|---|---|---|
+| 1 | [`Out`](../Scripts/Setup-Plan.ps1#L15) | 15-15 | `t`, `c` |  |
+| 2 | [`GB`](../Scripts/Setup-Plan.ps1#L16) | 16-16 | `b` |  |
+| 3 | [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L56) | 56-56 | `dir` | ---------- OSYNC already here? (installed = has Launchers\ or System\Data\; a download of the project has neither) ---------- |
 
 <a id="system-scripts-tool-check-ps1"></a>
 ### System/Scripts/Tool-Check.ps1
@@ -1347,11 +1365,11 @@
 <a id="system-scripts-tool-pack-ps1"></a>
 ### System/Scripts/Tool-Pack.ps1
 
-134 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
+139 บรรทัด · 1 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Out`, `NoExe` · [เปิดไฟล์](../Scripts/Tool-Pack.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L20) | 20-24 | `from`, `to`, `xf` |  |
+| 1 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L22) | 22-26 | `from`, `to`, `xf` |  |
 
 <a id="system-scripts-tool-riotdiag-ps1"></a>
 ### System/Scripts/Tool-RiotDiag.ps1

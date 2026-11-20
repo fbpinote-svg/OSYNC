@@ -13,7 +13,9 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $stamp = Get-Date -Format 'yyyyMMdd-HHmm'
 if (-not $Out) { $Out = Join-Path $SystemDir 'Dist' }
-$stage = Join-Path $env:TEMP "osync-pack-$stamp"
+# the long form of TEMP: a short 8.3 TEMP (C:\Users\LONGNA~1, user names over 8 letters) made every entry name in payload.zip
+# start with 'd/' (the files are listed with the long form), so OSYNC-Setup.exe could not find Setup-Install.ps1
+$stage = Join-Path (Get-Item -LiteralPath $env:TEMP).FullName "osync-pack-$stamp"
 $pl = Join-Path $stage 'payload'
 if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $pl, $Out | Out-Null
@@ -33,14 +35,17 @@ Write-Host '  system: OSYNC.bat, README.md, System\Scripts, Client, Docs'
 # 2 Settings for a NEW shop: this shop's values blanked (the setup fills SharedDrives / MasterIP / MasterPC), games list empty
 New-Item -ItemType Directory -Force -Path (Join-Path $pl 'Settings') | Out-Null
 $set = [IO.File]::ReadAllText($SettingsFile, [Text.Encoding]::UTF8)
-$set = [regex]::Replace($set, '(?m)^(\s*(SharedDrives|MasterIP|MasterPC)\s*=).*$', '$1')
-$set = [regex]::Replace($set, '(?m)^(\s*Role\s*=).*$', '${1}auto')
+# the values only THIS shop has (same list as Setup-Install.ps1 $ShopKeys): PC names, IPs, branch name, extra game folders
+$set = [regex]::Replace($set, '(?m)^(\s*(SharedDrives|MasterIP|MasterPC|GameFolders|ClientBlockCpuz|ClientApexClean|ClientSteamVerify|ClientSteamVerifyApps|OnlineBranch|OnlineBranchName|OnlineBind|OnlineExternalIP)\s*=)[^\r\n]*', '$1')
+$set = [regex]::Replace($set, '(?m)^(\s*Role\s*=)[^\r\n]*', '${1}auto')
 [IO.File]::WriteAllText((Join-Path $pl 'Settings\settings.txt'), $set, (New-Object Text.UTF8Encoding $false))
 $xg = [IO.File]::ReadAllText($ExtraGamesFile, [Text.Encoding]::UTF8)
 $xg = [regex]::Replace($xg, '"games"\s*:\s*\[[\s\S]*?\r?\n  \]', '"games": []')
 [void]($xg | ConvertFrom-Json)                                                       # still valid JSON
 [IO.File]::WriteAllText((Join-Path $pl 'Settings\extra-games.json'), $xg, (New-Object Text.UTF8Encoding $false))
-Write-Host '  settings: blank for the new shop'
+# the other files of Settings (already in git, nothing of this shop's PCs in them): game-start.json, gta5_settings*.xml
+Get-ChildItem -LiteralPath $SettingsDir -File | Where-Object { $_.Name -notin 'settings.txt', 'extra-games.json' -and $_.Extension -in '.json', '.xml' } | Copy-Item -Destination (Join-Path $pl 'Settings')
+Write-Host '  settings: blank for the new shop (+ game-start.json, gta5_settings*.xml)'
 
 # 3 the game menu: the built program (one exe; the old 0JAYSHOP.exe copy is left out), its tools, a neutral config
 $mi = Get-MenuInfo

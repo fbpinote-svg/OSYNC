@@ -76,7 +76,14 @@ else {
   if (Test-Path -LiteralPath $mi.Exe) { Write-Host "  program: $($mi.Exe)" -ForegroundColor Green }
   elseif (Test-Path -LiteralPath (Join-Path $Menu 'source\node_modules\electron')) {
     if (Ask 'The menu program is not built yet. Build it now (a few minutes)?') { & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Menu 'tools\_system\Build-App.ps1') }
-  } else { Write-Host "  not built and Menu\source\node_modules is missing: install Node.js LTS, run 'npm ci' in $Menu\source, then OSYNC.bat > 7 Tools > 3" -ForegroundColor Yellow }
+  } elseif ((Get-Command npm -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath (Join-Path $Menu 'source\package-lock.json'))) {
+    # a download of the project (EASY-INSTALL.bat) has the menu's source only
+    Write-Host '  not built yet, and its build tools are not here (a download of the project has the source only)' -ForegroundColor Yellow
+    if (Ask 'Get the build tools (npm ci: internet, a few minutes) and build the menu now?') {
+      Push-Location -LiteralPath (Join-Path $Menu 'source'); & npm.cmd ci --no-audit --no-fund; $rc = $LASTEXITCODE; Pop-Location
+      if ($rc -eq 0) { & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Menu 'tools\_system\Build-App.ps1') } else { Write-Host "  npm ci failed ($rc) - check the internet, then OSYNC.bat > 4 again" -ForegroundColor Red }
+    }
+  } else { Write-Host "  not built and Menu\source\node_modules is missing: install Node.js LTS (nodejs.org), then OSYNC.bat > 4 again (it builds the menu), or use OSYNC-Setup.exe which has it built" -ForegroundColor Yellow }
 }
 
 # 5-7

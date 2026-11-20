@@ -419,12 +419,12 @@ sequenceDiagram
 **เรียกจาก / ทำงานเมื่อไหร่:** `OSYNC.bat` 7 → 19 (`pack`, ไม่ต้อง admin)
 **พารามิเตอร์:** `-Out <โฟลเดอร์>` (ค่าเริ่ม `System\Dist`) · `-NoExe` หยุดหลังทำ `payload.zip` + `Setup.cmd` + `Setup-Install.ps1` ใน `%TEMP%\osync-pack-<เวลา>`
 **อ่านค่า:** `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `Settings\settings.txt`, `Settings\extra-games.json`, `Get-MenuInfo` (exe เมนู), `Menu\tools`, `Menu\README-TH.txt`, `Menu\config.json` · `csc.exe` ของ .NET Framework 4 (`Framework64` ก่อน)
-**เขียน / เปลี่ยน:** โฟลเดอร์ชั่วคราว `%TEMP%\osync-pack-<เวลา>` (ลบตอนจบ) และไฟล์ exe ใน `-Out` · ไม่แตะไฟล์ของร้าน
+**เขียน / เปลี่ยน:** โฟลเดอร์ชั่วคราว `%TEMP%\osync-pack-<เวลา>` (ลบตอนจบ; ใช้ชื่อเต็มของ `%TEMP%` จาก `Get-Item` เพราะ `%TEMP%` แบบ 8.3 เช่น `C:\Users\CCU_MA~1` เคยทำให้ชื่อไฟล์ใน zip ขึ้นต้นด้วย `d/` แก้ 20 พ.ย. 2026) และไฟล์ exe ใน `-Out` · ไม่แตะไฟล์ของร้าน
 **Log:** ไม่มี (ขึ้นจอ)
 
 **ขั้นตอนการทำงาน**
 1. คัดลอก `OSYNC.bat`, `README.md`, `System\Scripts`, `Client`, `Docs` และเขียน `System\VERSION.txt` = `OSYNC <เวลา> (packed on <ชื่อเครื่อง>)`
-2. Settings ของร้านใหม่: ล้าง `SharedDrives`, `MasterIP`, `MasterPC` · `Role=auto` · `extra-games.json` ให้ `"games": []` แล้วเช็กว่ายังเป็น JSON
+2. Settings ของร้านใหม่: ล้างค่าเฉพาะร้านนี้ (`SharedDrives`, `MasterIP`, `MasterPC`, `GameFolders`, `ClientBlockCpuz`, `ClientApexClean`, `ClientSteamVerify`, `ClientSteamVerifyApps`, `OnlineBranch`, `OnlineBranchName`, `OnlineBind`, `OnlineExternalIP`; รายการเดียวกับ `$ShopKeys` ของ `Setup-Install`) · `Role=auto` · `extra-games.json` ให้ `"games": []` แล้วเช็กว่ายังเป็น JSON · คัดลอก `.json` / `.xml` อื่นใน `Settings\` (`game-start.json`, `gta5_settings*.xml`)
 3. เมนู: `Menu\app` (ข้าม exe ใหญ่ตัวอื่นที่ไม่ใช่ตัวหลัก เช่นสำเนา `0JAYSHOP.exe` เก่า), `Menu\tools`, `README-TH.txt`, `config.json` แบบกลาง (`brandName=GAME CENTER`, ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText`, `featured=[]`), `Menu\data` ว่าง
 4. บีบ `payload.zip` ทีละไฟล์ด้วย `/` + คัดลอก `Setup-Install.ps1` + เขียน `Setup.cmd` (ล้าง `PSModulePath` แล้วรัน `Setup-Install.ps1 %*`) · `-NoExe` = จบตรงนี้
 5. คอมไพล์ตัวเปิด C# `OsyncSetup` ด้วย `csc.exe` แล้วต่อไฟล์: **stub exe + payload.zip + ท้าย 16 ไบต์** (8 ไบต์ = ตำแหน่งเริ่มของ zip, 8 ไบต์ = `OSYNCPK1`)
@@ -444,28 +444,28 @@ flowchart LR
 |---|---|---|
 | [`Copy-Dir`](../Scripts/Tool-Pack.ps1#L20) | 20 | `robocopy <จาก> <ไป> /E /R:1 /W:1` แบบเงียบ (`/NP /NFL /NDL /NJH /NJS`) ข้ามไฟล์ด้วย `/XF` · exit ≥ 8 = throw "copy failed" |
 
-**ค่าในร้านนี้ตอนนี้:** ยังไม่มีโฟลเดอร์ `H:\OSYNC\System\Dist` · ไม่มี `System\VERSION.txt` (เขียนเฉพาะในไฟล์แพ็ก)
+**ค่าในร้านนี้ตอนนี้:** ยังไม่มีโฟลเดอร์ `H:\OSYNC\System\Dist` · ไม่มี `System\VERSION.txt` (เขียนเฉพาะในไฟล์แพ็ก) · 20 พ.ย. 2026 ทำ exe ลงโฟลเดอร์ทดสอบ (188 MB) แล้วติดตั้งลงโฟลเดอร์ทดสอบผ่าน
 
 ---
 
 ## 7. `Setup-Install.ps1` — ตัวติดตั้งและอัปเดตเครื่องแม่
 
-**หน้าที่:** สิ่งที่ `OSYNC-Setup.exe` รัน: ติดตั้ง OSYNC ใหม่บนไดรฟ์เกมที่เครื่องลูกเห็น เขียน Settings ของร้านนี้ ตั้งชื่อเมนู แล้วเปิดตั้งค่าครั้งแรก หรืออัปเดต OSYNC ที่มีอยู่ในที่เดิม
-**เรียกจาก / ทำงานเมื่อไหร่:** ตัวเปิด C# ใน `OSYNC-Setup.exe` หรือ `Setup.cmd` (ทั้งคู่ทำโดย `Tool-Pack`) · ไม่ dot-source `Common.ps1` (ทำงานก่อนมี OSYNC ในเครื่อง)
+**หน้าที่:** Easy Install: สิ่งที่ `OSYNC-Setup.exe` และ `EASY-INSTALL.bat` รัน: ตรวจเครื่องแม่ (`Setup-Plan.ps1`) แล้วติดตั้ง OSYNC ใหม่บนไดรฟ์เกมที่เครื่องลูกเห็น ล้างค่าของร้านต้นทาง เขียน Settings ของร้านนี้ ตั้งชื่อเมนู แล้วเปิดตั้งค่าครั้งแรก หรืออัปเดต OSYNC ที่มีอยู่ในที่เดิม (คู่มือผู้ใช้: [00-EASY-INSTALL.md](00-EASY-INSTALL.md))
+**เรียกจาก / ทำงานเมื่อไหร่:** ตัวเปิด C# ใน `OSYNC-Setup.exe` หรือ `Setup.cmd` (ทั้งคู่ทำโดย `Tool-Pack`) · [`EASY-INSTALL.bat`](../../EASY-INSTALL.bat) ในโฟลเดอร์ที่แตกจาก zip ของโปรเจกต์ (`-Source <โฟลเดอร์นั้น>`) · ไม่ dot-source `Common.ps1` (ทำงานก่อนมี OSYNC ในเครื่อง) แต่เรียก `Setup-Plan.ps1` จากไฟล์ที่แตกแล้ว
 **พารามิเตอร์:**
 - `-Target <โฟลเดอร์>` ที่ติดตั้งใหม่ · `-ShopName "<ชื่อ>"` ชื่อร้าน (ค่าเริ่ม `GAME CENTER`) · `-Upgrade <โฟลเดอร์>` อัปเดต OSYNC นั้น
-- `-Payload <zip>` (ค่าเริ่ม `payload.zip` ข้างไฟล์) · `-Yes` ไม่ถาม · `-NoWizard` ไม่เปิดขั้นต่อไป · `-BranchCommand <บรรทัด>` ติดตั้ง branch runner
+- `-Payload <zip>` (ค่าเริ่ม `payload.zip` ข้างไฟล์) · `-Source <โฟลเดอร์>` ไฟล์จากโฟลเดอร์แทน zip (ไม่มีโปรแกรมเมนูที่ build แล้ว) · `-Yes` ไม่ถาม · `-NoWizard` ไม่เปิดขั้นต่อไป · `-BranchCommand <บรรทัด>` ติดตั้ง branch runner
 
 **อ่านค่า:** `System/VERSION.txt` ใน zip, ไดรฟ์ fixed (`Win32_LogicalDisk`), `C:\lwserver\config\lwservice.db` ตาราง `tServerDiskMng` (ผ่าน Node.js `node:sqlite` แบบ readOnly), IP ของการ์ดที่มี gateway, `Menu\config.json` เดิม, process ที่รันจาก `Menu\app` และ `Master-Watch.ps1`, `C:\AT9-Branch\state.json`
-**เขียน / เปลี่ยน:** โฟลเดอร์ OSYNC ทั้งหมด (ติดตั้งใหม่) หรือรายการที่แทนที่ (อัปเดต) · `Settings\settings.txt` (`SharedDrives`, `MasterPC`, `MasterIP` / คีย์ใหม่) · `Menu\config.json` `brandName` · ชื่อ exe เมนู · `System\Backup\upgrade-<เวลา>` · `Unblock-File` · หยุด/เปิดตัวเฝ้า
+**เขียน / เปลี่ยน:** โฟลเดอร์ OSYNC ทั้งหมด (ติดตั้งใหม่) หรือรายการที่แทนที่ (อัปเดต) · `Settings\settings.txt` (ล้าง `$ShopKeys`, เขียน `SharedDrives`, `MasterPC`, `MasterIP` / คีย์ใหม่) · `Menu\config.json` (`brandName` + ล้างค่าร้านต้นทาง) · `System\Data\setup-plan.txt` · ชื่อ exe เมนู · `System\Backup\upgrade-<เวลา>` · `Unblock-File` · หยุด/เปิดตัวเฝ้า
 **Log:** ไม่มี (ขึ้นจอ)
 
 **ขั้นตอนการทำงาน** (ทีละขั้นแบบผู้ใช้อยู่ใน [02 ข้อ 2](02-INSTALL-UPDATE.md#2-ตั้งเครื่องแม่สาขาใหม่ด้วย-osync-setupexe) และ [ข้อ 3](02-INSTALL-UPDATE.md#3-อัปเดตเครื่องแม่ที่มี-osync-อยู่แล้ว))
-1. หา payload, อ่านรุ่น, หาไดรฟ์ และ OSYNC ที่มีอยู่ (`OSYNC.bat` + `System\Scripts\Common.ps1`)
+1. หา payload (หรือ `-Source`: ต้องมี `System\Scripts\Common.ps1` และต้องไม่ใช่ OSYNC ที่ติดตั้งแล้ว), อ่านรุ่น, หาไดรฟ์ และ OSYNC ที่ติดตั้งแล้ว (`Test-Installed`: `OSYNC.bat` + `System\Scripts\Common.ps1` + `Launchers\` หรือ `System\Data\`; ไม่นับโฟลเดอร์ `-Source`)
 2. เจอ OSYNC และไม่ได้ใส่ `-Upgrade` / `-Target`: `-Yes` = หยุด exit 1 · ไม่งั้นถามว่าจะอัปเดตไหม
-3. หาไดรฟ์ที่เครื่องลูกเห็น (LW db หรือไดรฟ์ fixed)
-4. **อัปเดต:** แตก zip → หยุดตัวเฝ้า → แทนที่ `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` → เพิ่มคีย์ใหม่ใน `settings.txt` พร้อมคำอธิบาย → `MasterPC` ถ้าว่าง → แทนที่ `Menu\app` ถ้าเมนูปิด → เปิดตัวเฝ้าใหม่
-   **ติดตั้งใหม่:** เลือกโฟลเดอร์ → แตก zip และย้าย → สร้างโฟลเดอร์ว่าง → เขียน Settings → ชื่อร้าน → ชื่อ exe
+3. หาไดรฟ์ที่เครื่องลูกเห็น (LW db หรือไดรฟ์ fixed) เรียงตามตัวอักษร
+4. **อัปเดต:** แตกไฟล์ (`Expand-Files`) → หยุดตัวเฝ้า → แทนที่ `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` → เพิ่มคีย์ใหม่ใน `settings.txt` พร้อมคำอธิบาย → `MasterPC` ถ้าว่าง → แทนที่ `Menu\app` ถ้าเมนูปิด → เปิดตัวเฝ้าใหม่
+   **ติดตั้งใหม่:** แตกไฟล์ → ตรวจเครื่อง (`Setup-Plan.ps1 -SharedDrives <ที่หาได้> -PassThru`) → เลือกโฟลเดอร์ (ค่าแนะนำ = `OsyncRoot` ของผลตรวจ; ตอบไม่ = `Quit` ลบโฟลเดอร์ชั่วคราว) → ย้าย → สร้างโฟลเดอร์ว่าง → `Clear-ShopValues` + `Clear-MenuShop` + บันทึก `setup-plan.txt` → เขียน Settings → ชื่อร้าน → ชื่อ exe (ไม่มีโปรแกรมเมนู = บอกให้ build ที่ตั้งค่าครั้งแรกข้อ 4)
 5. `Unblock-File` ใน `System`, `Menu\app`, `Menu\tools` · ลบโฟลเดอร์ชั่วคราว
 6. branch runner: ใช้ `-BranchCommand` หรือถาม (ไม่ถามเมื่อ `-Yes` หรือมี `C:\AT9-Branch\state.json`) · บรรทัดต้องตรง `https?://<host>/api/branch/setup/<รหัส 20-64 ตัว>` แล้วรัน `Branch-Runner.ps1 -Install -Yes -Command <url> -OsyncRoot <root>` แบบ RunAs
 7. `-NoWizard` = บอกขั้นต่อไปแล้วจบ · อัปเดต = `Tool-Check.ps1 -Mode master` · ใหม่ = ตั้ง `OSYNC_NOPAUSE=1` แล้ว `cmd /c OSYNC.bat setup`
@@ -474,14 +474,35 @@ flowchart LR
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Ask`](../Scripts/Setup-Install.ps1#L16) | 16 | ถามพร้อมค่าแนะนำ `[ค่า]` Enter = ค่าแนะนำ · `-Yes` = คืนค่าแนะนำทันที |
-| [`YesNo`](../Scripts/Setup-Install.ps1#L17) | 17 | ถาม `[Y/N]` · `-Yes` = `$true` ทันที |
-| [`Head`](../Scripts/Setup-Install.ps1#L18) | 18 | พิมพ์หัวขั้น `== <ข้อความ>` สีเหลือง |
-| [`Set-Line`](../Scripts/Setup-Install.ps1#L19) | 19 | ตั้ง `คีย์=ค่า` ในไฟล์ (แทนบรรทัดแรกที่ตรง ไม่มี = ต่อท้าย) · `-OnlyIfEmpty` = ไม่ทับค่าที่มีอยู่ · เขียน UTF-8 ไม่มี BOM |
-| [`Set-BrandName`](../Scripts/Setup-Install.ps1#L26) | 26 | แทนค่า `"brandName": "..."` ตัวแรกด้วย regex โดยไม่จัดรูปไฟล์ใหม่ · UTF-8 ไม่มี BOM |
-| [`Get-Watchers`](../Scripts/Setup-Install.ps1#L32) | 32 | process `powershell.exe` ที่ command line มี `<root>\System\Scripts\Master-Watch.ps1` |
+| [`Test-Installed`](../Scripts/Setup-Install.ps1#L16) | 16 | โฟลเดอร์เป็น OSYNC ที่ติดตั้งแล้วไหม: `OSYNC.bat` + `System\Scripts\Common.ps1` + (`Launchers\` หรือ `System\Data\`) · โฟลเดอร์ที่แตกจาก zip ไม่มีสองโฟลเดอร์หลัง จึงไม่นับ |
+| [`Ask`](../Scripts/Setup-Install.ps1#L28) | 28 | ถามพร้อมค่าแนะนำ `[ค่า]` Enter = ค่าแนะนำ · `-Yes` = คืนค่าแนะนำทันที |
+| [`YesNo`](../Scripts/Setup-Install.ps1#L29) | 29 | ถาม `[Y/N]` · `-Yes` = `$true` ทันที |
+| [`Head`](../Scripts/Setup-Install.ps1#L30) | 30 | พิมพ์หัวขั้น `== <ข้อความ>` สีเหลือง |
+| [`Set-Line`](../Scripts/Setup-Install.ps1#L31) | 31 | ตั้ง `คีย์=ค่า` ในไฟล์ (แทนบรรทัดแรกที่ตรง ไม่มี = ต่อท้าย) · `-OnlyIfEmpty` = ไม่ทับค่าที่มีอยู่ · เขียน UTF-8 ไม่มี BOM |
+| [`Set-BrandName`](../Scripts/Setup-Install.ps1#L38) | 38 | แทนค่า `"brandName": "..."` ตัวแรกด้วย regex โดยไม่จัดรูปไฟล์ใหม่ · UTF-8 ไม่มี BOM |
+| [`Get-Watchers`](../Scripts/Setup-Install.ps1#L44) | 44 | process `powershell.exe` ที่ command line มี `<root>\System\Scripts\Master-Watch.ps1` |
+| [`Expand-Files`](../Scripts/Setup-Install.ps1#L48) | 48 | วางไฟล์ลงโฟลเดอร์ชั่วคราว: แตก `payload.zip` หรือ `robocopy` โฟลเดอร์ `-Source` โดยข้าม `.git`, `System\Data`, `System\Backup`, `System\Dist`, `Menu\source\node_modules` · exit ≥ 8 = throw |
+| [`Clear-ShopValues`](../Scripts/Setup-Install.ps1#L56) | 56 | ล้างค่าใน `$ShopKeys` เป็นว่างและ `Role=auto` (regex ต่อบรรทัด ไม่แตะท้ายบรรทัด CRLF) · UTF-8 ไม่มี BOM |
+| [`Clear-MenuShop`](../Scripts/Setup-Install.ps1#L63) | 63 | ล้าง `brandBadge`, `brandLogo`, `brandMark`, `apiUrl`, `machineId`, `hudBanner`, `hudBannerTag`, `hudBannerText` และ `featured=[]` ใน `Menu\config.json` แล้วเช็กว่ายังเป็น JSON |
+| [`Quit`](../Scripts/Setup-Install.ps1#L99) | 99 | ลบโฟลเดอร์ชั่วคราวแล้ว `exit <รหัส>` (ใช้ตอนผู้ใช้ตอบไม่ที่คำถามเรื่องโฟลเดอร์) |
 
-**ค่าในร้านนี้ตอนนี้:** ร้านนี้ไม่ได้ติดตั้งด้วยไฟล์นี้ (โฟลเดอร์ `H:\OSYNC` เป็นต้นทาง) · ถ้ารันบนเครื่องนี้จะเจอ OSYNC เดิมที่ `H:\OSYNC` · มี `C:\lwserver\config\lwservice.db` และ Node.js จึงอ่านไดรฟ์จาก LW ได้
+### `Setup-Plan.ps1` — ตรวจเครื่องแม่และแนะนำที่วางไฟล์ (อ่านอย่างเดียว)
+
+**หน้าที่:** ดูเครื่องแม่แล้วบอกว่าแต่ละส่วนของ OSYNC ควรอยู่ที่ไหน ไม่เปลี่ยนอะไรเลย (ผลจริงและวิธีอ่าน: [00 ข้อ 3](00-EASY-INSTALL.md#3-วางไฟล์ตรงไหนให้เหมาะกับเครื่องแม่ของคุณ))
+**เรียกจาก / ทำงานเมื่อไหร่:** `Setup-Install` ตอนติดตั้งใหม่ (`-PassThru`) · `OSYNC.bat` 7 → 23 (`-OutFile System\Data\setup-plan.txt`)
+**พารามิเตอร์:** `-SharedDrives <อักษร>` · `-OutFile <ไฟล์>` (UTF-8 มี BOM) · `-PassThru` คืนออบเจกต์ (`OsyncRoot`, `Why`, `SharedDrives`, `SharedHow`, `MoreGameFolders`, `Existing`, `Server`, `IP`, `Dhcp`, `Drives`, `Launchers`, `SteamLibraries`, `Text`) · `-Quiet` ไม่พิมพ์
+**อ่านค่า:** โฟลเดอร์ / เซอร์วิสของ diskless server (`$DisklessServerFolders`, `$DisklessServerServices` ของ `Common.ps1`), `lwservice.db` (Node.js), `SharedDrives`, `Win32_LogicalDisk`, `Get-PhysicalDisk` + `Get-Partition` (SSD / HDD / NVMe), `$LauncherTable` + `Get-LauncherInstallPath`, `libraryfolders.vdf` + `appmanifest_*.acf` (`SizeOnDisk`), `Win32_NetworkAdapterConfiguration` (IP, gateway, DHCP), `Win32_OperatingSystem`, `node --version`, `csc.exe`
+**เขียน / เปลี่ยน:** ไฟล์ `-OutFile` เท่านั้น
+
+**กติกาเลือกที่วาง OSYNC** (บรรทัด 98-113, เฉพาะไดรฟ์ที่เครื่องลูกเห็นและไม่ใช่ไดรฟ์ระบบ): 1) ไดรฟ์ของ OSYNC ที่ติดตั้งแล้ว 2) ไดรฟ์ที่มีเกม Steam มากที่สุด (library ≥ 50 GB, ว่าง ≥ 50 GB) 3) SSD ที่ว่าง ≥ 200 GB มากที่สุด 4) ไดรฟ์ที่ว่างมากที่สุด · ไดรฟ์ที่แชร์อื่นที่ว่าง ≥ 100 GB เสนอเป็น `X:\GAME` (ไม่เขียนลงค่า)
+
+| ฟังก์ชัน | บรรทัด | หลักการทำงาน |
+|---|---|---|
+| [`Out`](../Scripts/Setup-Plan.ps1#L15) | 15 | เก็บบรรทัดไว้ทำไฟล์ / ข้อความ และพิมพ์ขึ้นจอ (สีได้) เว้นแต่ `-Quiet` |
+| [`GB`](../Scripts/Setup-Plan.ps1#L16) | 16 | ไบต์ → GB ปัดเต็ม |
+| [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L56) | 56 | กติกาเดียวกับ `Test-Installed` ของ `Setup-Install` |
+
+**ค่าในร้านนี้ตอนนี้:** ร้านนี้ไม่ได้ติดตั้งด้วยไฟล์นี้ (โฟลเดอร์ `H:\OSYNC` เป็นต้นทาง) · ถ้ารันบนเครื่องนี้จะเจอ OSYNC เดิมที่ `H:\OSYNC` · มี `C:\lwserver\config\lwservice.db` และ Node.js จึงอ่านไดรฟ์จาก LW ได้ (`DEFGHIJ`) · 20 พ.ย. 2026 ทดสอบลงโฟลเดอร์ทดสอบ 4 แบบผ่าน: exe ใหม่, `EASY-INSTALL.bat` ใหม่, `-Upgrade` จาก zip (ค่าเดิมคงอยู่), เปิด `EASY-INSTALL.bat` ในโฟลเดอร์ที่ติดตั้งแล้ว (หยุดตามที่ตั้งใจ)
 
 ---
 
