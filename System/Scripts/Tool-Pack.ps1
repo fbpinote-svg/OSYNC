@@ -41,7 +41,7 @@ Write-Host '  system: OSYNC.bat, README.md, System\Scripts, Client, Docs'
 New-Item -ItemType Directory -Force -Path (Join-Path $pl 'Settings') | Out-Null
 $set = [IO.File]::ReadAllText($SettingsFile, [Text.Encoding]::UTF8)
 # the values only THIS shop has (same list as Setup-Install.ps1 $ShopKeys): PC names, IPs, branch name, extra game folders
-$set = [regex]::Replace($set, '(?m)^(\s*(SharedDrives|MasterIP|MasterPC|GameFolders|ClientBlockCpuz|ClientApexClean|ClientSteamVerify|ClientSteamVerifyApps|OnlineBranch|OnlineBranchName|OnlineBind|OnlineExternalIP)\s*=)[^\r\n]*', '$1')
+$set = [regex]::Replace($set, '(?m)^(\s*(SharedDrives|MasterIP|MasterPC|GameFolders|ClientBlockCpuz|ClientApexClean|ClientApexMinimal|ClientSteamVerify|ClientSteamVerifyApps|OnlineBranch|OnlineBranchName|OnlineBind|OnlineExternalIP)\s*=)[^\r\n]*', '$1')
 $set = [regex]::Replace($set, '(?m)^(\s*Role\s*=)[^\r\n]*', '${1}auto')
 [IO.File]::WriteAllText((Join-Path $pl 'Settings\settings.txt'), $set, (New-Object Text.UTF8Encoding $false))
 $xg = [IO.File]::ReadAllText($ExtraGamesFile, [Text.Encoding]::UTF8)

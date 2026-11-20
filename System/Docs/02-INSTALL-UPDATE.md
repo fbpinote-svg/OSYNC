@@ -151,7 +151,7 @@ flowchart TD
 |---|---|
 | `OSYNC.bat`, `README.md`, `System\Scripts`, `System\Client`, `System\Docs`, `System\VERSION.txt` (เขียนใหม่ตอนแพ็ก) | เกม, launcher, `System\Data`, `System\Backup`, ไฟล์ `*.log`, OSLink (`E:\LDPlayer`, ต้องติดตั้งเองที่สาขา) |
 | `Tools\` ทุกโฟลเดอร์ + `Tools\TOOLS-MANIFEST.txt` (SHA256 + ขนาดทุกไฟล์ ยกเว้น `Sunshine0J\config`) เพิ่ม 20 พ.ย. 2026 · `-NoTools` = ไม่ใส่ · ร้านนี้: 14 โฟลเดอร์ 6,969 ไฟล์ 1,000 MB → exe 754 MB (ทำใน 118 วินาที) · **มีโปรแกรมของผู้ผลิตอื่นและรหัสหน้าเว็บ Sunshine ส่งให้สาขาของร้านเองเท่านั้น** | |
-| `Settings\settings.txt` ที่ล้างค่าเฉพาะร้านนี้เป็นว่าง (`SharedDrives`, `MasterIP`, `MasterPC`, `GameFolders`, `ClientBlockCpuz`, `ClientApexClean`, `ClientSteamVerify`, `ClientSteamVerifyApps`, `OnlineBranch`, `OnlineBranchName`, `OnlineBind`, `OnlineExternalIP`) และ `Role=auto` | `Menu\source`, รายการเกมและโลโก้ของร้านนี้ |
+| `Settings\settings.txt` ที่ล้างค่าเฉพาะร้านนี้เป็นว่าง (`SharedDrives`, `MasterIP`, `MasterPC`, `GameFolders`, `ClientBlockCpuz`, `ClientApexClean`, `ClientApexMinimal`, `ClientSteamVerify`, `ClientSteamVerifyApps`, `OnlineBranch`, `OnlineBranchName`, `OnlineBind`, `OnlineExternalIP`) และ `Role=auto` | `Menu\source`, รายการเกมและโลโก้ของร้านนี้ |
 | `Settings\extra-games.json` ที่ `"games": []` และไฟล์ `.json` / `.xml` อื่นใน `Settings\` (`game-start.json`, `gta5_settings*.xml`, ใส่เพิ่ม 20 พ.ย. 2026) | |
 | `Menu\app` (โปรแกรมเมนูที่ build แล้ว 1 ตัว), `Menu\tools`, `Menu\README-TH.txt`, `Menu\config.json` แบบกลาง (`brandName=GAME CENTER`, ล้างโลโก้ / `apiUrl` / `machineId` / แบนเนอร์, `featured=[]`), `Menu\data` ว่าง | |
 

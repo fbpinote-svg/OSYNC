@@ -278,7 +278,7 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 | `MasterPC`, `MasterIP` | ชื่อและ IP ของเครื่องนี้ | `MasterPC` คือสิ่งที่ทำให้ทุกเครื่องรู้ว่าเครื่องไหนเป็นเครื่องแม่ |
 | `Role` | `auto` | |
 | `GameFolders` | ว่าง | เพิ่มเองเมื่อลงเกมในไดรฟ์อื่น |
-| `ClientBlockCpuz`, `ClientApexClean`, `ClientSteamVerify`, `ClientSteamVerifyApps` | ว่าง (ปิด) | ค่าทดสอบ Apex ของร้านต้นทาง |
+| `ClientBlockCpuz`, `ClientApexClean`, `ClientApexMinimal`, `ClientSteamVerify`, `ClientSteamVerifyApps` | ว่าง (ปิด) | ค่าทดสอบ Apex ของร้านต้นทาง |
 | `OnlineBranch`, `OnlineBranchName`, `OnlineBind`, `OnlineExternalIP` | ว่าง | คลังออนไลน์: ว่าง = ใช้ชื่อเครื่อง / ไม่ผูก IP |
 
 **ค่าเปิดปิดงานตอนบูตเครื่องลูก** (ค่าเริ่มต้นติดมาจากไฟล์ ตรวจว่าร้านคุณต้องการไหม · งานไหนต้องใช้โปรแกรมใน `Tools\` แต่ไม่มี จะข้ามเอง):

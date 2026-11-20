@@ -1341,7 +1341,7 @@ flowchart TD
 | `steam` | `-WaitSteamMinutes 180` | `logs\bootstrap_log.txt` ของ Steam มีบรรทัดหลังบูต (20 วินาที) | 240 วินาที | ไม่ส่ง |
 | `fivem` | `-WaitFiveMMinutes 180` | `CitizenFX_log*.log` หลังบูตมี "Downloading completed" (30 วินาที) | 60 วินาที | ไม่ส่ง |
 | `riot` | `-WaitRiotMinutes 180` | log ของ Riot Client หลังบูตมี "productId: valorant" (30 วินาที) | 120 วินาที | ไม่ส่ง |
-| `apex` | `-WaitApexMinutes 720` | โปรเซส `EAAntiCheat.GameServiceLauncher` หรือ `r5apex*` (5 วินาที) แล้วเฝ้าต่อสูงสุด 180 วินาที | 5 วินาที | ไม่ส่ง |
+| `apex` | `-WaitApexMinutes 720` | โปรเซส `EAAntiCheat.GameServiceLauncher` หรือ `r5apex*` (5 วินาที) แล้วเฝ้าต่อสูงสุด 180 วินาที · ตั้งแต่ 20 พ.ย. 2026 รายงานมีเพิ่ม: รหัสที่ `EAAntiCheatService` ใช้ตอนปิดตัวครั้งล่าสุด (`Win32ExitCode` / `ServiceSpecificExitCode`), รายงานแครชของ Windows (WER) ของ EA AntiCheat / r5apex หลังบูต, ไฟล์ของ Apex ที่เขียนหลังบูต (`Saved Games\Respawn\Apex`, `Temp\Respawn`), สถานะ VBS, Defender และ file-system filter | 5 วินาที | ไม่ส่ง |
 
 **พารามิเตอร์:**
 - `-Phase <ข้อความ>` — ชื่อรอบ ค่าเริ่ม `manual` (`boot+150s` ทำให้เก็บ hash ไฟล์ Steam ด้วย)

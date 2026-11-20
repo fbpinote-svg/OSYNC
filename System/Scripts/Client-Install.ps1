@@ -54,7 +54,16 @@ function Run-Script([string]$file, [string[]]$extra = @()) {
   $LASTEXITCODE
 }
 $results = New-Object System.Collections.Generic.List[object]
+# 20 Nov 2026 (Apex, the owner: with iPlay Apex plays on the same diskless system): Settings ClientApexMinimal = PC names ->
+# on those PCs ONLY the steps Steam and EA AntiCheat need run (0a CPU-Z block, 1q 1r 1u Steam, 2 Steam first-run, 3 EA);
+# the rest of OSYNC's boot setup (Sunshine, OSLink, mic, Parsec, VDD, runtimes, menu, desktop ...) is skipped for that boot.
+# Apex OK there = one of the skipped steps is the cause (turn them back on one by one); still FAIL = the image / Steam.
+$ApexMinimal = $Boot -and @((Get-Setting 'ClientApexMinimal' '').Trim() -split '[,;\s]+' | Where-Object { $_ -and $_ -ieq $env:COMPUTERNAME }).Count -gt 0
 function Step([string]$name, [scriptblock]$body) {
+  if ($ApexMinimal -and $name -notmatch '^(0a|1q|1r|1u|2|3) ') {
+    Write-Host "`n== $name   SKIP (ClientApexMinimal: Apex test PC, only Steam + EA AntiCheat steps)" -ForegroundColor DarkGray
+    $results.Add([pscustomobject]@{ Step = $name; Result = 'SKIP (ClientApexMinimal)'; Sec = 0 }); return
+  }
   Write-Host "`n== $name" -ForegroundColor Yellow
   try { [Console]::Title = "OSYNC $name" } catch {}
   $t = [Diagnostics.Stopwatch]::StartNew()

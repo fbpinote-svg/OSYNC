@@ -55,7 +55,7 @@ function Expand-Files([string]$to) {
 }
 # a NEW shop starts without the values of the shop the files came from (a project download carries them; OSYNC-Setup.exe
 # has them blank already). Same list as Tool-Pack.ps1. SharedDrives / MasterPC / MasterIP are written for this PC below.
-$ShopKeys = 'SharedDrives', 'MasterIP', 'MasterPC', 'GameFolders', 'ClientBlockCpuz', 'ClientApexClean', 'ClientSteamVerify', 'ClientSteamVerifyApps', 'OnlineBranch', 'OnlineBranchName', 'OnlineBind', 'OnlineExternalIP'
+$ShopKeys = 'SharedDrives', 'MasterIP', 'MasterPC', 'GameFolders', 'ClientBlockCpuz', 'ClientApexClean', 'ClientApexMinimal', 'ClientSteamVerify', 'ClientSteamVerifyApps', 'OnlineBranch', 'OnlineBranchName', 'OnlineBind', 'OnlineExternalIP'
 function Clear-ShopValues([string]$file) {
   $t = [IO.File]::ReadAllText($file, [Text.Encoding]::UTF8)
   foreach ($k in $ShopKeys) { $t = [regex]::Replace($t, "(?m)^(\s*$k\s*=)[^\r\n]*", '$1') }

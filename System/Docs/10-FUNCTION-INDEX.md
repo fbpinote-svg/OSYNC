@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 85 ไฟล์ · ฟังก์ชัน 638 ตัว · สร้างเมื่อ 20 Nov 2026 21:28 จากโค้ดใน repo นี้
+ไฟล์โค้ด 85 ไฟล์ · ฟังก์ชัน 638 ตัว · สร้างเมื่อ 20 Nov 2026 21:46 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -310,13 +310,13 @@
 <a id="system-scripts-client-install-ps1"></a>
 ### System/Scripts/Client-Install.ps1
 
-574 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Boot` · [เปิดไฟล์](../Scripts/Client-Install.ps1)
+583 บรรทัด · 3 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Boot` · [เปิดไฟล์](../Scripts/Client-Install.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
 | 1 | [`Run-Script`](../Scripts/Client-Install.ps1#L47) | 47-55 | `file`, `extra` |  |
-| 2 | [`Step`](../Scripts/Client-Install.ps1#L57) | 57-64 | `name`, `body` |  |
-| 3 | [`Stop-WoMicDriver`](../Scripts/Client-Install.ps1#L68) | 68-83 | - | 19 Nov 2026 (Apex): WO Mic's driver WOVAD off for this boot. Turning its device off was not enough (KORI23 15:03: "WOVAD Running" - Windows Audio still held ... |
+| 2 | [`Step`](../Scripts/Client-Install.ps1#L62) | 62-73 | `name`, `body` |  |
+| 3 | [`Stop-WoMicDriver`](../Scripts/Client-Install.ps1#L77) | 77-92 | - | 19 Nov 2026 (Apex): WO Mic's driver WOVAD off for this boot. Turning its device off was not enough (KORI23 15:03: "WOVAD Running" - Windows Audio still held ... |
 
 <a id="system-scripts-client-menu-ps1"></a>
 ### System/Scripts/Client-Menu.ps1
@@ -552,7 +552,7 @@
 <a id="system-scripts-client-oslinkreport-ps1"></a>
 ### System/Scripts/Client-OslinkReport.ps1
 
-305 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Phase`, `DelaySeconds`, `Print`, `WaitSteamMinutes`, `WaitFiveMMinutes`, `WaitRiotMinutes`, `WaitApexMinutes` · [เปิดไฟล์](../Scripts/Client-OslinkReport.ps1)
+320 บรรทัด · 6 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Phase`, `DelaySeconds`, `Print`, `WaitSteamMinutes`, `WaitFiveMMinutes`, `WaitRiotMinutes`, `WaitApexMinutes` · [เปิดไฟล์](../Scripts/Client-OslinkReport.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|

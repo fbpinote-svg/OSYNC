@@ -228,6 +228,21 @@ Sec 'EA Javelin Anticheat / Apex (18 Nov: Apex closes at "Starting EA Javelin An
 $es = Get-CimInstance Win32_Service -Filter "Name='EAAntiCheatService'" -ErrorAction SilentlyContinue
 if ($es) { $ex = [regex]::Match("$($es.PathName)", '^"?([^"]+?\.exe)').Groups[1].Value; Add "EAAntiCheatService: $($es.State) $($es.StartMode) $ex $((Get-Item -LiteralPath $ex -ErrorAction SilentlyContinue).VersionInfo.FileVersion)" } else { Add 'EAAntiCheatService: not installed' }
 try { Add "Secure Boot: $(Confirm-SecureBootUEFI -ErrorAction Stop)" } catch { Add "Secure Boot: unknown ($($_.Exception.Message))" }
+# 20 Nov 2026 (EAAntiCheatService ends itself 5-9 s after its filter loads, no crash dump): WHY it ended - its last exit codes,
+# Windows Error Reporting entries of it / r5apex, Apex's own crash files - and what differs from the master (it runs Apex):
+# VBS (master 2 = running, clients 0), Defender, the file-system filters
+if ($es) { Add ("EAAntiCheatService last exit: Win32ExitCode={0} (0x{0:X}) ServiceSpecificExitCode={1} (0x{1:X})" -f [uint32]$es.ExitCode, [uint32]$es.ServiceSpecificExitCode) }
+try { $dg = Get-CimInstance -Namespace 'root\Microsoft\Windows\DeviceGuard' -ClassName Win32_DeviceGuard -ErrorAction Stop; Add "VBS: status $($dg.VirtualizationBasedSecurityStatus) (0 off, 2 running) | services running: $(@($dg.SecurityServicesRunning) -join ',') | configured: $(@($dg.SecurityServicesConfigured) -join ',')" } catch { Add "VBS: unknown ($($_.Exception.Message))" }
+$wdS = Get-Service -Name 'WinDefend' -ErrorAction SilentlyContinue; Add "Defender: $(if ($wdS) { "$($wdS.Status) $($wdS.StartType)" } else { 'not installed' })"
+try { Add ("file-system filters: " + ((@(& fltmc.exe filters 2>&1) | Select-Object -Skip 3 | ForEach-Object { ("$_".Trim() -split '\s+')[0] } | Where-Object { $_ }) -join ', ')) } catch { }
+foreach ($w in @(Get-ChildItem 'C:\ProgramData\Microsoft\Windows\WER\ReportArchive', 'C:\ProgramData\Microsoft\Windows\WER\ReportQueue' -Recurse -Filter 'Report.wer' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt $os.LastBootUpTime -and (Get-Content -LiteralPath $_.FullName -Raw -ErrorAction SilentlyContinue) -match '(?i)eaanticheat|r5apex' } | Sort-Object LastWriteTime | Select-Object -Last 4)) {
+  Add "WER $($w.Directory.Name) $($w.LastWriteTime.ToString('HH:mm:ss'))"
+  Get-Content -LiteralPath $w.FullName -ErrorAction SilentlyContinue | Where-Object { $_ -match '^(EventType|FriendlyEventName|AppName|AppPath|Sig\[\d+\]\.(Name|Value)|DynamicSig\[\d+\]\.(Name|Value)|NsAppName)=' } | Select-Object -First 30 | ForEach-Object { Add "  $_" }
+}
+foreach ($cr in @(Get-ChildItem 'C:\Users\*\Saved Games\Respawn\Apex', 'C:\Users\*\AppData\Local\Temp\Respawn', 'C:\Users\*\AppData\Local\Temp\Apex' -Recurse -File -Force -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt $os.LastBootUpTime } | Sort-Object LastWriteTime | Select-Object -Last 12)) {
+  Add "apex file $($cr.FullName) $($cr.Length) $($cr.LastWriteTime.ToString('HH:mm:ss'))"
+  if ($cr.Extension -in '.txt', '.log' -and $cr.Length -lt 20000 -and $cr.FullName -match '(?i)crash|error') { Get-Content -LiteralPath $cr.FullName -Tail 15 -ErrorAction SilentlyContinue | ForEach-Object { Add "    $_" } }
+}
 # 19 Nov 2026: the watch result (-WaitApexMinutes), EA AC's own state keys, Steam's install-script marks, crash dumps, the folder
 foreach ($l in $ApexWatch) { Add $l }
 foreach ($kp in 'HKLM:\SOFTWARE\EA\AC', 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam\Apps\1172470', 'HKLM:\SOFTWARE\Valve\Steam\Apps\1172470') {
