@@ -1,0 +1,31 @@
+{
+  "_help": "brandName/brandBadge = shop name and badge. brandLogo = picture file (relative to this folder) or a URL; make it with tools\\_system\\Make-Brand.ps1 (also makes the app icon). machineId empty = use the PC name (e.g. KORI01). apiUrl empty = offline game menu; set it (e.g. http://192.168.51.202:8000/api) when your API server is ready.",
+  "brandName": "0JAYSHOP",
+  "brandBadge": "VIP",
+  "brandLogo": "data\\brand\\logo.png",
+  "machineId": "",
+  "apiUrl": "",
+  "_ui_help": "หน้าตาเมนู (แก้แล้วเครื่องลูกเห็นหลังรีบูต) - font: Kanit | Prompt | Chakra Petch | Leelawadee UI | Tahoma · hudSize/menuSize/lockSize: ขนาด % (80-130) ของหน้าต่างหลัก / คลังเกม+แท็บร้าน / หน้าล็อก · hudBanner: รูปแบนเนอร์ใต้ปุ่มหน้าต่างหลัก (ไฟล์เทียบกับโฟลเดอร์นี้ เช่น data\\brand\\banner.jpg) ว่าง = การ์ดไล่สีไม่มีรูป, off = ซ่อน · hudBannerTag / hudBannerText: ป้ายและข้อความบนแบนเนอร์ (ว่าง = ข้อความเดิม) · featured: id เกมที่ขึ้นแถว แนะนำจากร้าน (ดู id ใน data\\games.json) · categoryNames: ชื่อหมวดที่โชว์ เช่น {\"Launchers\": \"ตัวเปิดเกม\"} · graphicsPicker: id เกมที่ถามระดับภาพ ต่ำสุด/กลาง/สูง ก่อนเล่นทุกครั้ง (ค่าแต่ละระดับ = Settings\\gta5_settings.xml / gta5_settings-medium.xml / gta5_settings-high.xml) ค่าเริ่ม [\"steam-271590\",\"fivem\"] = GTA V + FiveM · menuOnly: true = เปิดมาเป็นหน้าเมนูเกมอย่างเดียว (ไม่มีหน้าต่างนับเวลา ไม่มีแท็บร้าน) ปิดเมนู = ย่อลงแถบงาน · sidePanel: false = ไม่มีแถบขวา (โฆษณา / แนะนำจากร้าน) · steamRequest: true = ปุ่ม ขอเกม ในเมนู (ลูกค้าส่งลิงก์เกม Steam แล้วสแกน QR ด้วยแอป Steam ของตัวเอง เครื่องแม่โหลดให้ - System\\Docs\\STEAM-REQUESTS.md) false = ไม่มีปุ่ม",
+  "ui": {
+    "font": "Kanit",
+    "hudSize": 100,
+    "menuSize": 100,
+    "lockSize": 100,
+    "hudBanner": "",
+    "hudBannerTag": "",
+    "hudBannerText": "",
+    "featured": [
+      "riot-valorant",
+      "steam-578080",
+      "fivem"
+    ],
+    "categoryNames": {},
+    "graphicsPicker": [
+      "steam-271590",
+      "fivem"
+    ],
+    "menuOnly": true,
+    "sidePanel": false,
+    "steamRequest": true
+  }
+}
