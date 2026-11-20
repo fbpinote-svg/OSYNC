@@ -5,6 +5,15 @@
 # Actions that change this PC ask for admin (UAC) and run in a new window.
 param([string]$Action = '', [string]$Arg = '')
 . (Join-Path $PSScriptRoot 'Common.ps1')
+# a DOWNLOAD of the project (no Launchers\ and no System\Data\ - the setup makes both) is not an installed OSYNC: its
+# settings.txt names the master PC of the shop it came from, so this PC would count as a client and a double-click
+# would install client things here. Point to the Easy Install instead (an old layout before step B is not a download).
+if (-not (Test-Path -LiteralPath $Launchers) -and -not (Test-Path -LiteralPath $DataDir) -and -not (Test-PreMigration)) {
+    Write-Host 'This folder is a download of OSYNC, not an installed OSYNC - nothing was done.' -ForegroundColor Yellow
+    Write-Host "Install it first: double-click $Root\EASY-INSTALL.bat   (guide: System\Docs\00-EASY-INSTALL.md)" -ForegroundColor Yellow
+    if (-not $env:OSYNC_NOPAUSE) { [void](Read-Host 'Press Enter to close') }
+    exit 1
+}
 $isMaster = Test-IsMaster
 $adminActions = 'setup', 'client', 'move', 'steam-library', 'organize', 'steam-firstrun', 'ea-install', 'ea-uninstall', 'ea-anticheat', 'eac', 'newthings',
                 'riot-startup-on', 'riot-startup-off', 'firewall', 'boot-off', 'migrate', 'branch', 'branch-off'

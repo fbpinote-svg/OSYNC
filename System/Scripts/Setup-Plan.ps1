@@ -33,7 +33,8 @@ if (-not $shared) {
     if ($shared) { $how = 'from the LW server settings' }
   }
 }
-if (-not $shared) { $s = ((Get-Setting 'SharedDrives') -replace '[^A-Za-z]', '').ToUpper(); if ($s) { $shared = $s; $how = 'from Settings\settings.txt' } }
+# Settings only of an INSTALLED OSYNC: a download of the project carries the SharedDrives of the shop it came from
+if (-not $shared -and ((Test-Path -LiteralPath $Launchers) -or (Test-Path -LiteralPath $DataDir))) { $s = ((Get-Setting 'SharedDrives') -replace '[^A-Za-z]', '').ToUpper(); if ($s) { $shared = $s; $how = 'from Settings\settings.txt' } }
 
 # ---------- drives ----------
 $media = @{}

@@ -89,10 +89,10 @@ flowchart LR
 **Log:** ไม่มี (สคริปต์ที่เรียกมี log ของตัวเอง)
 
 **ขั้นตอนการทำงาน**
-1. dot-source `Common.ps1` → `$isMaster = Test-IsMaster`
-2. ตั้งรายการงานที่ต้อง admin ([บรรทัด 9](../Scripts/OSYNC.ps1#L9)): `setup client move steam-library organize steam-firstrun ea-install ea-uninstall ea-anticheat eac newthings riot-startup-on riot-startup-off firewall boot-off migrate branch branch-off`
+1. dot-source `Common.ps1` → ถ้าโฟลเดอร์นี้ไม่มีทั้ง `Launchers\` และ `System\Data\` (= โฟลเดอร์ที่แตกจาก zip ของโปรเจกต์ ยังไม่ได้ติดตั้ง) และไม่ใช่โครงเดิมก่อนขั้น B: ขึ้น `This folder is a download of OSYNC, not an installed OSYNC - nothing was done.` บอกให้ใช้ `EASY-INSTALL.bat` แล้ว exit 1 ([บรรทัด 8-16](../Scripts/OSYNC.ps1#L8), เพิ่ม 20 พ.ย. 2026: `settings.txt` ในโฟลเดอร์นั้นยังเป็นชื่อเครื่องแม่ของร้านต้นทาง ถ้าไม่กัน เครื่องแม่ของร้านใหม่จะถูกนับเป็นเครื่องลูกและดับเบิลคลิกเดียวจะติดตั้งของเครื่องลูกลงไป) → `$isMaster = Test-IsMaster`
+2. ตั้งรายการงานที่ต้อง admin ([บรรทัด 18](../Scripts/OSYNC.ps1#L18)): `setup client move steam-library organize steam-firstrun ea-install ea-uninstall ea-anticheat eac newthings riot-startup-on riot-startup-off firewall boot-off migrate branch branch-off`
 3. `$preB = Test-PreMigration` และรายการงานที่กันก่อนขั้น B: `master update watch-on setup client move steam-library`
-4. ไม่มีชื่องาน และไม่ใช่เครื่องแม่ → งาน = `client` ([บรรทัด 134](../Scripts/OSYNC.ps1#L134))
+4. ไม่มีชื่องาน และไม่ใช่เครื่องแม่ → งาน = `client` ([บรรทัด 145](../Scripts/OSYNC.ps1#L145))
 5. มีชื่องาน → `Invoke-Action` → `Pause-End` → ออก
 6. ไม่มี → วนแสดงเมนูหลัก (1-7, 0) จนกด 0
 
@@ -100,11 +100,11 @@ flowchart LR
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
-| [`Pause-End`](../Scripts/OSYNC.ps1#L15) | 15 | รอ "Press Enter to close" เว้นแต่ตั้ง env `OSYNC_NOPAUSE` (Setup-Install ตั้งให้) |
-| [`Ask`](../Scripts/OSYNC.ps1#L16) | 16 | ถาม `[Y/N]` คืน `$true` เมื่อตอบขึ้นต้นด้วย Y |
-| [`Choose-Launcher`](../Scripts/OSYNC.ps1#L17) | 17 | แสดง `Title` ของ `$LauncherTable` เป็นเลข คืน `Key` ที่เลือก หรือ '' |
-| [`Invoke-Action`](../Scripts/OSYNC.ps1#L25) | 25 | ตัวแจกงาน: กันงานก่อนขั้น B → ถ้าต้อง admin แต่ยังไม่ใช่ เปิด `powershell.exe -Verb RunAs` ด้วยงานเดิมแล้วจบ → `switch` รันสคริปต์ของงาน (งานที่ย้ายของ = DryRun ก่อนแล้วถาม) |
-| [`Show-Tools`](../Scripts/OSYNC.ps1#L99) | 99 | เมนู 7 Tools: ตาราง `[ordered]` เลข → `งาน[:ค่า]` แสดงเป็นกลุ่ม · เลข 17 ใส่เฉพาะเมื่อมี `GAMELUNCHER` · แยก `งาน:ค่า` แล้วส่ง `Invoke-Action` |
+| [`Pause-End`](../Scripts/OSYNC.ps1#L24) | 24 | รอ "Press Enter to close" เว้นแต่ตั้ง env `OSYNC_NOPAUSE` (Setup-Install ตั้งให้) |
+| [`Ask`](../Scripts/OSYNC.ps1#L25) | 25 | ถาม `[Y/N]` คืน `$true` เมื่อตอบขึ้นต้นด้วย Y |
+| [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26 | แสดง `Title` ของ `$LauncherTable` เป็นเลข คืน `Key` ที่เลือก หรือ '' |
+| [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34 | ตัวแจกงาน: กันงานก่อนขั้น B → ถ้าต้อง admin แต่ยังไม่ใช่ เปิด `powershell.exe -Verb RunAs` ด้วยงานเดิมแล้วจบ → `switch` รันสคริปต์ของงาน (งานที่ย้ายของ = DryRun ก่อนแล้วถาม) |
+| [`Show-Tools`](../Scripts/OSYNC.ps1#L109) | 109 | เมนู 7 Tools: ตาราง `[ordered]` เลข → `งาน[:ค่า]` แสดงเป็นกลุ่ม · เลข 17 ใส่เฉพาะเมื่อมี `GAMELUNCHER` · แยก `งาน:ค่า` แล้วส่ง `Invoke-Action` |
 
 ### `Invoke-Action` — จุดที่ควรรู้
 
@@ -491,16 +491,16 @@ flowchart LR
 **หน้าที่:** ดูเครื่องแม่แล้วบอกว่าแต่ละส่วนของ OSYNC ควรอยู่ที่ไหน ไม่เปลี่ยนอะไรเลย (ผลจริงและวิธีอ่าน: [00 ข้อ 3](00-EASY-INSTALL.md#3-วางไฟล์ตรงไหนให้เหมาะกับเครื่องแม่ของคุณ))
 **เรียกจาก / ทำงานเมื่อไหร่:** `Setup-Install` ตอนติดตั้งใหม่ (`-PassThru`) · `OSYNC.bat` 7 → 23 (`-OutFile System\Data\setup-plan.txt`)
 **พารามิเตอร์:** `-SharedDrives <อักษร>` · `-OutFile <ไฟล์>` (UTF-8 มี BOM) · `-PassThru` คืนออบเจกต์ (`OsyncRoot`, `Why`, `SharedDrives`, `SharedHow`, `MoreGameFolders`, `Existing`, `Server`, `IP`, `Dhcp`, `Drives`, `Launchers`, `SteamLibraries`, `Text`) · `-Quiet` ไม่พิมพ์
-**อ่านค่า:** โฟลเดอร์ / เซอร์วิสของ diskless server (`$DisklessServerFolders`, `$DisklessServerServices` ของ `Common.ps1`), `lwservice.db` (Node.js), `SharedDrives`, `Win32_LogicalDisk`, `Get-PhysicalDisk` + `Get-Partition` (SSD / HDD / NVMe), `$LauncherTable` + `Get-LauncherInstallPath`, `libraryfolders.vdf` + `appmanifest_*.acf` (`SizeOnDisk`), `Win32_NetworkAdapterConfiguration` (IP, gateway, DHCP), `Win32_OperatingSystem`, `node --version`, `csc.exe`
+**อ่านค่า:** โฟลเดอร์ / เซอร์วิสของ diskless server (`$DisklessServerFolders`, `$DisklessServerServices` ของ `Common.ps1`), `lwservice.db` (Node.js), `SharedDrives` (เฉพาะ OSYNC ที่ติดตั้งแล้ว), `Win32_LogicalDisk`, `Get-PhysicalDisk` + `Get-Partition` (SSD / HDD / NVMe), `$LauncherTable` + `Get-LauncherInstallPath`, `libraryfolders.vdf` + `appmanifest_*.acf` (`SizeOnDisk`), `Win32_NetworkAdapterConfiguration` (IP, gateway, DHCP), `Win32_OperatingSystem`, `node --version`, `csc.exe`
 **เขียน / เปลี่ยน:** ไฟล์ `-OutFile` เท่านั้น
 
-**กติกาเลือกที่วาง OSYNC** (บรรทัด 98-113, เฉพาะไดรฟ์ที่เครื่องลูกเห็นและไม่ใช่ไดรฟ์ระบบ): 1) ไดรฟ์ของ OSYNC ที่ติดตั้งแล้ว 2) ไดรฟ์ที่มีเกม Steam มากที่สุด (library ≥ 50 GB, ว่าง ≥ 50 GB) 3) SSD ที่ว่าง ≥ 200 GB มากที่สุด 4) ไดรฟ์ที่ว่างมากที่สุด · ไดรฟ์ที่แชร์อื่นที่ว่าง ≥ 100 GB เสนอเป็น `X:\GAME` (ไม่เขียนลงค่า)
+**กติกาเลือกที่วาง OSYNC** (บรรทัด 99-114, เฉพาะไดรฟ์ที่เครื่องลูกเห็นและไม่ใช่ไดรฟ์ระบบ): 1) ไดรฟ์ของ OSYNC ที่ติดตั้งแล้ว 2) ไดรฟ์ที่มีเกม Steam มากที่สุด (library ≥ 50 GB, ว่าง ≥ 50 GB) 3) SSD ที่ว่าง ≥ 200 GB มากที่สุด 4) ไดรฟ์ที่ว่างมากที่สุด · ไดรฟ์ที่แชร์อื่นที่ว่าง ≥ 100 GB เสนอเป็น `X:\GAME` (ไม่เขียนลงค่า)
 
 | ฟังก์ชัน | บรรทัด | หลักการทำงาน |
 |---|---|---|
 | [`Out`](../Scripts/Setup-Plan.ps1#L15) | 15 | เก็บบรรทัดไว้ทำไฟล์ / ข้อความ และพิมพ์ขึ้นจอ (สีได้) เว้นแต่ `-Quiet` |
 | [`GB`](../Scripts/Setup-Plan.ps1#L16) | 16 | ไบต์ → GB ปัดเต็ม |
-| [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L56) | 56 | กติกาเดียวกับ `Test-Installed` ของ `Setup-Install` |
+| [`Test-OsyncInstalled`](../Scripts/Setup-Plan.ps1#L57) | 57 | กติกาเดียวกับ `Test-Installed` ของ `Setup-Install` |
 
 **ค่าในร้านนี้ตอนนี้:** ร้านนี้ไม่ได้ติดตั้งด้วยไฟล์นี้ (โฟลเดอร์ `H:\OSYNC` เป็นต้นทาง) · ถ้ารันบนเครื่องนี้จะเจอ OSYNC เดิมที่ `H:\OSYNC` · มี `C:\lwserver\config\lwservice.db` และ Node.js จึงอ่านไดรฟ์จาก LW ได้ (`DEFGHIJ`) · 20 พ.ย. 2026 ทดสอบลงโฟลเดอร์ทดสอบ 4 แบบผ่าน: exe ใหม่, `EASY-INSTALL.bat` ใหม่, `-Upgrade` จาก zip (ค่าเดิมคงอยู่), เปิด `EASY-INSTALL.bat` ในโฟลเดอร์ที่ติดตั้งแล้ว (หยุดตามที่ตั้งใจ)
 

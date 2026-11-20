@@ -18,6 +18,7 @@
 - [8. ทำ Image เครื่องลูก](#8-ทำ-image-เครื่องลูก)
 - [9. ตรวจว่าครบ และอัปเดตภายหลัง](#9-ตรวจว่าครบ-และอัปเดตภายหลัง)
 - [10. ปัญหาที่พบบ่อย](#10-ปัญหาที่พบบ่อย)
+- [11. ให้ AI ของร้านอื่นติดตั้งให้](#11-ให้-ai-ของร้านอื่นติดตั้งให้)
 
 ## ภาพรวมทั้งหมด
 
@@ -100,7 +101,7 @@ X:\OSYNC\                      ← ไดรฟ์ที่เครื่อง
 
 ### 3.3 ตัวติดตั้งเลือกไดรฟ์ให้ยังไง
 
-ตัวตรวจเครื่อง [`Setup-Plan.ps1`](../Scripts/Setup-Plan.ps1) **อ่านอย่างเดียว ไม่เปลี่ยนอะไร** แล้วเลือกที่วาง OSYNC ตามลำดับนี้ ([บรรทัด 98-113](../Scripts/Setup-Plan.ps1#L98)):
+ตัวตรวจเครื่อง [`Setup-Plan.ps1`](../Scripts/Setup-Plan.ps1) **อ่านอย่างเดียว ไม่เปลี่ยนอะไร** แล้วเลือกที่วาง OSYNC ตามลำดับนี้ ([บรรทัด 99-114](../Scripts/Setup-Plan.ps1#L99)):
 
 ```mermaid
 flowchart TD
@@ -115,7 +116,7 @@ flowchart TD
 
 - ได้ที่วางเป็น `<ไดรฟ์>:\OSYNC` ถ้าไม่ชอบ พิมพ์ที่อื่นแทนตอนถาม `Folder` ได้ (ตัวติดตั้งเตือนถ้าไดรฟ์นั้นเครื่องลูกมองไม่เห็น)
 - ไดรฟ์ที่แชร์อื่นที่ว่าง 100 GB ขึ้นไป ถูกเสนอเป็น "more game room" (`X:\GAME`) แค่เสนอ ไม่เขียนลงค่าให้ เพิ่มเองเมื่อจะลงเกมที่นั่นจริง
-- **ไดรฟ์ที่เครื่องลูกเห็น** อ่านจาก: 1) ฐานข้อมูลของ LW (`C:\lwserver\config\lwservice.db` ตาราง `tServerDiskMng` แบบอ่านอย่างเดียว ต้องมี Node.js) 2) `SharedDrives` ใน `settings.txt` 3) ไม่เจอทั้งสองอย่าง = ทุกไดรฟ์ fixed ยกเว้นไดรฟ์ระบบ (diskless ตัวอื่นที่ไม่ใช่ LW ให้ตรวจช่อง `clients` ในตารางแล้วแก้ `SharedDrives` เองถ้าไม่ตรง)
+- **ไดรฟ์ที่เครื่องลูกเห็น** อ่านจาก: 1) ฐานข้อมูลของ LW (`C:\lwserver\config\lwservice.db` ตาราง `tServerDiskMng` แบบอ่านอย่างเดียว ต้องมี Node.js) 2) `SharedDrives` ใน `settings.txt` (เฉพาะ OSYNC ที่ติดตั้งแล้ว ค่าในไฟล์ที่โหลดมาเป็นของร้านต้นทาง จึงไม่ใช้) 3) ไม่เจอทั้งสองอย่าง = ทุกไดรฟ์ fixed ยกเว้นไดรฟ์ระบบ (diskless ตัวอื่นที่ไม่ใช่ LW ให้ตรวจช่อง `clients` ในตารางแล้วแก้ `SharedDrives` เองถ้าไม่ตรง)
 - ประเภทดิสก์ (NVMe SSD / SSD / HDD) อ่านจาก Windows (`Get-PhysicalDisk`) ดิสก์ RAID หรือดิสก์เสมือนอาจขึ้น `?`
 
 ### 3.4 ตัวอย่างตามแบบเครื่องแม่
@@ -173,6 +174,32 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 | `4. Steam games` | library ของ Steam ทุกอัน จำนวนเกม ขนาด (จาก `SizeOnDisk` ในไฟล์ `appmanifest_*.acf`) และเครื่องลูกเห็นไหม |
 | `5. Suggested placement` | ที่วางที่แนะนำ พร้อมเหตุผลในวงเล็บ |
 
+### 3.6 ลง launcher และเกมแต่ละค่ายไว้ที่ไหน
+
+**ลำดับที่แนะนำ**
+1. ติดตั้ง OSYNC ก่อน ([ข้อ 4](#4-ติดตั้งทีละขั้น))
+2. ลง launcher ที่ร้านใช้ **ตามปกติ** (ที่ตัวติดตั้งของมันเสนอ แม้เป็น C: ก็ได้) แล้วล็อกอิน
+3. `OSYNC.bat` → `4` ขั้น 2 ย้าย launcher เข้า `X:\OSYNC\Launchers\<ชื่อ>` ให้ทีละตัว ตัวย้ายแก้ registry, เซอร์วิส, งานตั้งเวลา และ shortcut ให้ชี้ที่ใหม่ด้วย **ห้ามย้ายโฟลเดอร์เองด้วยมือ และห้ามทำ junction ไว้ที่ C:**
+4. ในแต่ละ launcher ตั้งที่ลงเกมให้เป็นไดรฟ์ที่เครื่องลูกเห็น (ตามตารางข้างล่าง)
+5. ลงหรืออัปเดตเกมให้เสร็จ แล้ว `OSYNC.bat` → `1` (หรือเปิดตัวเฝ้า `2`) เกมจะขึ้นเมนูเอง เครื่องลูกเห็นหลังรีบูต
+
+| ค่าย / ชนิดเกม | launcher อยู่ที่ (หลังย้าย) | ลงเกมที่ (แนะนำ) | OSYNC หาเกมเจอจาก ([`Master-GameList.ps1`](../Scripts/Master-GameList.ps1)) |
+|---|---|---|---|
+| Steam | `Launchers\Steam` | `X:\OSYNC\GAME\Steam` (Steam → Settings → Storage → เพิ่ม library แล้วตั้งเป็นค่าเริ่มต้น) หรือ `X:\SteamLibrary` บนไดรฟ์ที่แชร์ลูกไหนก็ได้ | `libraryfolders.vdf` + `appmanifest_*.acf` ของ Steam |
+| Riot (VALORANT, LoL, TFT) | `Launchers\Riot Client` (ชื่อโฟลเดอร์ต้องเป็น `Riot Client` เป๊ะ ไม่งั้น Riot ลงตัวเองใหม่) | ไดรฟ์ที่แชร์ เช่น `X:\OSYNC\GAME\Riot` (ร้าน 0JAYSHOP ใช้ `H:\RIOT\Riot Games`) · ใน `GAME\` ใช้ชื่อโฟลเดอร์ตามชื่อค่าย (`Riot`, `EA`, `Epic`, `Ubisoft`, `BattleNet`, `GOG`, `Rockstar`, `Amazon`, `Nexon`) ตัวสแกนโฟลเดอร์จะไม่นับโฟลเดอร์เหล่านี้เป็นเกมซ้ำ | `product_settings.yaml` ที่ `OSYNC.bat` → `1` คัดไว้ใน `System\Data\Riot` · อัปเดตเกมใน Riot Client จนขึ้น Play ก่อนกด `1` |
+| EA app | `Launchers\EA` | ไดรฟ์ที่แชร์ เช่น `X:\OSYNC\GAME\EA` (EA app → Settings → Download) | registry `Install Dir` ของเกมที่มี `__Installer\installerdata.xml` · เกมที่รู้ offer id ใส่ `Settings\extra-games.json` → `eaOffers` จะเปิดเกมตรง |
+| Epic Games | `Launchers\Epic` | ไดรฟ์ที่แชร์ เช่น `X:\OSYNC\GAME\Epic` (เลือกตอนกด Install) | รายการติดตั้งของ Epic (`InstallLocation`) |
+| Ubisoft, Battle.net, GOG, Rockstar, Amazon, Nexon | `Launchers\<ชื่อ>` | ไดรฟ์ที่แชร์ เช่น `X:\OSYNC\GAME\<ชื่อค่าย>` | รายการ "Installed apps" ของ Windows ที่ชี้ไปไดรฟ์ที่แชร์ (จัดหมวดตามผู้ผลิต) |
+| HoYoPlay (Genshin, Star Rail, ZZZ ...) | `Launchers\HoYoPlay` | ค่าเริ่มของมัน `Launchers\HoYoPlay\games` หรือ `GAME\HoYoPlay\<เกม>` (ย้ายแล้วกด "Locate game" ใน HoYoPlay) | สแกนโฟลเดอร์ |
+| Garena และเกมออนไลน์ที่เปิดจาก exe | `Launchers\Garena` | `GAME\Garena\<เกม>` หรือ `GAME\Online\<เกม>` | สแกนโฟลเดอร์ |
+| เกมชนิดอื่น | — | `GAME\<หมวด>\<เกม>`: `Online`, `PvP`, `Mobile`, `Single Player` (หรือ `Offline`), `Gacha`, `Emulator`, `Web` | สแกนโฟลเดอร์ · ชื่อโฟลเดอร์หมวด = หมวดในเมนู |
+| โปรแกรมของร้าน (Discord, RustDesk ...) | — | `X:\OSYNC\Tools\<ชื่อ>` | ไม่ขึ้นเป็นเกม · อยากให้ขึ้นเมนู ใส่ใน `Settings\extra-games.json` |
+
+- **สแกนโฟลเดอร์ทำงานยังไง:** ดูทุกโฟลเดอร์เกม (`GAME\` + `GameFolders`) และ `X:\Games\<หมวด>`, `X:\<หมวด>` ทุกไดรฟ์ D-Z · โฟลเดอร์เกมที่ยังไม่มีในเมนู = เลือกไฟล์ `.exe` ที่น่าจะเป็นตัวเปิดเอง (ชื่อมี launcher / start / play หรือคล้ายชื่อโฟลเดอร์ ไม่ใช่ setup / updater / anticheat) แล้วขึ้นคำเตือน `AUTO added <เกม> [หมวด] -> <exe>  (check it once)` ให้ตรวจครั้งเดียว
+- **ถ้าเดาผิด หรือเกมอยู่นอกโฟลเดอร์เหล่านี้:** ใส่ใน `Settings\extra-games.json` → `games`
+  `{ "id": "ชื่อสั้น", "title": "ชื่อที่โชว์", "cat": "Online", "platform": "Garena", "exe": "X:\\...\\game.exe", "root": "X:\\...", "args": "" }` · ซ่อนการ์ดที่ไม่ต้องการ: `{ "id": "auto-...", "hide": true }`
+- **ห้ามลงเกมไว้ใน C:** ของเครื่องแม่ (เครื่องลูกมองไม่เห็น) และอย่าลงซ้อนใน `Launchers\` ยกเว้นค่าเริ่มของ Steam / HoYoPlay
+
 ---
 
 ## 4. ติดตั้งทีละขั้น
@@ -199,7 +226,7 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 
 1. ติดตั้ง **Node.js LTS** จาก nodejs.org ก่อน (ใช้ build เมนูในข้อ 5)
 2. โหลด zip: https://github.com/fbpinote-svg/OSYNC → **Code** → **Download ZIP**
-3. แตก zip ไว้ที่ไหนก็ได้ เช่น `Downloads\OSYNC-main` **โฟลเดอร์นี้ไม่ใช่ที่ใช้งานจริง** ตัวติดตั้งคัดลอกไปที่ที่เลือกให้ ลบโฟลเดอร์นี้ทิ้งได้หลังติดตั้งเสร็จ
+3. แตก zip ไว้ที่ไหนก็ได้ เช่น `Downloads\OSYNC-main` **โฟลเดอร์นี้ไม่ใช่ที่ใช้งานจริง** ตัวติดตั้งคัดลอกไปที่ที่เลือกให้ ลบโฟลเดอร์นี้ทิ้งได้หลังติดตั้งเสร็จ · อย่ากด `OSYNC.bat` ในโฟลเดอร์นี้ (ระบบจะหยุดและบอกให้ใช้ `EASY-INSTALL.bat`)
 4. ดับเบิลคลิก `EASY-INSTALL.bat` ในโฟลเดอร์ที่แตก
 5. ขั้นต่อไปเหมือน[วิธี A](#41-วิธี-a-osync-setupexe) ข้อ 3-8 ต่างกันข้อเดียว: หลังตั้งชื่อร้านจะขึ้น
    `the menu program is not built yet (a project download has only its source) ...` เป็นเรื่องปกติ ข้อ 5 ขั้น 4 จะ build ให้
@@ -321,6 +348,7 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 
 | อาการ / ข้อความ | สาเหตุ | แก้ |
 |---|---|---|
+| `This folder is a download of OSYNC, not an installed OSYNC - nothing was done.` | ดับเบิลคลิก `OSYNC.bat` ในโฟลเดอร์ที่แตกจาก zip (ยังไม่ได้ติดตั้ง ระบบกันไว้ไม่ให้ทำอะไร) | ดับเบิลคลิก `EASY-INSTALL.bat` ในโฟลเดอร์เดียวกัน |
 | `Windows protected your PC` ตอนเปิด exe | ไฟล์ไม่ได้เซ็นชื่อดิจิทัล | **More info** → **Run anyway** |
 | `This file has no OSYNC inside.` | ไฟล์ exe เสียหรือโหลดไม่ครบ | ขอไฟล์ใหม่ |
 | `diskless server: NOT FOUND` | รันบนเครื่องที่ไม่ใช่เครื่องแม่ หรือ diskless ที่โค้ดไม่รู้จัก | รันบนเครื่องแม่ · ถ้าเป็น diskless ตัวอื่น ติดตั้งต่อได้ แต่ตรวจ `SharedDrives` เอง |
@@ -334,6 +362,31 @@ OSYNC plan for DESKTOP-3ORJAGC   2026-11-20 20:02   (read only - nothing was cha
 | launcher ขอติดตั้งใหม่บนเครื่องลูก | launcher ยังอยู่บน C: ของเครื่องแม่ | `OSYNC.bat` → `4` ขั้น 2 ย้ายเข้า `Launchers\` แล้วทำ Image ใหม่ |
 
 บทเรียนอื่นที่เคยเจอในร้านจริง: [KNOWLEDGE.md](KNOWLEDGE.md)
+
+---
+
+## 11. ให้ AI ของร้านอื่นติดตั้งให้
+
+AI (เช่น Claude Code) ทำงานส่วนใหญ่ได้เอง: ตรวจเครื่อง, ติดตั้ง, ตั้งค่า, ย้าย launcher, build เมนู, อัปเดตเครื่องลูก, ตรวจระบบ แต่ **ไม่ใช่ 100%** มีขั้นที่คนต้องทำเองเสมอ:
+- กด Yes ที่หน้าต่าง UAC ของ Windows
+- ล็อกอินบัญชี launcher (Steam, Riot, EA, Epic ...) รหัสผ่านและรหัสยืนยัน และกดยอมรับข้อตกลงของแต่ละโปรแกรม
+- ตั้งค่าในโปรแกรม diskless: เพิ่มไดรฟ์เกม, โหมด super, บันทึก Image
+- ตั้ง IP ตายตัวที่เราเตอร์ และเปิด / รีบูตเครื่องลูกเพื่อทดสอบเกมจริง
+- อนุญาตให้ดาวน์โหลดโปรแกรมเสริม (`Tools\`) และซื้อเกม / บัญชี
+
+ขั้นตอนสำหรับ AI ทีละขั้น พร้อมจุดที่ต้องหยุดถามเจ้าของร้าน: [SETUP-AI.md](SETUP-AI.md) (บอก AI ว่า "อ่าน System\Docs\SETUP-AI.md แล้วติดตั้งตามนั้น")
+
+**AI จะสัมภาษณ์ก่อนติดตั้งเสมอ** ([SETUP-AI ข้อ 2](SETUP-AI.md#2-สัมภาษณ์เจ้าของร้าน-ต้องครบก่อนติดตั้ง)) ถามทีละหัวข้อ แล้วสรุปแผนให้ตกลงก่อนลงมือ เตรียมคำตอบเหล่านี้ไว้:
+
+| หัวข้อ | สิ่งที่ AI จะถาม |
+|---|---|
+| ร้านและเครื่องลูก | ชื่อร้าน + โลโก้, ยี่ห้อ diskless, จำนวนเครื่องลูก + ชื่อ + ช่วง IP, Image กี่ตัว (Windows 10 / 11), เวลาเปิดปิดร้าน |
+| ไดรฟ์ | แต่ละไดรฟ์ใช้ทำอะไร, ไดรฟ์ไหนห้ามแตะ (Image / write-back), เครื่องลูกเห็นไดรฟ์ไหน, ในไดรฟ์มีอะไรอยู่แล้ว, จะวาง OSYNC ที่ไหน, เกมแต่ละค่ายลงไดรฟ์ไหน, ไดรฟ์ไหนใกล้เต็ม |
+| launcher และเกม | launcher ครบหรือยัง ต้องการเพิ่มตัวไหน, บัญชีของร้านหรือลูกค้าล็อกอินเอง, เกมที่ต้องมีลงครบ / อัปเดตหรือยัง ต้องการลงเพิ่มเกมไหน, เกมนอก launcher, เกมที่มีกันโกงระดับ kernel, เกมที่ไม่อยากให้ขึ้นเมนู |
+| งานตอนบูต | ไมค์ (WO Mic / VB-CABLE), เล่นทางไกล (Parsec / Sunshine / OSLink), จอเสมือน, ล้างล็อกอิน, ห้ามลูกค้าปิดเครื่อง, ไอคอนเดสก์ท็อป, โปรแกรมเสริมใน `Tools\` |
+| ระบบเดิม | เมนูเกม / ระบบอัปเดตเกมที่ใช้อยู่ ใช้คู่หรือแทน, สิ่งที่ห้ามยุ่งเด็ดขาด |
+
+AI จะไม่ถามรหัสผ่าน ล็อกอินบัญชีต่างๆ ให้เจ้าของร้านทำเอง
 
 ---
 [← สารบัญเอกสาร](README.md) · [02 ติดตั้ง / อัปเดต / ทำ Image →](02-INSTALL-UPDATE.md)

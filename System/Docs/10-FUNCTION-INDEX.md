@@ -1,6 +1,6 @@
 ﻿# 10 · ดัชนีฟังก์ชันทั้งหมด (สร้างจากโค้ดอัตโนมัติ)
 
-ไฟล์โค้ด 84 ไฟล์ · ฟังก์ชัน 635 ตัว · สร้างเมื่อ 20 Nov 2026 20:16 จากโค้ดใน repo นี้
+ไฟล์โค้ด 84 ไฟล์ · ฟังก์ชัน 635 ตัว · สร้างเมื่อ 20 Nov 2026 20:22 จากโค้ดใน repo นี้
 
 - **PowerShell** อ่านด้วยตัวแยกโค้ดของ PowerShell เอง (AST) จึงได้ชื่อ บรรทัด และพารามิเตอร์ตรงกับโค้ดจริงทุกตัว
 - **JavaScript / JSX** (เมนูเกม) หาจากรูปแบบ `function x(` / `const x = (...) =>` / เมธอดในออบเจ็กต์ ตัวที่เขียนแบบอื่นอาจไม่อยู่ในรายการ
@@ -1278,15 +1278,15 @@
 <a id="system-scripts-osync-ps1"></a>
 ### System/Scripts/OSYNC.ps1
 
-170 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
+179 บรรทัด · 5 ฟังก์ชัน · พารามิเตอร์ของสคริปต์: `Action`, `Arg` · [เปิดไฟล์](../Scripts/OSYNC.ps1)
 
 | # | ฟังก์ชัน | บรรทัด | พารามิเตอร์ | หมายเหตุในโค้ด |
 |---|---|---|---|---|
-| 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L15) | 15-15 | - |  |
-| 2 | [`Ask`](../Scripts/OSYNC.ps1#L16) | 16-16 | `q` |  |
-| 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L17) | 17-23 | - |  |
-| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L25) | 25-98 | `a`, `x` |  |
-| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L100) | 100-133 | - |  |
+| 1 | [`Pause-End`](../Scripts/OSYNC.ps1#L24) | 24-24 | - |  |
+| 2 | [`Ask`](../Scripts/OSYNC.ps1#L25) | 25-25 | `q` |  |
+| 3 | [`Choose-Launcher`](../Scripts/OSYNC.ps1#L26) | 26-32 | - |  |
+| 4 | [`Invoke-Action`](../Scripts/OSYNC.ps1#L34) | 34-107 | `a`, `x` |  |
+| 5 | [`Show-Tools`](../Scripts/OSYNC.ps1#L109) | 109-142 | - |  |
 
 <a id="system-scripts-setup-install-ps1"></a>
 ### System/Scripts/Setup-Install.ps1
